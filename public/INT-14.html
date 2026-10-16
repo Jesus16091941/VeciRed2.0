@@ -817,6 +817,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var categoryBox = issueSection ? issueSection.querySelector('.bg-surface-subtle.border-blue-200\\/90') : null;
   if (!categoryBox && issueSection) categoryBox = issueSection.querySelector('[class*="border-blue-200"]');
   var categoryName = categoryBox ? categoryBox.querySelector('.text-sm.font-bold') : null;
+  var categoryIcon = categoryBox ? categoryBox.querySelector('.w-10.h-10 i') : null;
   var confidence = categoryBox ? categoryBox.querySelector('.rounded-full') : null;
   var changeCategoryButton = categoryBox ? Array.from(categoryBox.querySelectorAll('button')).find(function (b) { return /Cambiar Categoría/i.test(b.textContent); }) : null;
   var specialtyContainer = issueSection ? Array.from(issueSection.querySelectorAll('.flex.flex-wrap')).slice(-1)[0] : null;
@@ -847,7 +848,22 @@ document.addEventListener('DOMContentLoaded', function () {
       };
     });
   }
+  function updateCategoryIcon(category) {
+    if (!categoryIcon) return;
+    var icons = {
+      'Gasfitería': 'fa-faucet-drip',
+      'Electricidad': 'fa-bolt',
+      'Cerrajería': 'fa-key',
+      'Carpintería': 'fa-hammer',
+      'Climatización': 'fa-fan',
+      'Pintura y muros': 'fa-paint-roller',
+      'Albañilería': 'fa-trowels'
+    };
+    categoryIcon.className = 'fa-solid ' + (icons[category] || 'fa-screwdriver-wrench') + ' text-base';
+  }
+
   function refreshCategory() {
+    updateCategoryIcon(category);
     var detected = detectCategory(textarea.value);
     var category = manualCategory && currentCategory ? currentCategory : (detected || categoryFromDirectTechnician() || 'Gasfitería');
     currentCategory = category;
@@ -877,6 +893,7 @@ document.addEventListener('DOMContentLoaded', function () {
     select.addEventListener('change', function () {
       currentCategory = select.value;
       manualCategory = true;
+      updateCategoryIcon(currentCategory);
       if (categoryName) categoryName.textContent = currentCategory + ' · selección manual';
       renderSpecialties(currentCategory);
       renderSuggestions(currentCategory);
