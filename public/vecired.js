@@ -1038,7 +1038,8 @@
         return String(user.correo || '').trim().toLowerCase() === email;
       });
       var nextName = matched && matched.nombre ? matched.nombre.split(' ')[0] : '';
-      if (email !== supportContactEmail) {
+      var changed = email !== supportContactEmail;
+      if (changed) {
         supportContactEmail = email;
         supportContactName = nextName;
         state.messages = [];
@@ -1048,7 +1049,7 @@
         if (chipsHost) setChips(null);
         save();
       }
-      return true;
+      return changed;
     }
 
     function timeLabel(ts) {
