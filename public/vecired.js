@@ -1396,8 +1396,9 @@
       var name = user && user.nombre ? user.nombre : '';
       var accountHomeLink = header.querySelector('#headerAccountHomeLink');
       var publishRequestLink = header.querySelector('#headerPublishRequestLink');
+      var isProfessional = !!(user && user.rol === 'tech' && ['certificado', 'experiencia'].indexOf(user.perfil) !== -1);
       if (accountHomeLink) {
-        if (user && user.rol === 'tech') {
+        if (isProfessional) {
           accountHomeLink.href = 'INT-08.html';
           accountHomeLink.textContent = 'Mi perfil profesional';
         } else if (user && user.rol === 'admin') {
