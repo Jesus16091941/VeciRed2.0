@@ -1341,7 +1341,10 @@
 
   /* Sincroniza los banners de acceso que contienen ambos enlaces y las sesiones entre pestañas. */
   function renderAccountBanners() {
-    var user = users.current();
+    // Registro, acceso y recuperación siempre se muestran como páginas para visitantes.
+    var AUTH_PAGES = ['INT-02', 'INT-03', 'INT-03.5', 'INT-04', 'INT-05'];
+    var isAuthPage = AUTH_PAGES.indexOf(PAGE) !== -1;
+    var user = isAuthPage ? null : users.current();
     document.querySelectorAll('header').forEach(function (header) {
       var guestLinks = header.querySelector('#headerGuestLinks');
       var userMenu = header.querySelector('#headerUserMenu');
@@ -1432,6 +1435,8 @@
   }
 
   window.addEventListener('storage', function (event) {
+    // Estas páginas no participan en la sincronización visual de la sesión.
+    if (['INT-02', 'INT-03', 'INT-03.5', 'INT-04', 'INT-05'].indexOf(PAGE) !== -1) return;
     if (event.key !== 'vecired:session-sync' || !event.newValue) return;
     var sync;
     try { sync = JSON.parse(event.newValue); } catch (e) { return; }
