@@ -34,7 +34,7 @@
 
   <a id="btnGarantia" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 cursor-pointer" data-path="garantia-de-confianza" href="INT-00-teryser.html">Garantía de confianza</a>
 </nav><div id="headerAccount" class="relative flex items-center gap-space-md">
-  <div id="headerGuestLinks" class="hidden sm:inline-block font-label-md text-label-md text-on-surface-variant"><a href="INT-02.html" class="hover:text-primary transition-colors">¿Ya tienes cuenta?</a> <a href="INT-04.html" class="font-semibold text-primary underline decoration-outline-variant hover:opacity-80">Iniciar Sesión</a></div>
+  <div id="headerGuestLinks" class="hidden font-label-md text-label-md text-on-surface-variant"><a href="INT-02.html" class="hover:text-primary transition-colors">¿Ya tienes cuenta?</a> <a href="INT-04.html" class="font-semibold text-primary underline decoration-outline-variant hover:opacity-80">Iniciar Sesión</a></div>
   <div id="headerUserMenu" class="hidden relative">
     <button id="headerUserButton" type="button" aria-expanded="false" aria-controls="headerUserDropdown" class="flex items-center gap-2 rounded-full hover:bg-surface-container-low px-2 py-1.5 transition-colors">
       <span id="headerUserName" class="font-label-md text-label-md text-primary font-semibold max-w-[150px] truncate"></span>
@@ -955,6 +955,8 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('headerDropdownUserName').textContent = user.nombre;
     const initials = user.nombre.trim().split(/\s+/).filter(Boolean).slice(0, 2).map(part => part.charAt(0)).join('').toUpperCase();
     document.getElementById('headerUserInitial').textContent = initials || 'U';
+  } else {
+    guestLinks.classList.remove('hidden');
   }
 
   userButton.addEventListener('click', function (event) {
