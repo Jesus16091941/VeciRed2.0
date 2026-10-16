@@ -1495,6 +1495,7 @@
       var lastSync = null;
       try { lastSync = JSON.parse(localStorage.getItem('vecired:session-sync')); } catch (e) { /* sincronización no disponible */ }
       if (currentUser || (lastSync && lastSync.action === 'login' && lastSync.user)) {
+        alert('Ya tienes una sesión iniciada en VeciRed. Para evitar iniciar otra sesión o registrar una cuenta mientras estás conectado, volverás a la página principal. Si necesitas cambiar de cuenta, cierra primero la sesión actual desde el menú de tu perfil.');
         location.replace('INT-01.html');
         return;
       }
