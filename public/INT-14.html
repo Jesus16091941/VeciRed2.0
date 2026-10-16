@@ -902,8 +902,8 @@ document.addEventListener('DOMContentLoaded', function () {
   if (urgencyToggle) {
     urgencyToggle.addEventListener('change', function () {
       var banner = urgencyToggle.closest('section') || urgencyToggle.parentElement.parentElement;
-      var title = document.querySelector('h3');
-      if (title && /Modo Urgencia/.test(title.textContent)) title.textContent = urgencyToggle.checked ? 'Modo Urgencia: Atención Inmediata Hoy' : 'Solicitud programada: atención según disponibilidad';
+      var title = Array.from(document.querySelectorAll('h3')).find(function (h) { return /Modo Urgencia|Solicitud programada/.test(h.textContent); });
+      if (title) title.textContent = urgencyToggle.checked ? 'Modo Urgencia: Atención Inmediata Hoy' : 'Solicitud programada: atención según disponibilidad';
       updatePublishButton();
     });
   }
@@ -1060,11 +1060,12 @@ document.addEventListener('DOMContentLoaded', function () {
     var tech=directRequests[technician];
     var label=publishButton.querySelector('span');
     var category=currentCategory||categoryFromDirectTechnician()||'servicio';
+    var matchingTech=tech && tech.category===category ? tech : null;
     var action=urgencyToggle && !urgencyToggle.checked ? 'Publicar solicitud' : 'Publicar urgencia';
-    var text=action+(tech?' para '+tech.name:'')+' · '+category+' ('+km+' km)';
+    var text=action+(matchingTech?' para '+matchingTech.name:'')+' · '+category+' ('+km+' km)';
     if(label) label.textContent=text;
     var query=new URLSearchParams();
-    if(technician) query.set('tecnico',technician);
+    if(matchingTech) query.set('tecnico',technician);
     query.set('categoria',category);
     query.set('radio',String(selectedRadius));
     query.set('fecha',selectedDate);
