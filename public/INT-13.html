@@ -493,6 +493,7 @@
 
 
 <script id="vr-public-profile-dynamic">
+document.addEventListener('DOMContentLoaded', function () {
 (function () {
   'use strict';
   var profiles = {
@@ -605,6 +606,7 @@
     : 'Identidad y antecedentes revisados por VeciRed; credenciales profesionales registradas en el perfil.';
   document.querySelectorAll('[data-vr-public-profile-link]').forEach(function (link) { link.href = 'INT-13.html?profile=' + encodeURIComponent(profile.id); });
 })();
+});
 </script>
 
 <!-- Banner compartido (replicado desde INT-01) -->
