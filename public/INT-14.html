@@ -207,8 +207,8 @@
           </p>
 <!-- Textarea -->
 <div class="relative">
-<textarea class="w-full rounded-xl border border-slate-300 p-3.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none shadow-xs font-normal leading-relaxed" placeholder="Ej: Tengo una fuga continua debajo del lavaplatos que empezó anoche. El agua gotea por la llave de paso y ya mojó el mueble. Necesito que venga alguien a revisar y cambiar el empaque o tubería flexible..." rows="4">Tengo una fuga constante de agua bajo el mueble del lavaplatos en la cocina. Parece que la llave de paso o el sifón se agrietaron y gotea sin parar. Se necesita cambio urgente de tubería flexible y sellado.</textarea>
-<div class="absolute bottom-2.5 right-3 text-[11px] text-slate-400 font-medium">
+<textarea id="serviceDescription" maxlength="500" class="w-full rounded-xl border border-slate-300 p-3.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none shadow-xs font-normal leading-relaxed" placeholder="Ej: Tengo una fuga continua debajo del lavaplatos que empezó anoche. El agua gotea por la llave de paso y ya mojó el mueble. Necesito que venga alguien a revisar y cambiar el empaque o tubería flexible..." rows="4">Tengo una fuga constante de agua bajo el mueble del lavaplatos en la cocina. Parece que la llave de paso o el sifón se agrietaron y gotea sin parar. Se necesita cambio urgente de tubería flexible y sellado.</textarea>
+<div id="serviceDescriptionCounter" class="absolute bottom-2.5 right-3 text-[11px] text-slate-400 font-medium">
               184 / 500 caracteres
             </div>
 </div>
@@ -719,5 +719,34 @@
 </div>
 </div>
 </footer>
+
+<script id="vr-direct-technician-request">
+document.addEventListener('DOMContentLoaded', function () {
+  var params = new URLSearchParams(window.location.search);
+  var technician = params.get('tecnico');
+  var textarea = document.getElementById('serviceDescription');
+  var counter = document.getElementById('serviceDescriptionCounter');
+
+  var emergencyMessages = {
+    roberto: 'Urgencia: tengo una fuga de agua debajo del lavaplatos y no deja de gotear. Necesito revisar y reparar la llave de paso o el sifón cuanto antes.',
+    lucia: 'Urgencia eléctrica: el automático del tablero se dispara y me quedé sin luz en parte de la casa. Necesito una revisión segura lo antes posible.',
+    carlos: 'Urgencia: la cerradura de la puerta quedó trabada y no puedo abrirla. Necesito ayuda para revisar la cerradura y recuperar el acceso cuanto antes.'
+  };
+
+  if (textarea && emergencyMessages[technician]) {
+    textarea.value = emergencyMessages[technician];
+  }
+
+  function updateCounter() {
+    if (textarea && counter) {
+      counter.textContent = textarea.value.length + ' / 500 caracteres';
+    }
+  }
+
+  if (textarea) textarea.addEventListener('input', updateCounter);
+  updateCounter();
+});
+</script>
+
 </body>
 </html>
