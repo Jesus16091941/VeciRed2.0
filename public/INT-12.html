@@ -5,6 +5,79 @@
 <link rel="stylesheet" href="vecired.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
 <script src="vecired.js" defer></script>
+
+<style>
+/* INT-12 responsive layout repair */
+main > div > div > .grid.grid-cols-1 {
+  height: calc(100vh - 190px) !important;
+  min-height: 560px !important;
+  align-items: stretch;
+}
+main > div > div > .grid.grid-cols-1 > section {
+  min-width: 0;
+  min-height: 0;
+}
+main > div > div > .grid.grid-cols-1 > section:first-child {
+  min-height: 0;
+}
+main > div > div > .grid.grid-cols-1 > section:last-child {
+  min-height: 0;
+}
+main [data-vr-map="tecnicos"] {
+  min-height: 0;
+}
+@media (max-width: 1023px) {
+  main > div > div > .grid.grid-cols-1 {
+    height: auto !important;
+    min-height: 0 !important;
+    grid-template-rows: minmax(480px, 62vh) auto;
+    gap: 1rem;
+  }
+  main > div > div > .grid.grid-cols-1 > section:first-child {
+    height: min(62vh, 620px) !important;
+    min-height: 480px;
+  }
+  main > div > div > .grid.grid-cols-1 > section:last-child {
+    height: auto !important;
+    min-height: 0;
+    overflow: visible !important;
+  }
+  main > div > div > .grid.grid-cols-1 > section:last-child > div:first-child {
+    flex-wrap: wrap;
+    gap: .75rem;
+  }
+  main > div > div > .grid.grid-cols-1 > section:last-child > div:first-child > div:last-child {
+    max-width: 100%;
+  }
+  main > div > div > .grid.grid-cols-1 > section:last-child > div:nth-child(2) {
+    flex: initial;
+    overflow: visible;
+    max-height: none;
+  }
+}
+@media (max-width: 640px) {
+  main > div > section {
+    padding-left: .75rem;
+    padding-right: .75rem;
+  }
+  main > div > div > .grid.grid-cols-1 {
+    padding-left: .75rem;
+    padding-right: .75rem;
+    grid-template-rows: 460px auto;
+  }
+  main > div > div > .grid.grid-cols-1 > section:first-child {
+    height: 460px !important;
+    min-height: 460px;
+  }
+  main > div > div > .grid.grid-cols-1 > section:last-child > div:first-child {
+    align-items: flex-start;
+  }
+  main > div > div > .grid.grid-cols-1 > section:last-child > div:first-child select {
+    max-width: 100%;
+  }
+}
+</style>
+
 </head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(15,41,66,0.06)]"><div class="h-20 w-full px-space-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm"><img alt="Brand logo. - Primary color: #0f2942
 - Font: plusJakartaSans
 - Mode: light
