@@ -1435,8 +1435,9 @@
   }
 
   window.addEventListener('storage', function (event) {
-    // Estas páginas no participan en la sincronización visual de la sesión.
-    if (['INT-02', 'INT-03', 'INT-03.5', 'INT-04', 'INT-05'].indexOf(PAGE) !== -1) return;
+    // Registro y recuperación no participan en la sincronización visual.
+    // INT-04 sí debe reaccionar a los cambios de sesión en otras pestañas.
+    if (['INT-02', 'INT-03', 'INT-03.5', 'INT-05'].indexOf(PAGE) !== -1) return;
     if (event.key !== 'vecired:session-sync' || !event.newValue) return;
     var sync;
     try { sync = JSON.parse(event.newValue); } catch (e) { return; }
@@ -1449,6 +1450,11 @@
         sessionStorage.setItem('vecired:role', JSON.stringify(sync.role || 'client'));
       }
     } catch (e) { /* almacenamiento no disponible */ }
+
+    if (PAGE === 'INT-04' && sync.action === 'login') {
+      location.replace('INT-01.html');
+      return;
+    }
     renderAccountBanners();
     bindCurrentUser();
   });
@@ -1482,6 +1488,16 @@
   }
 
   function boot() {
+    // INT-04 solo se puede usar cuando no existe una sesión activa en este navegador.
+    if (PAGE === 'INT-04') {
+      var currentUser = users.current();
+      var lastSync = null;
+      try { lastSync = JSON.parse(localStorage.getItem('vecired:session-sync')); } catch (e) { /* sincronización no disponible */ }
+      if (currentUser || (lastSync && lastSync.action === 'login' && lastSync.user)) {
+        location.replace('INT-01.html');
+        return;
+      }
+    }
     renderAccountBanners();
     bindCurrentUser();
     wireScrollbar();
