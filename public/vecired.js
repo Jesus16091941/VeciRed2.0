@@ -1014,6 +1014,7 @@
     ];
 
     var host, log, input, sendBtn, chipsHost, lastTrigger, fallbackCount = 0, busy = false, pending = [];
+    var supportContactName = '', supportContactEmail = '';
     var state = store.get(CHAT_KEY) || { messages: [], open: false };
 
     function save() { store.set(CHAT_KEY, state); }
@@ -1023,8 +1024,31 @@
     }
 
     function firstName() {
+      if (supportContactName) return supportContactName;
       var user = users.current && users.current();
       return user && user.nombre ? user.nombre.split(' ')[0] : '';
+    }
+
+    function identifyRecoveryContact(trigger) {
+      if (PAGE !== 'INT-05' || !trigger) return false;
+      var emailField = document.getElementById('email');
+      var email = emailField ? emailField.value.trim().toLowerCase() : '';
+      if (!email) return false;
+      var matched = users.list().find(function (user) {
+        return String(user.correo || '').trim().toLowerCase() === email;
+      });
+      var nextName = matched && matched.nombre ? matched.nombre.split(' ')[0] : '';
+      if (email !== supportContactEmail) {
+        supportContactEmail = email;
+        supportContactName = nextName;
+        state.messages = [];
+        state.open = true;
+        fallbackCount = 0;
+        if (log) log.querySelectorAll('.vr-chat__row').forEach(function (row) { row.remove(); });
+        if (chipsHost) setChips(null);
+        save();
+      }
+      return true;
     }
 
     function timeLabel(ts) {
@@ -1224,12 +1248,19 @@
 
     function open(trigger) {
       if (!host) build();
+      var recoveryContact = identifyRecoveryContact(trigger);
       lastTrigger = trigger || document.activeElement;
       host.hidden = false;
       requestAnimationFrame(function () { host.classList.add('vr-chat--open'); });
       state.open = true;
       save();
-      if (!state.messages.length && !busy) greet();
+      if ((!state.messages.length || recoveryContact) && !busy) {
+        if (recoveryContact && !supportContactName && supportContactEmail) {
+          agentSays(['¡Hola! No pude asociar ese correo con una cuenta registrada en este navegador, pero igual puedo ayudarte.', 'Cuéntame qué necesitas resolver o elige uno de estos temas para empezar.'], MAIN_CHIPS);
+        } else {
+          greet();
+        }
+      }
       log.scrollTop = log.scrollHeight;
       input.focus();
     }
