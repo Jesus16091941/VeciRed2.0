@@ -1488,8 +1488,9 @@
   }
 
   function boot() {
-    // INT-04 solo se puede usar cuando no existe una sesión activa en este navegador.
-    if (PAGE === 'INT-04') {
+    // Inicio de sesión y registro solo están disponibles sin una sesión activa.
+    var SESSION_GUARD_PAGES = ['INT-02', 'INT-03', 'INT-03.5', 'INT-04'];
+    if (SESSION_GUARD_PAGES.indexOf(PAGE) !== -1) {
       var currentUser = users.current();
       var lastSync = null;
       try { lastSync = JSON.parse(localStorage.getItem('vecired:session-sync')); } catch (e) { /* sincronización no disponible */ }
