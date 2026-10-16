@@ -52,6 +52,9 @@
     },
     set: function (key, value) {
       try { sessionStorage.setItem('vecired:' + key, JSON.stringify(value)); } catch (e) { /* almacenamiento no disponible */ }
+      if (key === 'user' && value) {
+        try { localStorage.setItem('vecired:session-sync', JSON.stringify({ action: 'login', user: value, role: value.rol === 'tech' ? 'tech' : value.rol === 'admin' ? 'admin' : 'client', timestamp: Date.now() })); } catch (e) { /* sincronización entre pestañas no disponible */ }
+      }
     }
   };
 
@@ -138,7 +141,10 @@
       localStorage.setItem(USERS_KEY, JSON.stringify(list));
     },
     current: function () { return store.get('user'); },
-    logout: function () { try { sessionStorage.removeItem('vecired:user'); } catch (e) { /* sin almacenamiento */ } },
+    logout: function () {
+      try { sessionStorage.removeItem('vecired:user'); sessionStorage.removeItem('vecired:role'); } catch (e) { /* sin almacenamiento */ }
+      try { localStorage.setItem('vecired:session-sync', JSON.stringify({ action: 'logout', timestamp: Date.now() })); } catch (e) { /* sincronización entre pestañas no disponible */ }
+    },
     clear: function () { localStorage.removeItem(USERS_KEY); users.logout(); },
     updateCurrent: function (patch) {
       var current = users.current();
@@ -1333,6 +1339,115 @@
     window.addEventListener('scroll', function () { show(); hideSoon(); }, { passive: true });
   }
 
+  /* Sincroniza los banners de acceso que contienen ambos enlaces y las sesiones entre pestañas. */
+  function renderAccountBanners() {
+    var user = users.current();
+    document.querySelectorAll('header').forEach(function (header) {
+      var guestLinks = header.querySelector('#headerGuestLinks');
+      var userMenu = header.querySelector('#headerUserMenu');
+      var guestAvatar = header.querySelector('#headerGuestAvatar');
+
+      if (!guestLinks || !userMenu) {
+        var links = Array.prototype.slice.call(header.querySelectorAll('a'));
+        var registerLink = links.find(function (a) { return a.textContent.trim() === '¿Ya tienes cuenta?'; });
+        var loginLink = links.find(function (a) { return a.textContent.trim() === 'Iniciar Sesión'; });
+        if (!registerLink || !loginLink) return;
+
+        var linksWrap = registerLink.parentElement;
+        while (linksWrap && linksWrap !== header && !linksWrap.contains(loginLink)) linksWrap = linksWrap.parentElement;
+        if (!linksWrap || linksWrap === header) return;
+
+        var outer = linksWrap.parentElement;
+        guestAvatar = outer && Array.prototype.slice.call(outer.children).find(function (el) {
+          return el !== linksWrap && el.classList && el.classList.contains('w-8') && el.classList.contains('h-8');
+        });
+        if (!guestAvatar) return;
+
+        guestLinks = document.createElement('div');
+        guestLinks.id = 'headerGuestLinks';
+        guestLinks.className = 'font-label-md text-label-md text-on-surface-variant';
+        guestLinks.innerHTML = '<a href="INT-02.html" class="hover:text-primary transition-colors">¿Ya tienes cuenta?</a> <a href="INT-04.html" class="font-semibold text-primary underline decoration-outline-variant hover:opacity-80">Iniciar Sesión</a>';
+
+        userMenu = document.createElement('div');
+        userMenu.id = 'headerUserMenu';
+        userMenu.className = 'hidden relative';
+        userMenu.setAttribute('data-vr-account-shared', 'true');
+        userMenu.innerHTML =
+          '<button id="headerUserButton" type="button" aria-expanded="false" aria-controls="headerUserDropdown" class="flex items-center gap-2 rounded-full hover:bg-surface-container-low px-2 py-1.5 transition-colors">' +
+            '<span id="headerUserName" class="font-label-md text-label-md text-primary font-semibold max-w-[150px] truncate"></span>' +
+            '<span class="material-symbols-outlined text-primary text-[20px]">keyboard_arrow_down</span>' +
+            '<span id="headerUserInitial" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-semibold text-sm">U</span>' +
+          '</button>' +
+          '<div id="headerUserDropdown" class="hidden absolute right-0 top-full mt-2 w-56 rounded-xl bg-surface-container-lowest border border-outline-variant/40 shadow-lg p-2 z-[60]">' +
+            '<div class="px-3 py-2 border-b border-outline-variant/30"><p class="text-xs text-on-surface-variant">Sesión iniciada como</p><p id="headerDropdownUserName" class="font-semibold text-primary text-sm truncate"></p></div>' +
+            '<a href="INT-10.html" class="block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Mi perfil</a>' +
+            '<a href="INT-14.html" class="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Publicar solicitud de servicio</a>' +
+            '<button id="headerLogoutButton" type="button" class="w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-error hover:bg-error-container/40 transition-colors">Cerrar sesión</button>' +
+          '</div>';
+
+        linksWrap.replaceWith(guestLinks, userMenu);
+        guestAvatar.id = 'headerGuestAvatar';
+      }
+
+      if (!guestLinks || !userMenu) return;
+      var name = user && user.nombre ? user.nombre : '';
+      guestLinks.classList.toggle('hidden', !!name);
+      userMenu.classList.toggle('hidden', !name);
+      if (guestAvatar) guestAvatar.classList.toggle('hidden', !!name);
+      if (name) {
+        var nameNode = header.querySelector('#headerUserName');
+        var dropdownName = header.querySelector('#headerDropdownUserName');
+        var initialNode = header.querySelector('#headerUserInitial');
+        if (nameNode) nameNode.textContent = name;
+        if (dropdownName) dropdownName.textContent = name;
+        if (initialNode) initialNode.textContent = name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map(function (part) { return part.charAt(0); }).join('').toUpperCase() || 'U';
+      }
+
+      // INT-01 ya tiene sus propios eventos; las otras páginas usan este menú compartido.
+      if (userMenu.getAttribute('data-vr-account-shared') === 'true' && !userMenu.hasAttribute('data-vr-account-wired')) {
+        userMenu.setAttribute('data-vr-account-wired', 'true');
+        var button = userMenu.querySelector('#headerUserButton');
+        var dropdown = userMenu.querySelector('#headerUserDropdown');
+        var logoutButton = userMenu.querySelector('#headerLogoutButton');
+        if (button && dropdown) {
+          button.addEventListener('click', function (event) {
+            event.stopPropagation();
+            var opening = dropdown.classList.contains('hidden');
+            dropdown.classList.toggle('hidden');
+            button.setAttribute('aria-expanded', String(opening));
+          });
+          document.addEventListener('click', function (event) {
+            if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+              dropdown.classList.add('hidden');
+              button.setAttribute('aria-expanded', 'false');
+            }
+          });
+        }
+        if (logoutButton) logoutButton.addEventListener('click', function () {
+          users.logout();
+          window.location.href = 'INT-01.html';
+        });
+      }
+    });
+  }
+
+  window.addEventListener('storage', function (event) {
+    if (event.key !== 'vecired:session-sync' || !event.newValue) return;
+    var sync;
+    try { sync = JSON.parse(event.newValue); } catch (e) { return; }
+    try {
+      if (sync.action === 'logout') {
+        sessionStorage.removeItem('vecired:user');
+        sessionStorage.removeItem('vecired:role');
+      } else if (sync.action === 'login' && sync.user) {
+        sessionStorage.setItem('vecired:user', JSON.stringify(sync.user));
+        sessionStorage.setItem('vecired:role', JSON.stringify(sync.role || 'client'));
+      }
+    } catch (e) { /* almacenamiento no disponible */ }
+    renderAccountBanners();
+    bindCurrentUser();
+  });
+
   /* Rellena los elementos [data-vr-user="campo"] con los datos de la cuenta en sesión. */
   function bindCurrentUser() {
     var u = users.current();
@@ -1362,6 +1477,7 @@
   }
 
   function boot() {
+    renderAccountBanners();
     bindCurrentUser();
     wireScrollbar();
     wireLogo();
