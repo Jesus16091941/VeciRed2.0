@@ -47,7 +47,8 @@
         <p id="headerDropdownUserName" class="font-semibold text-primary text-sm truncate"></p>
       </div>
       <a id="headerAccountHomeLink" href="INT-10.html" class="block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Inicio del vecino</a>
-      <a href="INT-14.html" class="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Publicar solicitud de servicio</a>
+      <a id="headerPublishRequestLink" href="INT-14.html" class="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Publicar solicitud de servicio</a>
+      <a id="headerPublicProfileLink" href="INT-13.html" class="hidden block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Ver mi perfil público</a>
       <button id="headerLogoutButton" type="button" class="w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-error hover:bg-error-container/40 transition-colors">Cerrar sesión</button>
     </div>
   </div>
@@ -955,12 +956,17 @@ document.addEventListener('DOMContentLoaded', function () {
     userMenu.classList.remove('hidden');
     const accountHomeLink = document.getElementById('headerAccountHomeLink');
     const publishRequestLink = userMenu.querySelector('#headerPublishRequestLink');
+    const publicProfileLink = userMenu.querySelector('#headerPublicProfileLink');
     const isProfessional = user.rol === 'tech' && ['certificado', 'experiencia'].includes(user.perfil);
     if (accountHomeLink) {
       accountHomeLink.href = isProfessional ? 'INT-08.html' : user.rol === 'admin' ? 'INT-24.html' : 'INT-10.html';
       accountHomeLink.textContent = isProfessional ? 'Mi perfil profesional' : user.rol === 'admin' ? 'Panel de administración' : 'Inicio del vecino';
     }
     if (publishRequestLink) publishRequestLink.classList.toggle('hidden', user.rol !== 'client');
+    if (publicProfileLink) {
+      publicProfileLink.href = 'INT-13.html?profile=' + encodeURIComponent(user.id || '');
+      publicProfileLink.classList.toggle('hidden', !isProfessional);
+    }
     document.getElementById('headerUserName').textContent = user.nombre;
     document.getElementById('headerDropdownUserName').textContent = user.nombre;
     const initials = user.nombre.trim().split(/\s+/).filter(Boolean).slice(0, 2).map(part => part.charAt(0)).join('').toUpperCase();
