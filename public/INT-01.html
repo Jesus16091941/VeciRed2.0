@@ -953,6 +953,14 @@ document.addEventListener('DOMContentLoaded', function () {
     guestLinks.classList.add('hidden');
     guestAvatar.classList.add('hidden');
     userMenu.classList.remove('hidden');
+    const accountHomeLink = document.getElementById('headerAccountHomeLink');
+    const publishRequestLink = userMenu.querySelector('#headerPublishRequestLink');
+    const isProfessional = user.rol === 'tech' && ['certificado', 'experiencia'].includes(user.perfil);
+    if (accountHomeLink) {
+      accountHomeLink.href = isProfessional ? 'INT-08.html' : user.rol === 'admin' ? 'INT-24.html' : 'INT-10.html';
+      accountHomeLink.textContent = isProfessional ? 'Mi perfil profesional' : user.rol === 'admin' ? 'Panel de administración' : 'Inicio del vecino';
+    }
+    if (publishRequestLink) publishRequestLink.classList.toggle('hidden', user.rol !== 'client');
     document.getElementById('headerUserName').textContent = user.nombre;
     document.getElementById('headerDropdownUserName').textContent = user.nombre;
     const initials = user.nombre.trim().split(/\s+/).filter(Boolean).slice(0, 2).map(part => part.charAt(0)).join('').toUpperCase();
