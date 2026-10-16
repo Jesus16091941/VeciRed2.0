@@ -1383,8 +1383,8 @@
           '</button>' +
           '<div id="headerUserDropdown" class="hidden absolute right-0 top-full mt-2 w-56 rounded-xl bg-surface-container-lowest border border-outline-variant/40 shadow-lg p-2 z-[60]">' +
             '<div class="px-3 py-2 border-b border-outline-variant/30"><p class="text-xs text-on-surface-variant">Sesión iniciada como</p><p id="headerDropdownUserName" class="font-semibold text-primary text-sm truncate"></p></div>' +
-            '<a href="INT-10.html" class="block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Mi perfil</a>' +
-            '<a href="INT-14.html" class="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Publicar solicitud de servicio</a>' +
+            '<a id="headerAccountHomeLink" href="INT-10.html" class="block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Inicio del vecino</a>' +
+            '<a id="headerPublishRequestLink" href="INT-14.html" class="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Publicar solicitud de servicio</a>' +
             '<button id="headerLogoutButton" type="button" class="w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-error hover:bg-error-container/40 transition-colors">Cerrar sesión</button>' +
           '</div>';
 
@@ -1394,6 +1394,21 @@
 
       if (!guestLinks || !userMenu) return;
       var name = user && user.nombre ? user.nombre : '';
+      var accountHomeLink = header.querySelector('#headerAccountHomeLink');
+      var publishRequestLink = header.querySelector('#headerPublishRequestLink');
+      if (accountHomeLink) {
+        if (user && user.rol === 'tech') {
+          accountHomeLink.href = 'INT-08.html';
+          accountHomeLink.textContent = 'Mi perfil profesional';
+        } else if (user && user.rol === 'admin') {
+          accountHomeLink.href = 'INT-24.html';
+          accountHomeLink.textContent = 'Panel de administración';
+        } else {
+          accountHomeLink.href = 'INT-10.html';
+          accountHomeLink.textContent = 'Inicio del vecino';
+        }
+      }
+      if (publishRequestLink) publishRequestLink.classList.toggle('hidden', !!(user && user.rol !== 'client'));
       guestLinks.classList.toggle('hidden', !!name);
       userMenu.classList.toggle('hidden', !name);
       if (guestAvatar) guestAvatar.classList.toggle('hidden', !!name);
