@@ -270,7 +270,7 @@
           <span>¡Acceso concedido!</span>
         `;
         VR.toast('Hola, ' + user.nombre.split(' ')[0] + ' · ' + user.tipoCuenta);
-        setTimeout(() => { location.href = VR.users.homeFor(user); }, 900);
+        setTimeout(() => { location.href = 'INT-01.html'; }, 900);
       }).catch(() => {
         restore();
         VR.toast('No se pudo iniciar sesión en este navegador.');
