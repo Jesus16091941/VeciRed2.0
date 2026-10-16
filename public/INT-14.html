@@ -723,28 +723,367 @@
 <script id="vr-direct-technician-request">
 document.addEventListener('DOMContentLoaded', function () {
   var params = new URLSearchParams(window.location.search);
-  var technician = params.get('tecnico');
+  var technician = params.get('tecnico') || '';
   var textarea = document.getElementById('serviceDescription');
   var counter = document.getElementById('serviceDescriptionCounter');
+  var urgencyToggle = document.getElementById('urgencyToggle');
+  var main = document.querySelector('main');
+  if (!main || !textarea) return;
 
-  var emergencyMessages = {
-    roberto: 'Urgencia: tengo una fuga de agua debajo del lavaplatos y no deja de gotear. Necesito revisar y reparar la llave de paso o el sifón cuanto antes.',
-    lucia: 'Urgencia eléctrica: el automático del tablero se dispara y me quedé sin luz en parte de la casa. Necesito una revisión segura lo antes posible.',
-    carlos: 'Urgencia: la cerradura de la puerta quedó trabada y no puedo abrirla. Necesito ayuda para revisar la cerradura y recuperar el acceso cuanto antes.'
+  var directRequests = {
+    roberto: {
+      name: 'Roberto D.',
+      category: 'Gasfitería',
+      message: 'Urgencia: tengo una fuga de agua debajo del lavaplatos y no deja de gotear. Necesito revisar y reparar la llave de paso o el sifón cuanto antes.',
+      specialties: ['Detección y contención de fugas', 'Reparación de grifería y sifón', 'Revisión de tuberías']
+    },
+    lucia: {
+      name: 'Lucía M.',
+      category: 'Electricidad',
+      message: 'Urgencia eléctrica: el automático del tablero se dispara y me quedé sin luz en parte de la casa. Necesito una revisión segura lo antes posible.',
+      specialties: ['Diagnóstico de tablero eléctrico', 'Revisión de circuitos', 'Detección de cortocircuitos']
+    },
+    carlos: {
+      name: 'Carlos V.',
+      category: 'Cerrajería',
+      message: 'Urgencia: la cerradura de la puerta quedó trabada y no puedo abrirla. Necesito ayuda para revisar la cerradura y recuperar el acceso cuanto antes.',
+      specialties: ['Apertura de cerraduras', 'Reparación de cilindros', 'Revisión de chapas y pestillos']
+    }
   };
 
-  if (textarea && emergencyMessages[technician]) {
-    textarea.value = emergencyMessages[technician];
-  }
+  var categories = {
+    'Gasfitería': ['fuga', 'agua', 'lavaplatos', 'sifón', 'grifo', 'grifería', 'cañería', 'tubería', 'desagüe', 'wc', 'inodoro', 'calefón', 'gas'],
+    'Electricidad': ['luz', 'eléctric', 'electric', 'enchufe', 'interruptor', 'automático', 'tablero', 'cortocircuito', 'breaker', 'cable', 'chispa', 'apagón'],
+    'Cerrajería': ['cerradura', 'llave', 'puerta trabada', 'no puedo abrir', 'chapa', 'candado', 'pestillo', 'cilindro'],
+    'Carpintería': ['mueble', 'bisagra', 'cajón', 'puerta de madera', 'repisa', 'madera'],
+    'Climatización': ['aire acondicionado', 'refrigerador', 'calefacción', 'ventilador', 'lavadora', 'electrodoméstico'],
+    'Pintura y muros': ['pintura', 'humedad', 'muro', 'pared', 'filtración en pared', 'yeso'],
+    'Albañilería': ['cerámica', 'baldosa', 'ladrillo', 'mampostería', 'piso quebrado']
+  };
+  var specialtiesByCategory = {
+    'Gasfitería': ['Detección y contención de fugas', 'Reparación de grifería y sifón', 'Revisión de tuberías'],
+    'Electricidad': ['Diagnóstico de tablero eléctrico', 'Revisión de circuitos', 'Detección de cortocircuitos'],
+    'Cerrajería': ['Apertura de cerraduras', 'Reparación de cilindros', 'Revisión de chapas y pestillos'],
+    'Carpintería': ['Reparación de puertas y bisagras', 'Ajuste de muebles', 'Reparación de cajones y repisas'],
+    'Climatización': ['Diagnóstico del equipo', 'Revisión de conexiones', 'Mantenimiento y reparación'],
+    'Pintura y muros': ['Reparación de superficies', 'Tratamiento de humedad', 'Preparación y terminaciones'],
+    'Albañilería': ['Reparación de revestimientos', 'Reposición de cerámicas', 'Reparación de muros']
+  };
+  var quickSuggestions = {
+    'Gasfitería': ['Fuga de agua activa', 'Desagüe completamente tapado', 'Grifo o sifón goteando', 'Corte de agua y revisión de tubería'],
+    'Electricidad': ['Se corta la luz al subir el automático', 'Enchufe con olor a quemado', 'Chispas en interruptor', 'Parte de la vivienda quedó sin electricidad'],
+    'Cerrajería': ['Cerradura trabada y no puedo entrar', 'Llave se atasca en la chapa', 'Cerradura dañada tras intento de apertura', 'Puerta no cierra con seguro'],
+    'Carpintería': ['Puerta no cierra por bisagra suelta', 'Cajón atascado', 'Mueble dañado', 'Reparación urgente de puerta interior'],
+    'Climatización': ['Aire acondicionado dejó de funcionar', 'Refrigerador no enfría', 'Lavadora presenta una fuga', 'Equipo hace un ruido inusual'],
+    'Pintura y muros': ['Filtración visible en muro', 'Se desprendió parte del revestimiento', 'Humedad que requiere revisión', 'Reparación localizada de pared'],
+    'Albañilería': ['Cerámica suelta en zona de paso', 'Baldosa rota', 'Daño en muro', 'Reparación localizada de revestimiento']
+  };
+  var currentCategory = '';
+  var manualCategory = false;
+  var selectedDate = 'hoy';
+  var selectedTime = 'Tarde (12:00–17:00)';
+  var selectedBudget = 'Reparación media: $12.000–$22.500 CLP';
+  var selectedRadius = 3000;
+  var selectedFiles = [];
+  var gpsLabel = 'Ubicación de referencia: Santiago Centro (GPS no confirmado)';
+  var customDateInput = null;
 
+  function make(tag, cls, text) {
+    var el = document.createElement(tag);
+    if (cls) el.className = cls;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
   function updateCounter() {
-    if (textarea && counter) {
-      counter.textContent = textarea.value.length + ' / 500 caracteres';
+    if (counter) counter.textContent = textarea.value.length + ' / 500 caracteres';
+  }
+  function detectCategory(value) {
+    var t = (value || '').toLowerCase();
+    var best = '';
+    var bestScore = 0;
+    Object.keys(categories).forEach(function (category) {
+      var score = categories[category].reduce(function (n, word) { return n + (t.indexOf(word) !== -1 ? 1 : 0); }, 0);
+      if (score > bestScore) { best = category; bestScore = score; }
+    });
+    return bestScore ? best : '';
+  }
+  function categoryFromDirectTechnician() {
+    return directRequests[technician] ? directRequests[technician].category : '';
+  }
+  var issueSection = textarea.closest('section');
+  var suggestionButtons = issueSection ? Array.from(issueSection.querySelectorAll('button')).filter(function (b) {
+    return !/Cambiar Categoría/i.test(b.textContent) && !b.closest('[data-vr-category-picker]');
+  }).slice(0, 4) : [];
+  var categoryBox = issueSection ? issueSection.querySelector('.bg-surface-subtle.border-blue-200\\/90') : null;
+  if (!categoryBox && issueSection) categoryBox = issueSection.querySelector('[class*="border-blue-200"]');
+  var categoryName = categoryBox ? categoryBox.querySelector('.text-sm.font-bold') : null;
+  var confidence = categoryBox ? categoryBox.querySelector('.rounded-full') : null;
+  var changeCategoryButton = categoryBox ? Array.from(categoryBox.querySelectorAll('button')).find(function (b) { return /Cambiar Categoría/i.test(b.textContent); }) : null;
+  var specialtyContainer = issueSection ? Array.from(issueSection.querySelectorAll('.flex.flex-wrap')).slice(-1)[0] : null;
+
+  function renderSpecialties(category) {
+    if (!specialtyContainer) return;
+    specialtyContainer.innerHTML = '';
+    specialtyContainer.appendChild(make('span', 'text-xs font-medium text-slate-500 mr-1', 'Especialidades detectadas:'));
+    var items = specialtiesByCategory[category] || ['Diagnóstico inicial del problema', 'Evaluación de seguridad', 'Reparación según revisión'];
+    items.forEach(function (item) {
+      var chip = make('span', 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 text-blue-800 text-xs font-semibold border border-blue-200');
+      chip.appendChild(make('i', 'fa-solid fa-check text-[10px]'));
+      chip.appendChild(document.createTextNode(item));
+      specialtyContainer.appendChild(chip);
+    });
+  }
+  function renderSuggestions(category) {
+    var suggestions = quickSuggestions[category] || ['Describe el síntoma principal', 'Indica desde cuándo ocurre', 'Señala si afecta a otras zonas', 'Menciona cualquier riesgo inmediato'];
+    suggestionButtons.forEach(function (button, index) {
+      if (!suggestions[index]) { button.hidden = true; return; }
+      button.hidden = false;
+      button.textContent = suggestions[index];
+      button.onclick = function () {
+        textarea.value = suggestions[index] + '. Necesito una revisión lo antes posible.';
+        manualCategory = false;
+        updateCounter();
+        refreshCategory();
+      };
+    });
+  }
+  function refreshCategory() {
+    var detected = detectCategory(textarea.value);
+    var category = manualCategory && currentCategory ? currentCategory : (detected || categoryFromDirectTechnician() || 'Gasfitería');
+    currentCategory = category;
+    if (categoryName) categoryName.textContent = category === 'Gasfitería' ? 'Gasfitería y detección de fugas' : category + ' · diagnóstico y reparación';
+    if (confidence) {
+      confidence.innerHTML = '';
+      confidence.appendChild(make('i', 'fa-solid fa-circle-check text-[9px]'));
+      confidence.appendChild(document.createTextNode(detected ? 'Coincidencia por palabras clave' : 'Revisión manual recomendada'));
+      confidence.className = 'px-2 py-0.5 rounded-full ' + (detected ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200') + ' text-[10px] font-bold flex items-center gap-1';
     }
+    renderSpecialties(category);
+    renderSuggestions(category);
+    updatePublishButton();
   }
 
-  if (textarea) textarea.addEventListener('input', updateCounter);
+  function ensureCategoryPicker() {
+    if (!categoryBox || categoryBox.querySelector('[data-vr-category-picker]')) return;
+    var wrap = make('div', 'hidden mt-3 w-full');
+    wrap.setAttribute('data-vr-category-picker', 'true');
+    var label = make('label', 'block text-xs font-semibold text-slate-700 mb-1', 'Selecciona la categoría correcta');
+    var select = make('select', 'w-full rounded-lg border border-slate-300 bg-white p-2.5 text-sm text-slate-800');
+    select.setAttribute('aria-label', 'Cambiar categoría detectada');
+    ['Gasfitería','Electricidad','Cerrajería','Carpintería','Climatización','Pintura y muros','Albañilería'].forEach(function (name) {
+      var option = make('option', '', name); option.value = name; select.appendChild(option);
+    });
+    select.value = currentCategory || 'Gasfitería';
+    select.addEventListener('change', function () {
+      currentCategory = select.value;
+      manualCategory = true;
+      if (categoryName) categoryName.textContent = currentCategory + ' · selección manual';
+      renderSpecialties(currentCategory);
+      renderSuggestions(currentCategory);
+      wrap.classList.add('hidden');
+      updatePublishButton();
+    });
+    wrap.appendChild(label); wrap.appendChild(select);
+    categoryBox.appendChild(wrap);
+  }
+  if (changeCategoryButton) changeCategoryButton.addEventListener('click', function () {
+    ensureCategoryPicker();
+    var picker = categoryBox.querySelector('[data-vr-category-picker]');
+    picker.classList.toggle('hidden');
+    var select = picker.querySelector('select');
+    if (select) select.value = currentCategory || 'Gasfitería';
+  });
+
+  // Datos iniciales del técnico, conservando la posibilidad de corregir la categoría si el texto cambia.
+  if (directRequests[technician]) textarea.value = directRequests[technician].message;
+  textarea.addEventListener('input', function () { manualCategory = false; updateCounter(); refreshCategory(); });
+
+  // Urgencia: el estado del interruptor cambia el texto explicativo y el botón de publicación.
+  if (urgencyToggle) {
+    urgencyToggle.addEventListener('change', function () {
+      var banner = urgencyToggle.closest('section') || urgencyToggle.parentElement.parentElement;
+      var title = document.querySelector('h3');
+      if (title && /Modo Urgencia/.test(title.textContent)) title.textContent = urgencyToggle.checked ? 'Modo Urgencia: Atención Inmediata Hoy' : 'Solicitud programada: atención según disponibilidad';
+      updatePublishButton();
+    });
+  }
+
+  // Archivos reales: selección, arrastrar/soltar, vista previa local y eliminación.
+  var mediaHeading = Array.from(document.querySelectorAll('h2')).find(function (h) { return /Fotos y Videos del Problema/i.test(h.textContent); });
+  var mediaSection = mediaHeading ? mediaHeading.closest('section') : null;
+  if (mediaSection) {
+    var dropzone = mediaSection.querySelector('.border-dashed.rounded-2xl');
+    var fileGrid = mediaSection.querySelector('.grid.grid-cols-2');
+    if (fileGrid) fileGrid.innerHTML = '';
+    var fileInput = make('input', 'hidden');
+    fileInput.type = 'file'; fileInput.multiple = true; fileInput.accept = 'image/*,video/mp4,video/webm,video/quicktime';
+    fileInput.setAttribute('aria-label','Seleccionar fotos o videos del problema');
+    mediaSection.appendChild(fileInput);
+    var browse = dropzone ? Array.from(dropzone.querySelectorAll('button')).find(function (b) { return true; }) : null;
+    if (browse) browse.onclick = function () { fileInput.click(); };
+    if (dropzone) {
+      dropzone.setAttribute('role','button'); dropzone.setAttribute('tabindex','0');
+      dropzone.addEventListener('click', function (e) { if (e.target !== browse && !e.target.closest('button')) fileInput.click(); });
+      dropzone.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+      dropzone.addEventListener('dragover', function(e) { e.preventDefault(); dropzone.classList.add('border-primary','bg-blue-50'); });
+      dropzone.addEventListener('dragleave', function() { dropzone.classList.remove('border-primary','bg-blue-50'); });
+      dropzone.addEventListener('drop', function(e) { e.preventDefault(); dropzone.classList.remove('border-primary','bg-blue-50'); addFiles(e.dataTransfer.files); });
+    }
+    function renderFiles() {
+      if (!fileGrid) return;
+      fileGrid.innerHTML = '';
+      selectedFiles.forEach(function(file, index) {
+        var card = make('div','relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 min-h-[130px] p-2 flex flex-col justify-between');
+        var preview;
+        if (file.type.indexOf('image/') === 0) {
+          preview = make('img','w-full h-24 object-cover rounded-lg mb-2');
+          preview.src = URL.createObjectURL(file); preview.alt = 'Vista previa de ' + file.name;
+        } else {
+          preview = make('div','h-24 rounded-lg bg-slate-900 text-white flex flex-col items-center justify-center mb-2');
+          preview.appendChild(make('i','fa-solid fa-circle-play text-2xl text-emerald-400'));
+          preview.appendChild(make('span','text-[10px] mt-1','Video seleccionado'));
+        }
+        var name = make('div','text-[10px] font-semibold text-slate-700 truncate',file.name);
+        var size = make('div','text-[10px] text-slate-500', (file.size / (1024*1024)).toFixed(1) + ' MB');
+        var remove = make('button','absolute top-2 right-2 w-6 h-6 rounded-full bg-white text-red-600 shadow flex items-center justify-center');
+        remove.type='button'; remove.setAttribute('aria-label','Eliminar '+file.name); remove.innerHTML='<i class="fa-solid fa-xmark"></i>';
+        remove.onclick=function(){selectedFiles.splice(index,1);renderFiles();};
+        card.appendChild(preview); card.appendChild(name); card.appendChild(size); card.appendChild(remove); fileGrid.appendChild(card);
+      });
+      var add = make('button','border-2 border-dashed border-slate-300 rounded-xl hover:border-slate-400 flex flex-col items-center justify-center p-3 text-center min-h-[130px] bg-slate-50');
+      add.type='button'; add.appendChild(make('i','fa-solid fa-plus text-xl mb-2')); add.appendChild(make('span','text-xs font-semibold','Añadir toma')); add.appendChild(make('span','text-[10px] text-slate-400','Hasta 5 archivos'));
+      add.disabled = selectedFiles.length >= 5; add.onclick=function(){fileInput.click();}; fileGrid.appendChild(add);
+      var help=make('div','border border-slate-200 rounded-xl p-3 flex flex-col justify-center bg-blue-50/40 text-left');
+      help.appendChild(make('i','fa-solid fa-lightbulb text-amber-500 text-sm mb-1'));
+      help.appendChild(make('span','text-[11px] font-bold text-slate-800','Adjuntos seleccionados'));
+      help.appendChild(make('p','text-[10px] text-slate-500 leading-tight mt-0.5',selectedFiles.length ? selectedFiles.length+' archivo(s) listos para previsualizar en esta sesión.' : 'Aún no has seleccionado archivos.'));
+      fileGrid.appendChild(help);
+    }
+    function addFiles(files) {
+      Array.from(files || []).forEach(function(file) {
+        if (selectedFiles.length >= 5) return;
+        if (file.size > 25 * 1024 * 1024) { alert('El archivo "'+file.name+'" supera el límite de 25 MB.'); return; }
+        if (!(file.type.indexOf('image/') === 0 || file.type.indexOf('video/') === 0)) { alert('Selecciona imágenes o videos compatibles.'); return; }
+        selectedFiles.push(file);
+      });
+      renderFiles();
+    }
+    fileInput.addEventListener('change', function(){ addFiles(fileInput.files); fileInput.value=''; });
+    renderFiles();
+  }
+
+  // Disponibilidad y presupuesto: tarjetas seleccionables con estado visible.
+  var scheduleHeading = Array.from(document.querySelectorAll('h2')).find(function (h) { return /Disponibilidad y Presupuesto Estimado/i.test(h.textContent); });
+  var scheduleSection = scheduleHeading ? scheduleHeading.closest('section') : null;
+  function selectable(cards, onSelect) {
+    cards.forEach(function(card) {
+      card.setAttribute('role','button'); card.setAttribute('tabindex','0');
+      function choose() { onSelect(card); }
+      card.addEventListener('click',choose);
+      card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});
+    });
+  }
+  if (scheduleSection) {
+    var grids = scheduleSection.querySelectorAll('.grid');
+    var dateCards = grids[0] ? Array.from(grids[0].querySelectorAll('button')) : [];
+    var dateLabels = ['hoy','mañana','otra fecha'];
+    var today = new Date();
+    function dateText(offset) { var d=new Date(today); d.setDate(d.getDate()+offset); return new Intl.DateTimeFormat('es-CL',{weekday:'long',day:'numeric',month:'short'}).format(d); }
+    if (dateCards[0]) dateCards[0].querySelector('span:last-child').textContent = dateText(0);
+    if (dateCards[1]) dateCards[1].querySelector('span:last-child').textContent = dateText(1);
+    var dateInput = make('input','mt-3 w-full rounded-lg border border-slate-300 bg-white p-2.5 text-sm');
+    dateInput.type='date'; dateInput.min=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+    dateInput.classList.add('hidden'); dateInput.setAttribute('aria-label','Elegir fecha de visita');
+    if (grids[0]) grids[0].after(dateInput);
+    dateCards.forEach(function(card,i){card.addEventListener('click',function(){
+      selectedDate=dateLabels[i];
+      dateCards.forEach(function(c,j){c.className=c.className.replace(/border-2 border-primary bg-surface-subtle text-primary font-bold/g,'border border-slate-200 bg-white text-slate-700 font-semibold');if(j===i)c.className='flex flex-col items-center justify-center py-3 px-2 rounded-xl border-2 border-primary bg-surface-subtle text-primary font-bold text-sm shadow-xs transition-all';});
+      dateInput.classList.toggle('hidden',i!==2);
+      if(i===2) dateInput.focus();
+      updatePublishButton();
+    });});
+    dateInput.addEventListener('change',function(){selectedDate=dateInput.value||'otra fecha';updatePublishButton();});
+    var timeCards = grids[1] ? Array.from(grids[1].children) : [];
+    selectable(timeCards,function(card){
+      timeCards.forEach(function(c){c.classList.remove('border-2','border-primary','bg-surface-subtle');c.classList.add('border','border-slate-200','bg-white');});
+      card.classList.remove('border','border-slate-200','bg-white');card.classList.add('border-2','border-primary','bg-surface-subtle');
+      selectedTime=card.innerText.replace(/\s+/g,' ').trim();updatePublishButton();
+    });
+    var budgetCards = grids[2] ? Array.from(grids[2].children) : [];
+    selectable(budgetCards,function(card){
+      budgetCards.forEach(function(c){c.classList.remove('border-2','border-primary','bg-surface-subtle');c.classList.add('border','border-slate-200','bg-white');});
+      card.classList.remove('border','border-slate-200','bg-white');card.classList.add('border-2','border-primary','bg-surface-subtle');
+      selectedBudget=card.innerText.replace(/\s+/g,' ').trim();updatePublishButton();
+    });
+  }
+
+  // Radio de búsqueda y GPS: el radio se aplica alrededor de la ubicación actual del mapa.
+  var radiusHeading = Array.from(document.querySelectorAll('h2')).find(function (h) { return /Radio Hiperlocal de Búsqueda/i.test(h.textContent); });
+  var radiusSection = radiusHeading ? radiusHeading.closest('section') : null;
+  var radiusButtons = radiusSection ? Array.from(radiusSection.querySelectorAll('[data-vr-set-radius]')) : [];
+  var addressNode = radiusSection ? radiusSection.querySelector('[data-vr-user="direccionCompleta"]') : null;
+  if (radiusSection) {
+    var gpsRow = make('div','flex flex-col sm:flex-row sm:items-center gap-2 mt-2');
+    var gpsStatus = make('p','text-xs text-slate-500',gpsLabel);
+    var gpsButton = make('button','self-start px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:border-primary');
+    gpsButton.type='button'; gpsButton.innerHTML='<i class="fa-solid fa-location-crosshairs mr-1"></i> Usar mi ubicación GPS';
+    gpsButton.onclick=function(){
+      if(!navigator.geolocation){gpsStatus.textContent='Este navegador no permite consultar el GPS. Se mantiene Santiago Centro como referencia.';return;}
+      gpsStatus.textContent='Solicitando permiso de ubicación…';
+      navigator.geolocation.getCurrentPosition(function(position){
+        gpsLabel='GPS activo · precisión aproximada de '+Math.round(position.coords.accuracy)+' m';
+        gpsStatus.textContent=gpsLabel;
+        gpsStatus.dataset.lat=position.coords.latitude;gpsStatus.dataset.lng=position.coords.longitude;
+        if(addressNode) addressNode.textContent='Ubicación GPS actual';
+        updatePublishButton();
+      },function(){
+        gpsLabel='GPS no disponible · se mantiene Santiago Centro como referencia';
+        gpsStatus.textContent=gpsLabel;
+        if(addressNode) addressNode.textContent='Santiago Centro (ubicación de referencia)';
+      },{enableHighAccuracy:true,timeout:10000,maximumAge:60000});
+    };
+    gpsRow.appendChild(gpsStatus);gpsRow.appendChild(gpsButton);
+    var radiusIntro=radiusSection.querySelector('p');
+    if(radiusIntro) radiusIntro.after(gpsRow);
+  }
+  radiusButtons.forEach(function(button){
+    button.addEventListener('click',function(){
+      selectedRadius=Number(button.getAttribute('data-vr-set-radius'))||3000;
+      updatePublishButton();
+    });
+  });
+
+  var publishButton = Array.from(document.querySelectorAll('[data-go="INT-15.html"]')).find(function(el){return /Publicar y Buscar Técnicos Cercanos/i.test(el.textContent);});
+  function updatePublishButton() {
+    if(!publishButton) return;
+    var km=selectedRadius/1000;
+    var tech=directRequests[technician];
+    var label=publishButton.querySelector('span');
+    var category=currentCategory||categoryFromDirectTechnician()||'servicio';
+    var action=urgencyToggle && !urgencyToggle.checked ? 'Publicar solicitud' : 'Publicar urgencia';
+    var text=action+(tech?' para '+tech.name:'')+' · '+category+' ('+km+' km)';
+    if(label) label.textContent=text;
+    var query=new URLSearchParams();
+    if(technician) query.set('tecnico',technician);
+    query.set('categoria',category);
+    query.set('radio',String(selectedRadius));
+    query.set('fecha',selectedDate);
+    if(selectedDate==='otra fecha' && dateInput && dateInput.value) query.set('fecha',dateInput.value);
+    query.set('franja',selectedTime);
+    query.set('presupuesto',selectedBudget);
+    var destination='INT-15.html?'+query.toString();
+    publishButton.setAttribute('href',destination);
+    publishButton.setAttribute('data-go',destination);
+    publishButton.setAttribute('data-toast',action+' y buscando técnicos cercanos…');
+  }
+
+  // Evita mostrar una confianza de IA inventada: la detección es local por palabras clave, no una IA conectada.
+  var aiLabel = categoryBox ? categoryBox.querySelector('.text-xs.font-semibold') : null;
+  if (aiLabel) aiLabel.innerHTML='<i class="fa-solid fa-microchip"></i> Detección automática por texto';
+  if (directRequests[technician]) textarea.value=directRequests[technician].message;
   updateCounter();
+  refreshCategory();
+  updatePublishButton();
 });
 </script>
 
