@@ -540,7 +540,7 @@ document.addEventListener('DOMContentLoaded', function () {
     value = value.split('Don Roberto').join(profile.alias);
     value = value.split('Roberto').join(firstName);
     value = value.split('Maestro Gasfíter & Plomero Certificado').join(profile.title);
-    value = value.split('Maestro Gasfíter').join(profile.title);
+    if (profile.id !== 'seed-t-roberto') value = value.split('Maestro Gasfíter').join(profile.title);
     node.nodeValue = value;
   });
   document.title = profile.short + ' | Perfil público VeciRed';
