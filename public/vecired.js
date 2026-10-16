@@ -1385,6 +1385,7 @@
             '<div class="px-3 py-2 border-b border-outline-variant/30"><p class="text-xs text-on-surface-variant">Sesión iniciada como</p><p id="headerDropdownUserName" class="font-semibold text-primary text-sm truncate"></p></div>' +
             '<a id="headerAccountHomeLink" href="INT-10.html" class="block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Inicio del vecino</a>' +
             '<a id="headerPublishRequestLink" href="INT-14.html" class="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Publicar solicitud de servicio</a>' +
+            '<a id="headerPublicProfileLink" href="INT-13.html" class="hidden block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Ver mi perfil público</a>' +
             '<button id="headerLogoutButton" type="button" class="w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-error hover:bg-error-container/40 transition-colors">Cerrar sesión</button>' +
           '</div>';
 
@@ -1396,6 +1397,7 @@
       var name = user && user.nombre ? user.nombre : '';
       var accountHomeLink = header.querySelector('#headerAccountHomeLink');
       var publishRequestLink = header.querySelector('#headerPublishRequestLink');
+      var publicProfileLink = header.querySelector('#headerPublicProfileLink');
       var isProfessional = !!(user && user.rol === 'tech' && ['certificado', 'experiencia'].indexOf(user.perfil) !== -1);
       if (accountHomeLink) {
         if (isProfessional) {
@@ -1410,6 +1412,10 @@
         }
       }
       if (publishRequestLink) publishRequestLink.classList.toggle('hidden', !!(user && user.rol !== 'client'));
+      if (publicProfileLink) {
+        publicProfileLink.href = 'INT-13.html?profile=' + encodeURIComponent(user && user.id ? user.id : '');
+        publicProfileLink.classList.toggle('hidden', !isProfessional);
+      }
       guestLinks.classList.toggle('hidden', !!name);
       userMenu.classList.toggle('hidden', !name);
       if (guestAvatar) guestAvatar.classList.toggle('hidden', !!name);
