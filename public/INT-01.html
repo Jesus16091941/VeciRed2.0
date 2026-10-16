@@ -33,7 +33,24 @@
   </div>
 
   <a id="btnGarantia" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 cursor-pointer" data-path="garantia-de-confianza" href="INT-00-teryser.html">Garantía de confianza</a>
-</nav><div class="flex items-center gap-space-md"><span class="hidden sm:inline-block font-label-md text-label-md text-on-surface-variant"><a href="INT-02.html" class="hover:text-primary transition-colors">¿Ya tienes cuenta?</a> <a href="INT-04.html" class="font-semibold text-primary underline decoration-outline-variant hover:opacity-80">Iniciar Sesión</a></span><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-16rem)]"><div class="flex flex-col w-full">
+</nav><div id="headerAccount" class="relative flex items-center gap-space-md">
+  <div id="headerGuestLinks" class="hidden sm:inline-block font-label-md text-label-md text-on-surface-variant"><a href="INT-02.html" class="hover:text-primary transition-colors">¿Ya tienes cuenta?</a> <a href="INT-04.html" class="font-semibold text-primary underline decoration-outline-variant hover:opacity-80">Iniciar Sesión</a></div>
+  <div id="headerUserMenu" class="hidden relative">
+    <button id="headerUserButton" type="button" aria-expanded="false" aria-controls="headerUserDropdown" class="flex items-center gap-2 rounded-full hover:bg-surface-container-low px-2 py-1.5 transition-colors">
+      <span id="headerUserName" class="font-label-md text-label-md text-primary font-semibold max-w-[150px] truncate"></span>
+      <span class="material-symbols-outlined text-primary text-[20px]">keyboard_arrow_down</span>
+      <span id="headerUserInitial" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-semibold text-sm">U</span>
+    </button>
+    <div id="headerUserDropdown" class="hidden absolute right-0 top-full mt-2 w-52 rounded-xl bg-surface-container-lowest border border-outline-variant/40 shadow-lg p-2 z-[60]">
+      <div class="px-3 py-2 border-b border-outline-variant/30">
+        <p class="text-xs text-on-surface-variant">Sesión iniciada como</p>
+        <p id="headerDropdownUserName" class="font-semibold text-primary text-sm truncate"></p>
+      </div>
+      <button id="headerLogoutButton" type="button" class="w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-error hover:bg-error-container/40 transition-colors">Cerrar sesión</button>
+    </div>
+  </div>
+  <div id="headerGuestAvatar" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div>
+</div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-16rem)]"><div class="flex flex-col w-full">
 <!-- Top Hyperlocal Context Notification Banner -->
 <section class="w-full bg-surface-container-high py-space-xs px-space-lg">
 <div class="max-w-container-max mx-auto flex flex-wrap items-center justify-between gap-space-sm">
@@ -917,4 +934,44 @@
   });
 </script>
 
+<script>
+(function () {
+  const VR = window.VeciRed;
+  const guestLinks = document.getElementById('headerGuestLinks');
+  const guestAvatar = document.getElementById('headerGuestAvatar');
+  const userMenu = document.getElementById('headerUserMenu');
+  const userButton = document.getElementById('headerUserButton');
+  const dropdown = document.getElementById('headerUserDropdown');
+  const logoutButton = document.getElementById('headerLogoutButton');
+  if (!VR || !guestLinks || !userMenu) return;
+
+  const user = VR.users.current();
+  if (user && user.nombre) {
+    guestLinks.classList.add('hidden');
+    guestAvatar.classList.add('hidden');
+    userMenu.classList.remove('hidden');
+    document.getElementById('headerUserName').textContent = user.nombre;
+    document.getElementById('headerDropdownUserName').textContent = user.nombre;
+    const initials = user.nombre.trim().split(/\\s+/).filter(Boolean).slice(0, 2).map(part => part.charAt(0)).join('').toUpperCase();
+    document.getElementById('headerUserInitial').textContent = initials || 'U';
+  }
+
+  userButton.addEventListener('click', function (event) {
+    event.stopPropagation();
+    const opening = dropdown.classList.contains('hidden');
+    dropdown.classList.toggle('hidden');
+    userButton.setAttribute('aria-expanded', String(opening));
+  });
+  document.addEventListener('click', function (event) {
+    if (!dropdown.contains(event.target) && !userButton.contains(event.target)) {
+      dropdown.classList.add('hidden');
+      userButton.setAttribute('aria-expanded', 'false');
+    }
+  });
+  logoutButton.addEventListener('click', function () {
+    VR.users.logout();
+    window.location.reload();
+  });
+})();
+</script>
 </body></html>
