@@ -529,6 +529,93 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!profile) profile = { id:user.id, name:user.nombre || 'Profesional VeciRed', short:user.nombre || 'Profesional', alias:user.nombre || 'Profesional', title:user.titulo || (user.perfil === 'experiencia' ? 'Profesional por experiencia verificada' : 'Profesional certificado'), icon:'engineering', years:user.anosExperiencia || null, neighborhood:user.barrio || 'Santiago Centro', location:user.barrio || 'Santiago Centro', rating:'Nuevo', reviews:0, satisfaction:100, jobs:0, response:null, credential:user.respaldo || user.titulo || 'Perfil registrado en VeciRed', type:user.perfil || 'certificado', bio:'Este es el perfil público de ' + (user.nombre || 'este profesional') + '. Su información de cuenta se muestra junto con los datos profesionales registrados en VeciRed.', specialties:(user.oficios || ['Servicios para el hogar']).slice(0,4) };
   }
   if (!profile) profile = profiles['seed-t-roberto'];
+
+  var workAndReviewData = {
+    'seed-t-roberto': {
+      works:[['Reparación de fuga bajo lavaplatos','Cambio de sifón y sellado de uniones en cocina.'],['Recambio de tubería de cobre','Reparación de tramo deteriorado en red de agua caliente.'],['Mantención de calefón','Limpieza y revisión preventiva de conexiones y funcionamiento.'],['Instalación de grifería','Montaje de monomando y prueba de filtraciones.']],
+      reviews:[['Mariana S.','La fuga bajo el lavaplatos quedó solucionada y revisó también que las uniones no gotearan.','Cambio de sifón'],['Camilo V.','Instaló la llave monomando y me explicó cómo detectar futuras filtraciones.','Instalación de grifería'],['Patricia R.','Hizo la mantención del calefón y explicó qué piezas necesitaban atención.','Mantención de calefón']]
+    },
+    'seed-t-lucia': {
+      works:[['Renovación de tablero eléctrico','Ordenamiento de circuitos y rotulación de protecciones.'],['Instalación de luminarias LED','Montaje y comprobación de puntos de iluminación.'],['Diagnóstico de circuito domiciliario','Detección de una falla en enchufes y revisión de conexiones.'],['Recambio de interruptores','Sustitución segura y prueba de funcionamiento.']],
+      reviews:[['Camila P.','Encontró la falla del circuito y dejó los enchufes funcionando sin improvisar conexiones.','Diagnóstico eléctrico'],['Rodrigo M.','Instaló las luminarias y comprobó cada interruptor antes de terminar.','Instalación de luminarias'],['Elena G.','Revisó el tablero, identificó los circuitos y me explicó las protecciones.','Revisión de tablero']]
+    },
+    'seed-t-carlosv': {
+      works:[['Instalación de cerradura de alta seguridad','Montaje y ajuste de cerradura en puerta principal.'],['Cambio de cilindro de seguridad','Recambio del cilindro y comprobación de llaves.'],['Ajuste de chapa de acceso','Corrección de alineación para un cierre suave.'],['Instalación de cerrojo adicional','Refuerzo del cierre en acceso residencial.']],
+      reviews:[['Daniela F.','Cambió el cilindro y probó todas las llaves conmigo antes de irse.','Cambio de cilindro'],['Felipe A.','La puerta no cerraba bien; ajustó la chapa y ahora encaja sin forzarla.','Ajuste de cerradura'],['Marcela T.','Instaló una cerradura de seguridad y explicó cómo mantenerla.','Cerradura de seguridad']]
+    },
+    'seed-t-carlost': {
+      works:[['Reparación de puerta de madera','Ajuste de bisagras y corrección del roce con el marco.'],['Fabricación de repisas a medida','Corte, montaje y nivelación de repisas interiores.'],['Reparación de cajones de cocina','Ajuste de correderas y refuerzo de uniones.'],['Montaje de escritorio','Ensamblaje y fijación estable de mueble de trabajo.']],
+      reviews:[['Paula C.','Ajustó la puerta que rozaba el piso y quedó cerrando correctamente.','Reparación de puerta'],['Ignacio L.','Las repisas quedaron niveladas y firmes, con las medidas que necesitaba.','Montaje de repisas'],['Teresa B.','Reparó los cajones de la cocina sin tener que cambiar todo el mueble.','Reparación de muebles']]
+    },
+    'seed-t-andresp': {
+      works:[['Pintura de living y comedor','Preparación de muros y aplicación de pintura interior.'],['Resane de grietas en muro','Corrección de imperfecciones antes de pintar.'],['Pintura de fachada interior','Aplicación uniforme y protección de bordes y pisos.'],['Tratamiento de humedad superficial','Preparación del área afectada y acabado posterior.']],
+      reviews:[['Andrea V.','Preparó los muros, tapó las pequeñas grietas y dejó la pintura pareja.','Pintura interior'],['Cristóbal N.','Protegió el piso y los muebles, y entregó el living limpio.','Pintura de living'],['Mónica E.','Las terminaciones alrededor de puertas y ventanas quedaron muy prolijas.','Terminaciones de pintura']]
+    },
+    'seed-t-juan': {
+      works:[['Instalación de enchufes','Montaje de enchufes y comprobación de polaridad y funcionamiento.'],['Revisión de circuito de iluminación','Localización de una conexión defectuosa.'],['Montaje de lámparas de techo','Fijación y conexión de luminarias.'],['Mantención de tablero domiciliario','Inspección de conexiones y protecciones eléctricas.']],
+      reviews:[['Sofía R.','Instaló los enchufes y revisó que quedaran firmes y funcionando.','Instalación de enchufes'],['Miguel P.','Encontró una conexión suelta en la iluminación y explicó la reparación.','Revisión de circuito'],['Francisca D.','Montó las lámparas y dejó los cables ordenados y bien asegurados.','Montaje de luminarias']]
+    },
+    'seed-t-luisa': {
+      works:[['Revisión de conexión de cocina a gas','Inspección de conexiones y comprobación de seguridad.'],['Mantención preventiva de calefón','Revisión de funcionamiento y limpieza según el equipo.'],['Instalación de flexible certificado','Recambio de conexión compatible y verificación posterior.'],['Evaluación de artefacto a gas','Diagnóstico y recomendaciones para uso seguro.']],
+      reviews:[['Lorena C.','Revisó la conexión de la cocina y me indicó qué debía reemplazarse para usarla con seguridad.','Revisión de conexión de gas'],['Esteban J.','Hizo la mantención del calefón y explicó los puntos que había que vigilar.','Mantención de calefón'],['Paola M.','Fue cuidadosa al comprobar las conexiones y dejó claras las recomendaciones.','Inspección de gas']]
+    },
+    'seed-t-valentina': {
+      works:[['Mantención de equipo de aire acondicionado','Limpieza de filtros y revisión del funcionamiento.'],['Diagnóstico de refrigerador','Evaluación de enfriamiento irregular y comprobación del equipo.'],['Mantención de lavadora','Revisión de desagüe y prueba de ciclo.'],['Limpieza de unidad interior','Mantención preventiva de equipo de climatización.']],
+      reviews:[['Carolina H.','El aire acondicionado enfriaba poco; revisó filtros y funcionamiento y explicó el resultado.','Mantención de climatización'],['Tomás R.','Diagnosticó el refrigerador y me informó las opciones antes de reparar.','Diagnóstico de refrigerador'],['Verónica P.','Revisó el desagüe de la lavadora y comprobó un ciclo completo al terminar.','Mantención de lavadora']]
+    },
+    'mateo-s': {
+      works:[['Diagnóstico de refrigerador','Revisión de enfriamiento y evaluación de componentes.'],['Reparación de lavadora','Inspección del desagüe y comprobación del ciclo de lavado.'],['Revisión de secadora','Evaluación de ventilación y funcionamiento del equipo.'],['Cambio de repuesto de electrodoméstico','Instalación de repuesto compatible tras confirmar la falla.']],
+      reviews:[['Natalia P.','Revisó el refrigerador, explicó qué estaba causando la falla y entregó el presupuesto antes de reparar.','Diagnóstico de refrigerador'],['Óscar D.','La lavadora no desaguaba; encontró el problema y probó el ciclo después del arreglo.','Reparación de lavadora'],['María J.','Me orientó sobre el repuesto adecuado y no intentó cambiar piezas innecesarias.','Revisión de electrodoméstico']]
+    },
+    'seed-e-hernan': {
+      works:[['Reparación de muro de albañilería','Resane de superficie deteriorada y nivelación del paño.'],['Instalación de cerámica en cocina','Colocación y alineación de piezas en salpicadero.'],['Reposición de cerámicas sueltas','Retiro de piezas dañadas y colocación de reemplazos.'],['Reparación de borde de escalón','Reconstrucción y acabado de una zona de tránsito.']],
+      reviews:[['Claudia S.','Reparó el muro y emparejó la superficie antes de dar por terminado el trabajo.','Reparación de albañilería'],['Patricio G.','Las cerámicas quedaron alineadas y las juntas bien terminadas.','Instalación de cerámica'],['Rosa M.','Reemplazó las piezas sueltas y dejó el sector firme y limpio.','Reposición de cerámicas']]
+    },
+    'seed-e-marta': {
+      works:[['Pintura de dormitorio','Preparación de paredes y aplicación uniforme de pintura.'],['Instalación de papel mural','Alineación del diseño y acabado de uniones.'],['Renovación de muro de acento','Pintura decorativa con bordes y cortes definidos.'],['Preparación de superficies','Lijado y resane previo al empapelado.']],
+      reviews:[['Isabel C.','Pintó el dormitorio con un acabado parejo y cuidó los muebles durante el trabajo.','Pintura de dormitorio'],['Fernanda L.','El papel mural quedó alineado y las uniones casi no se notan.','Instalación de papel mural'],['Javiera R.','Preparó bien la pared antes de pintar; se nota en cómo quedó el acabado.','Preparación de muros']]
+    },
+    'seed-e-jorge': {
+      works:[['Reparación de filtración en lavamanos','Revisión de sifón y ajuste de uniones de desagüe.'],['Cambio de grifería','Retiro de llave antigua e instalación de una nueva.'],['Sellado de juntas en baño','Renovación de sellos deteriorados en zonas húmedas.'],['Ajuste de descarga de inodoro','Revisión de mecanismo y corrección de descarga.']],
+      reviews:[['Alejandra T.','Solucionó la filtración del lavamanos y comprobó que no quedaran goteras.','Reparación de filtración'],['Víctor S.','Cambió la grifería y dejó todo funcionando sin fugas.','Cambio de grifería'],['Cecilia P.','Ajustó la descarga del inodoro y me mostró que funcionara correctamente.','Reparación sanitaria']]
+    }
+  };
+  function escapeHTML(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]);
+    });
+  }
+  var matchingContent = workAndReviewData[profile.id];
+  if (matchingContent) {
+    var galleryHeading = Array.from(document.querySelectorAll('h2')).find(function (el) { return el.textContent.indexOf('Galería de Trabajos en el Barrio') !== -1; });
+    var gallerySection = galleryHeading && galleryHeading.closest('section');
+    var galleryGrid = gallerySection && gallerySection.querySelector('.grid');
+    var galleryCount = gallerySection && gallerySection.querySelector('.font-label-sm.text-label-sm');
+    var sampleImage = gallerySection && gallerySection.querySelector('img');
+    var sampleSrc = sampleImage ? sampleImage.src : '';
+    if (galleryGrid) {
+      galleryGrid.innerHTML = matchingContent.works.map(function (work, index) {
+        return '<article class="group rounded-lg overflow-hidden border border-outline-variant/30 bg-surface flex flex-col"><div class="relative h-40 overflow-hidden">' +
+          (sampleSrc ? '<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Imagen ilustrativa de ' + escapeHTML(work[0]) + '" src="' + escapeHTML(sampleSrc) + '">' : '<div class="h-full bg-surface-container"></div>') +
+          '<span class="absolute top-2 left-2 bg-primary/80 backdrop-blur-sm text-white font-label-sm text-[10px] px-2 py-0.5 rounded">Trabajo realizado</span></div><div class="p-space-sm"><h4 class="font-label-md text-label-md font-bold text-primary">' + escapeHTML(work[0]) + '</h4><p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">' + escapeHTML(work[1]) + '</p></div></article>';
+      }).join('');
+    }
+    if (galleryCount) galleryCount.textContent = matchingContent.works.length + ' trabajos de muestra';
+    var reviewsHeading = Array.from(document.querySelectorAll('h2')).find(function (el) { return el.textContent.indexOf('Opiniones de Vecinos Reales') !== -1; });
+    var reviewsSection = reviewsHeading && reviewsHeading.closest('section');
+    var reviewsList = reviewsSection && reviewsSection.querySelector('.space-y-space-lg.mt-space-md');
+    if (reviewsList) {
+      reviewsList.innerHTML = matchingContent.reviews.map(function (review, index) {
+        var initials = review[0].split(/\s+/).filter(Boolean).slice(0, 2).map(function (part) { return part.charAt(0); }).join('').toUpperCase();
+        return '<article class="p-space-md rounded-lg bg-surface-container-low/40 border border-outline-variant/30"><div class="flex items-start justify-between"><div class="flex items-center gap-space-sm"><div class="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center font-label-md">' + escapeHTML(initials) + '</div><div><h4 class="font-label-md text-label-md font-bold text-primary">' + escapeHTML(review[0]) + '</h4><span class="font-body-sm text-body-sm text-on-surface-variant">Vecino/a de ' + escapeHTML(profile.location || 'Santiago Centro') + '</span></div></div><div class="flex flex-col items-end"><div class="flex text-amber-500" aria-label="5 de 5 estrellas"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings: \'FILL\' 1;">star</span><span class="material-symbols-outlined text-[16px]" style="font-variation-settings: \'FILL\' 1;">star</span><span class="material-symbols-outlined text-[16px]" style="font-variation-settings: \'FILL\' 1;">star</span><span class="material-symbols-outlined text-[16px]" style="font-variation-settings: \'FILL\' 1;">star</span><span class="material-symbols-outlined text-[16px]" style="font-variation-settings: \'FILL\' 1;">star</span></div><span class="text-label-sm text-outline text-[11px] mt-0.5">' + (index === 0 ? 'Hace 2 días' : index === 1 ? 'Hace 1 semana' : 'Hace 2 semanas') + '</span></div></div><p class="text-body-md text-on-surface mt-space-sm">“' + escapeHTML(review[1]) + '”</p><div class="mt-space-sm flex items-center justify-between text-label-sm text-on-surface-variant"><span class="bg-surface-container-high px-2 py-0.5 rounded font-mono text-[11px] text-primary">' + escapeHTML(review[2]) + '</span><span class="text-outline text-[11px]">Opinión de muestra</span></div></article>';
+      }).join('');
+    }
+    var reviewFilter = reviewsSection && reviewsSection.querySelector('button');
+    if (reviewFilter) reviewFilter.textContent = 'Todas (' + matchingContent.reviews.length + ')';
+    var reviewsCountLabel = Array.from(document.querySelectorAll('aside span')).find(function (el) { return /reseñas locales/.test(el.textContent); });
+    if (reviewsCountLabel) reviewsCountLabel.textContent = matchingContent.reviews.length + ' opiniones de muestra';
+  }
+
   var firstName = profile.name.split(/\s+/)[0];
   var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   var nodes = [];
