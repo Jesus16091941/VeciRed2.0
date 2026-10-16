@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+
+<html lang="es-CL"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-container": "#0f2942", "on-tertiary-container": "#818fa6", "surface-container-low": "#eff4ff", "on-primary-fixed-variant": "#314863", "surface-variant": "#d3e4fe", "outline": "#74777e", "error-container": "#ffdad6", "surface": "#f8f9ff", "tertiary": "#041325", "surface-container": "#e5eeff", "surface-container-highest": "#d3e4fe", "secondary-fixed-dim": "#6bd8cb", "surface-container-high": "#dce9ff", "tertiary-container": "#1a283b", "surface-bright": "#f8f9ff", "surface-dim": "#cbdbf5", "on-tertiary-fixed-variant": "#3a485c", "on-surface-variant": "#43474d", "on-secondary-container": "#006f66", "on-surface": "#0b1c30", "on-tertiary-fixed": "#0d1c2f", "error": "#ba1a1a", "on-background": "#0b1c30", "primary": "#001428", "tertiary-fixed": "#d5e3fd", "background": "#f8f9ff", "secondary": "#006a61", "on-error-container": "#93000a", "primary-fixed-dim": "#b0c9e8", "secondary-container": "#86f2e4", "on-tertiary": "#ffffff", "surface-container-lowest": "#ffffff", "primary-fixed": "#d1e4ff", "tertiary-fixed-dim": "#b9c7e0", "on-secondary": "#ffffff", "outline-variant": "#c3c6ce", "inverse-primary": "#b0c9e8", "secondary-fixed": "#89f5e7", "inverse-on-surface": "#eaf1ff", "surface-tint": "#49607c", "on-primary": "#ffffff", "on-primary-container": "#7991af", "on-secondary-fixed-variant": "#005049", "on-error": "#ffffff", "inverse-surface": "#213145", "on-primary-fixed": "#011d35", "on-secondary-fixed": "#00201d" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "container-max": "1280px", "space-sm": "0.75rem", "space-2xl": "3rem", "space-lg": "1.5rem", "form-column-width": "540px", "space-md": "1rem", "space-xl": "2rem", "space-xs": "0.5rem", "space-3xl": "4rem", "split-sidebar-width": "420px", "space-2xs": "0.25rem" }, "fontFamily": { "body-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "headline-xl": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"] }, "fontSize": { "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }], "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "label-lg": ["15px", { "lineHeight": "20px", "letterSpacing": "0.005em", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "700" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "display-hero": ["44px", { "lineHeight": "52px", "letterSpacing": "-0.025em", "fontWeight": "700" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-sm": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } };</script><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<link rel="stylesheet" href="vecired.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+<script src="vecired.js" defer></script>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-outline-variant/40 shadow-[0_1px_8px_rgba(15,41,66,0.04)]"><div class="h-16 max-w-container-max mx-auto px-space-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[32px]" aria-hidden="true">hub</span><span class="font-headline-sm text-headline-sm text-primary tracking-tight">VeciRed</span></div><div class="hidden lg:flex items-center gap-space-2xs bg-surface-container-low border border-outline-variant/60 rounded-full px-space-sm py-1"><span class="material-symbols-outlined text-secondary text-[16px]">location_on</span><span class="font-label-sm text-label-sm text-secondary uppercase">Tu Barrio:</span><span id="spanUbicacion" class="font-label-sm text-label-sm text-on-surface font-semibold">Santiago Centro / Barrio Lastarria</span></div></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="text-primary font-bold border-b-2 border-primary">
+  <a id="btnComoFunciona" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 cursor-pointer" data-path="como-funciona" href="INT-01.html">Cómo funciona</a>
+
+  <div class="relative inline-block">
+    <a id="btnCategorias" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 cursor-pointer flex items-center gap-1" data-path="categorias-de-servicios" href="INT-11.html">
+      Categorías de servicios
+      <span class="material-symbols-outlined text-[16px]">expand_more</span>
+    </a>
+    <div id="dropdownCategorias" class="hidden absolute left-0 mt-2 w-64 bg-surface-container-lowest border border-outline-variant/60 rounded-xl shadow-lg py-2 z-50 flex flex-col">
+      <a href="INT-11.html" class="px-4 py-2 text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-secondary">plumbing</span> Gasfitería / Plomería
+      </a>
+      <a href="INT-11.html" class="px-4 py-2 text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-secondary">bolt</span> Electricidad
+      </a>
+      <a href="INT-11.html" class="px-4 py-2 text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-secondary">handyman</span> Carpintería y Muebles
+      </a>
+      <a href="INT-11.html" class="px-4 py-2 text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors flex items-center gap-2">
+        <span class="material-symbols-outlined text-[18px] text-secondary">cleaning_services</span> Aseo y Limpieza
+      </a>
+      <a href="INT-11.html" class="px-4 py-2 text-body-sm text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-colors flex items-center gap-2 border-t border-outline-variant/30 mt-1 pt-2 font-semibold text-primary">
+        Ver todas las categorías →
+      </a>
+    </div>
+  </div>
+
+  <a id="btnGarantia" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 cursor-pointer" data-path="garantia-de-confianza" href="INT-00-teryser.html">Garantía de confianza</a>
+</nav><div class="flex items-center gap-space-md"><span class="hidden sm:inline-block font-label-md text-label-md text-on-surface-variant"><a href="INT-02.html" class="hover:text-primary transition-colors">¿Ya tienes cuenta?</a> <a href="INT-04.html" class="font-semibold text-primary underline decoration-outline-variant hover:opacity-80">Iniciar Sesión</a></span><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface min-h-[calc(100vh-16rem)]"><div class="flex flex-col w-full">
+<div class="w-full bg-surface-container-low py-space-md">
+<div class="max-w-container-max mx-auto px-space-lg">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-[22px]">verified_user</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">Paso opcional</span>
+<span class="text-outline-variant font-bold">/</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Tu cuenta ya está creada</span>
+</div>
+<h1 class="font-headline-sm text-headline-sm text-primary tracking-tight">Verificación de Identidad y Arraigo Barrial</h1>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="w-48 bg-surface-container-highest h-2 rounded-full overflow-hidden" role="progressbar" aria-label="Documentos cargados" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" id="sello-barra">
+<div id="sello-barra-relleno" class="bg-secondary h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+</div>
+<span id="sello-progreso" class="font-label-sm text-label-sm font-bold text-primary">0 de 3 documentos</span>
+</div>
+</div>
+</div>
+</div>
+<div class="max-w-container-max mx-auto px-space-lg py-space-xl w-full">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+<div class="lg:col-span-4 flex flex-col gap-space-lg">
+<div class="bg-primary-container text-on-primary rounded-xl p-space-lg shadow-md relative overflow-hidden">
+<div class="absolute -right-8 -bottom-8 w-36 h-36 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
+<div class="flex items-center justify-between gap-space-xs mb-space-md">
+<span class="inline-flex items-center gap-1.5 bg-secondary/20 text-secondary-fixed text-label-sm font-label-sm font-bold px-space-sm py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]">stars</span>
+              Perfil Profesional
+            </span>
+<span class="material-symbols-outlined text-secondary-fixed-dim text-[26px]">workspace_premium</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-primary mb-space-xs">Obtener Sello de Vecino Verificado</h2>
+<p class="font-body-sm text-body-sm text-on-primary-container mb-space-lg">
+            Las familias de tu zona priorizan profesionales con antecedentes y cédula revisada. El sello multiplica por 4 tus llamadas de urgencia.
+          </p>
+<div class="space-y-space-sm">
+<div class="flex items-start gap-space-xs">
+<div class="p-1 rounded-lg bg-tertiary-container text-secondary-container mt-0.5">
+<span class="material-symbols-outlined text-[16px]">radar</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-primary">
+<strong class="font-semibold text-white">Prioridad radial:</strong> Mayor visibilidad en un radio de 5 km en Santiago Centro, Barrio Yungay y Providencia.
+              </p>
+</div>
+<div class="flex items-start gap-space-xs">
+<div class="p-1 rounded-lg bg-tertiary-container text-secondary-container mt-0.5">
+<span class="material-symbols-outlined text-[16px]">lock_clock</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-primary">
+<strong class="font-semibold text-white">Pagos en custodia:</strong> Garantía de liquidación puntual VeciPay al terminar cada labor.
+              </p>
+</div>
+<div class="flex items-start gap-space-xs">
+<div class="p-1 rounded-lg bg-tertiary-container text-secondary-container mt-0.5">
+<span class="material-symbols-outlined text-[16px]">gavel</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-primary">
+<strong class="font-semibold text-white">Respaldo legal:</strong> Cobertura de responsabilidad civil básica para servicios aprobados.
+              </p>
+</div>
+</div>
+<div class="mt-space-lg pt-space-md border-t border-on-primary-container/20 flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-primary-container">Tiempo promedio de revisión:</span>
+<span class="font-label-sm text-label-sm font-bold text-secondary-fixed">≤ 4 horas hábiles</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+<div class="flex items-center gap-space-xs mb-space-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]">engineering</span>
+<h3 class="font-headline-sm text-[16px] leading-[22px] font-bold text-primary">Resumen de Tu Perfil Registrado</h3>
+</div>
+<div class="bg-surface-container-low rounded-lg p-space-md mb-space-sm">
+<div class="text-on-surface-variant font-label-sm text-label-sm uppercase">Especialista</div>
+<div id="resumen-nombre" class="font-headline-sm text-[17px] leading-[24px] font-bold text-on-surface mt-0.5">Sin sesión iniciada</div>
+<div class="flex flex-wrap gap-1.5 mt-2">
+<span id="resumen-perfil" class="bg-surface-container-highest px-2 py-0.5 rounded text-label-sm text-on-surface font-medium">Perfil sin definir</span>
+<span id="resumen-estado" class="bg-surface-container-highest px-2 py-0.5 rounded text-label-sm text-on-surface font-medium">Sin sello</span>
+</div>
+</div>
+<div class="space-y-space-xs font-body-sm text-body-sm text-on-surface-variant">
+<div class="flex justify-between gap-space-sm py-1 border-b border-outline-variant/30">
+<span>RUT:</span>
+<span id="resumen-rut" class="font-semibold text-on-surface text-right">—</span>
+</div>
+<div class="flex justify-between gap-space-sm py-1 border-b border-outline-variant/30">
+<span>Barrio:</span>
+<span id="resumen-barrio" class="font-semibold text-on-surface text-right">—</span>
+</div>
+<div class="flex justify-between gap-space-sm py-1">
+<span>Respaldo entregado:</span>
+<span id="resumen-respaldo" class="font-semibold text-secondary text-right">—</span>
+</div>
+</div>
+<p id="resumen-sin-sesion" class="mt-space-sm font-body-sm text-body-sm text-on-surface-variant" hidden>
+Para ver tus datos, <a class="text-secondary font-semibold underline" href="INT-03.html">crea tu cuenta</a> o <a class="text-secondary font-semibold underline" href="INT-04.html">inicia sesión</a>.
+</p>
+<div class="mt-space-md pt-space-xs">
+<a class="text-secondary hover:text-on-secondary-container font-label-sm text-label-sm font-semibold flex items-center gap-1 transition-colors" href="INT-09.html">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+              Modificar especialidad o zonas
+            </a>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[22px] mt-0.5">shield</span>
+<div class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-primary font-bold">Cifrado Bancario y Ley 19.628</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">
+              Tus datos reposan bajo cifrado SSL 256-bit y no serán transferidos a terceros. Tratamiento exclusivo para la verificación vecinal.
+            </p>
+</div>
+</div>
+</div>
+<div class="lg:col-span-8 flex flex-col gap-space-lg">
+<div class="bg-surface-container-lowest rounded-xl p-space-lg md:p-space-xl shadow-sm">
+<div class="mb-space-lg">
+<div class="flex flex-wrap items-center justify-between gap-space-xs mb-space-xs">
+<span class="font-label-sm text-label-sm text-secondary font-bold tracking-wider uppercase">Requisitos de Seguridad Barrial</span>
+<span class="inline-flex items-center gap-1 text-label-sm text-on-secondary-fixed-variant bg-secondary-fixed px-space-xs py-0.5 rounded font-semibold">
+<span class="material-symbols-outlined text-[14px]">policy</span>
+                Ley 19.628 · Protección de la vida privada
+              </span>
+</div>
+<h2 class="font-headline-lg text-headline-lg font-bold text-primary">Documentos para el Sello de Vecino Verificado</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">
+              Tus datos y tu respaldo profesional ya quedaron en tu registro. Aquí solo comprobamos que el RUT es tuyo, que vives en el barrio y que no tienes antecedentes. Sube fotos claras o archivos PDF.
+            </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm mb-space-xl">
+<div class="bg-surface-container-low rounded-lg p-space-md relative">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-label-sm">1</span>
+<span class="inline-flex items-center gap-1 font-label-sm text-[11px] font-bold text-on-surface-variant bg-surface-container px-2 py-0.5 rounded" data-doc-estado="cedula">Pendiente</span>
+</div>
+<h4 class="font-label-lg text-label-lg font-bold text-on-surface">Cédula de Identidad</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Ambas caras, con el RUT legible</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-space-md relative">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-label-sm">2</span>
+<span class="inline-flex items-center gap-1 font-label-sm text-[11px] font-bold text-on-surface-variant bg-surface-container px-2 py-0.5 rounded" data-doc-estado="domicilio">Pendiente</span>
+</div>
+<h4 class="font-label-lg text-label-lg font-bold text-on-surface">Comprobante de Domicilio</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Boleta de luz, agua o gas (&lt; 60 días)</p>
+</div>
+<div class="bg-surface-container-low rounded-lg p-space-md relative">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-label-sm">3</span>
+<span class="inline-flex items-center gap-1 font-label-sm text-[11px] font-bold text-on-surface-variant bg-surface-container px-2 py-0.5 rounded" data-doc-estado="antecedentes">Pendiente</span>
+</div>
+<h4 class="font-label-lg text-label-lg font-bold text-on-surface">Certificado de Antecedentes</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Registro Civil, gratis en línea</p>
+</div>
+</div>
+<form id="form-sello" novalidate>
+<div class="space-y-space-xl">
+<div>
+<div class="flex items-center justify-between mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">badge</span>
+<h3 class="font-headline-sm text-[17px] leading-[24px] font-bold text-primary">
+                    1. Cédula de Identidad (Frente y Reverso)
+                  </h3>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Chilena o de extranjero, vigente</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-sm">
+                El RUT de la cédula debe coincidir con el que ingresaste al registrarte<span id="cedula-rut-hint"></span>. Evita reflejos del flash.
+              </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="group relative rounded-xl bg-surface-container-low hover:bg-surface-container transition-all p-space-lg flex flex-col items-center justify-center text-center cursor-pointer min-h-[160px] shadow-sm">
+<input accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" type="file" name="cedulaFrente" data-doc="cedula" aria-label="Cédula de identidad, cara frontal" required/>
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary mb-space-xs group-hover:scale-105 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[24px]">flip_to_front</span>
+</div>
+<span class="font-label-md text-label-md font-bold text-primary">Cara Frontal</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant mt-0.5" data-file-name>Con foto, nombre y RUT</span>
+<div class="mt-space-xs inline-flex items-center gap-1 text-[11px] font-label-sm text-secondary bg-surface-container-lowest px-2 py-0.5 rounded-full shadow-2xs">
+<span class="material-symbols-outlined text-[13px]">add_photo_alternate</span>
+                    JPG, PNG o PDF (Máx 10MB)
+                  </div>
+</div>
+<div class="group relative rounded-xl bg-surface-container-low hover:bg-surface-container transition-all p-space-lg flex flex-col items-center justify-center text-center cursor-pointer min-h-[160px] shadow-sm">
+<input accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" type="file" name="cedulaReverso" data-doc="cedula" aria-label="Cédula de identidad, cara posterior" required/>
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary mb-space-xs group-hover:scale-105 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[24px]">flip_to_back</span>
+</div>
+<span class="font-label-md text-label-md font-bold text-primary">Cara Posterior</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant mt-0.5" data-file-name>Con código QR y huella</span>
+<div class="mt-space-xs inline-flex items-center gap-1 text-[11px] font-label-sm text-secondary bg-surface-container-lowest px-2 py-0.5 rounded-full shadow-2xs">
+<span class="material-symbols-outlined text-[13px]">add_photo_alternate</span>
+                    JPG, PNG o PDF (Máx 10MB)
+                  </div>
+</div>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">receipt_long</span>
+<h3 class="font-headline-sm text-[17px] leading-[24px] font-bold text-primary">
+                    2. Comprobante de Domicilio
+                  </h3>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Emitido hace menos de 60 días</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-sm">
+                Boleta de luz, agua o gas a tu nombre (o de alguien de tu hogar) con la dirección que registraste<span id="domicilio-direccion-hint"></span>.
+              </p>
+<div class="group relative rounded-xl bg-surface-container-low hover:bg-surface-container transition-all p-space-xl flex flex-col items-center justify-center text-center cursor-pointer min-h-[170px] shadow-sm">
+<input accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" type="file" name="comprobanteDomicilio" data-doc="domicilio" aria-label="Comprobante de domicilio" required/>
+<div class="w-14 h-14 rounded-full bg-surface-container-lowest flex items-center justify-center text-secondary mb-space-xs group-hover:scale-105 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[28px]">cloud_upload</span>
+</div>
+<span class="font-label-lg text-label-lg font-bold text-primary">Cargar Boleta de Servicios</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-md" data-file-name>
+                  PDF o foto clara donde se lean la dirección y la fecha de emisión
+                </span>
+<div class="mt-space-sm flex flex-wrap items-center justify-center gap-space-xs text-label-sm text-[12px] text-on-surface-variant">
+<span class="inline-flex items-center gap-1 bg-surface-container-lowest px-2.5 py-1 rounded-md text-primary font-medium">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Luz
+                  </span>
+<span class="inline-flex items-center gap-1 bg-surface-container-lowest px-2.5 py-1 rounded-md text-primary font-medium">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Agua
+                  </span>
+<span class="inline-flex items-center gap-1 bg-surface-container-lowest px-2.5 py-1 rounded-md text-primary font-medium">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Gas
+                  </span>
+</div>
+</div>
+</div>
+<div>
+<div class="flex flex-wrap items-center justify-between gap-space-xs mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">gavel</span>
+<h3 class="font-headline-sm text-[17px] leading-[24px] font-bold text-primary">
+                    3. Certificado de Antecedentes
+                  </h3>
+</div>
+<a class="inline-flex items-center gap-1 font-label-sm text-label-sm text-secondary font-semibold underline decoration-outline-variant hover:text-on-secondary-container" href="https://www.registrocivil.cl/principal/servicios-en-linea" target="_blank" rel="noopener noreferrer">
+                  Obtenerlo en el Registro Civil
+                  <span class="material-symbols-outlined text-[14px]" aria-hidden="true">open_in_new</span>
+<span class="sr-only">(se abre en una pestaña nueva)</span>
+</a>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-sm">
+                Se descarga gratis con tu ClaveÚnica. Sirve el certificado &quot;para fines especiales&quot; o &quot;para fines particulares&quot; emitido hace menos de 30 días.
+              </p>
+<div class="group relative rounded-xl bg-surface-container-low hover:bg-surface-container transition-all p-space-lg flex flex-col items-center justify-center text-center cursor-pointer min-h-[140px] shadow-sm">
+<input accept=".pdf,.jpg,.jpeg,.png" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" type="file" name="certificadoAntecedentes" data-doc="antecedentes" aria-label="Certificado de antecedentes" required/>
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-secondary mb-space-xs group-hover:scale-105 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[24px]">description</span>
+</div>
+<span class="font-label-md text-label-md font-bold text-primary">Cargar Certificado</span>
+<span class="font-body-sm text-[12px] text-on-surface-variant mt-0.5" data-file-name>PDF con código de verificación</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-md">
+<div class="flex items-start gap-space-sm">
+<div class="p-2 rounded-lg bg-surface-container text-primary mt-0.5">
+<span class="material-symbols-outlined text-[20px]">fact_check</span>
+</div>
+<div class="flex-1">
+<h4 class="font-label-lg text-label-lg font-bold text-primary">Autorización de Revisión</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                    El equipo de VeciRed revisará estos documentos solo para otorgar el sello. Puedes pedir que se eliminen en cualquier momento, según la Ley 19.628.
+                  </p>
+<label class="flex items-start gap-space-xs mt-space-sm cursor-pointer select-none">
+<input name="autorizacion" class="mt-0.5 w-5 h-5 rounded bg-surface-container-lowest text-primary focus:ring-primary" type="checkbox" required/>
+<span class="font-label-md text-label-md text-on-surface font-semibold">
+                      Autorizo la revisión de mis documentos y acepto la <a class="text-secondary underline" href="INT-00-poldepri.html">política de privacidad</a>
+</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<p id="sello-error" class="mt-space-md font-body-sm text-body-sm text-error font-semibold" role="alert" hidden></p>
+<div class="mt-space-xl pt-space-lg border-t border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<button id="btn-enviar-sello" class="w-full sm:w-auto px-space-xl py-space-sm rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold flex items-center justify-center gap-space-xs transition-all shadow-sm active:scale-[0.99]" type="submit">
+<span>Enviar Documentos para Verificación</span>
+<span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span>
+</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors py-2" type="button" data-go="INT-07.html" data-toast="Puedes conseguir el sello más tarde desde tu panel.">
+                Omitir por ahora e ir a mi panel
+              </button>
+</div>
+</form>
+<div class="mt-space-lg flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm bg-surface-container-low px-space-md py-space-sm rounded-lg">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]">support_agent</span>
+<span>¿Tienes problemas para escanear tus documentos?</span>
+</div>
+<a class="inline-flex items-center gap-1.5 font-label-md text-label-md font-bold text-secondary hover:text-on-secondary-container transition-colors" href="INT-00-cendeayu.html">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+              Asistencia por WhatsApp Vecinal
+            </a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant/40 py-space-xl"><div class="max-w-container-max mx-auto px-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 VeciRed Marketplace. Conexión local confiable.</span></div><nav class="flex flex-wrap items-center justify-center gap-space-md" data-active-classes="text-on-surface font-semibold"><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="terminos-de-servicio" href="INT-00-teryser.html">Términos de Servicio</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="politica-de-privacidad" href="INT-00-poldepri.html">Política de Privacidad</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="proteccion-de-datos" href="INT-00-prodeda.html">Protección de Datos</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="centro-de-ayuda" href="INT-00-cendeayu.html">Centro de Ayuda</a></nav></div></footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const VR = window.VeciRed;
+  const form = document.getElementById('form-sello');
+  const errorBox = document.getElementById('sello-error');
+  const DOCS = ['cedula', 'domicilio', 'antecedentes'];
+  const PERFILES = {
+    certificado: { etiqueta: 'Titulado o con curso', respaldo: 'Título o certificado' },
+    experiencia: { etiqueta: 'Con experiencia comprobable', respaldo: 'Referencias de trabajos' }
+  };
+  const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+
+  const user = VR && VR.users.current();
+  if (user) {
+    const perfil = PERFILES[user.perfil];
+    const sello = user.sello && user.sello.estado;
+    setText('resumen-nombre', user.nombre || 'Especialista');
+    setText('resumen-perfil', perfil ? perfil.etiqueta : 'Vecino / Cliente');
+    setText('resumen-estado', sello ? 'Sello ' + sello : 'Sin sello');
+    setText('resumen-rut', (user.verificacion && user.verificacion.rut) || '—');
+    setText('resumen-barrio', user.barrio || '—');
+    setText('resumen-respaldo', perfil ? perfil.respaldo : '—');
+    if (user.verificacion && user.verificacion.rut) setText('cedula-rut-hint', ' (' + user.verificacion.rut + ')');
+    if (user.direccion) setText('domicilio-direccion-hint', ' (' + user.direccion + ')');
+  } else {
+    document.getElementById('resumen-sin-sesion').hidden = false;
+  }
+
+  const inputs = Array.from(form.querySelectorAll('input[type="file"]'));
+  inputs.forEach((input) => {
+    const label = input.parentElement.querySelector('[data-file-name]');
+    const original = label.textContent;
+    input.addEventListener('change', () => {
+      const file = input.files[0];
+      label.textContent = file ? file.name : original;
+      label.classList.toggle('text-secondary', !!file);
+      label.classList.toggle('font-semibold', !!file);
+      errorBox.hidden = true;
+      updateProgress();
+    });
+  });
+
+  function docReady(doc) {
+    return inputs.filter((i) => i.dataset.doc === doc).every((i) => i.files.length > 0);
+  }
+
+  function updateProgress() {
+    const ready = DOCS.filter(docReady).length;
+    DOCS.forEach((doc) => {
+      const badge = document.querySelector('[data-doc-estado="' + doc + '"]');
+      const ok = docReady(doc);
+      badge.textContent = ok ? 'Cargado' : 'Pendiente';
+      badge.classList.toggle('text-secondary', ok);
+      badge.classList.toggle('bg-secondary-fixed', ok);
+    });
+    document.getElementById('sello-barra').setAttribute('aria-valuenow', ready);
+    document.getElementById('sello-barra-relleno').style.width = Math.round(ready / DOCS.length * 100) + '%';
+    setText('sello-progreso', ready + ' de ' + DOCS.length + ' documentos');
+  }
+
+  form.addEventListener('submit', () => {
+    const missing = inputs.filter((i) => !i.files.length);
+    if (missing.length) {
+      errorBox.textContent = 'Falta cargar: ' + missing.map((i) => i.getAttribute('aria-label')).join(', ') + '.';
+      errorBox.hidden = false;
+      missing[0].focus();
+      return;
+    }
+    if (!form.elements.autorizacion.checked) {
+      errorBox.textContent = 'Debes autorizar la revisión de tus documentos para continuar.';
+      errorBox.hidden = false;
+      form.elements.autorizacion.focus();
+      return;
+    }
+    errorBox.hidden = true;
+
+    if (!VR.users.current()) {
+      VR.toast('Inicia sesión o crea tu cuenta para solicitar el sello.');
+      return;
+    }
+    const documentos = {};
+    inputs.forEach((i) => {
+      const f = i.files[0];
+      documentos[i.name] = { nombre: f.name, tipo: f.type, tamanoKB: Math.round(f.size / 1024) };
+    });
+    try {
+      VR.users.updateCurrent({ sello: { estado: 'en revisión', documentos, solicitadoEn: new Date().toISOString() } });
+    } catch (e) {
+      VR.toast('No se pudo guardar la solicitud en este navegador.');
+      return;
+    }
+    VR.toast('Documentos enviados. Te avisaremos cuando tengas tu sello.');
+    setTimeout(() => { location.href = 'INT-07.html'; }, 900);
+  });
+
+  updateProgress();
+});
+</script>
+
+<!-- Banner compartido (replicado desde INT-01) -->
+<style id="vecired-banner-style">
+  .modal-overlay { display: none; position: fixed; inset: 0; background-color: rgba(11, 28, 48, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 16px; }
+  .modal-card { background: #f8f9ff; border: 1px solid #d3e4fe; padding: 32px; border-radius: 1rem; max-width: 480px; width: 100%; max-height: calc(100dvh - 32px); overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 20, 40, 0.1); }
+  .modal-card h3 { font-size: 24px; line-height: 32px; overflow-wrap: break-word; }
+  .modal-card button[id$="Cruz"] { flex-shrink: 0; margin-left: 12px; }
+  @media (max-width: 639px) { #dropdownCategorias { left: auto; right: 0; width: min(256px, calc(100vw - 32px)); } .modal-card { padding: 24px; } }
+</style>
+<!-- Estructura de la Ventana Emergente (Modal) -->
+<div id="modalComoFunciona" class="modal-overlay">
+  <div class="modal-card flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <h3 class="font-headline-lg text-primary">¿Cómo funciona VeciRed?</h3>
+      <button id="cerrarModalCruz" class="text-on-surface-variant hover:text-primary text-xl font-bold">&times;</button>
+    </div>
+    <p class="text-on-surface-variant text-body-md">
+      VeciRed conecta hogares de forma hiperlocal con profesionales y técnicos calificados de tu mismo sector en pocos pasos:
+    </p>
+    <ul class="flex flex-col gap-2 text-body-sm text-on-surface-variant list-disc pl-4">
+      <li><strong>Explora o publica:</strong> Busca servicios cercanos o publica lo que necesitas resolver en tu hogar.</li>
+      <li><strong>Compara y elige:</strong> Revisa perfiles verificados, valoraciones y propuestas de los técnicos.</li>
+      <li><strong>Coordina seguro:</strong> Chatea directamente y agenda el servicio de forma transparente.</li>
+    </ul>
+    <button id="cerrarModalBtn" class="mt-2 bg-primary text-on-primary font-label-md py-2.5 px-4 rounded-lg hover:opacity-90 transition-opacity">
+      Entendido
+    </button>
+  </div>
+</div>
+
+<!-- Script para controlar la apertura y cierre -->
+<script>(() => {
+  const btnAbrirModal = document.getElementById('btnComoFunciona');
+  const modalComoFunciona = document.getElementById('modalComoFunciona');
+  const btnCerrarModal = document.getElementById('cerrarModalBtn');
+  const btnCerrarCruz = document.getElementById('cerrarModalCruz');
+
+  btnAbrirModal.addEventListener('click', (e) => {
+    e.preventDefault();
+    modalComoFunciona.style.display = 'flex';
+  });
+
+  const cerrarModal = () => {
+    modalComoFunciona.style.display = 'none';
+  };
+
+  btnCerrarModal.addEventListener('click', cerrarModal);
+  btnCerrarCruz.addEventListener('click', cerrarModal);
+
+  // Cerrar si hacen clic fuera de la tarjeta blanca
+  modalComoFunciona.addEventListener('click', (e) => {
+    if (e.target === modalComoFunciona) {
+      cerrarModal();
+    }
+  });
+})();</script>
+
+<script>(() => {
+  const btnCategorias = document.getElementById('btnCategorias');
+  const dropdownCategorias = document.getElementById('dropdownCategorias');
+
+  // Alternar apertura/cierre del menú al hacer clic
+  btnCategorias.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // Evita que se propague el evento
+    dropdownCategorias.classList.toggle('hidden');
+  });
+
+  // Cerrar el menú si se hace clic en cualquier otra parte de la página
+  window.addEventListener('click', (e) => {
+    if (!dropdownCategorias.contains(e.target) && e.target !== btnCategorias) {
+      dropdownCategorias.classList.add('hidden');
+    }
+  });
+})();</script>
+
+<div id="modalGarantia" class="modal-overlay">
+  <div class="modal-card flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <h3 class="font-headline-lg text-primary">Garantía de confianza VeciProtege</h3>
+      <button id="cerrarGarantiaCruz" class="text-on-surface-variant hover:text-primary text-xl font-bold">&times;</button>
+    </div>
+    <p class="text-on-surface-variant text-body-md">Cada servicio contratado en VeciRed está respaldado por nuestra garantía vecinal:</p>
+    <ul class="flex flex-col gap-2 text-body-sm text-on-surface-variant list-disc pl-4">
+      <li><strong>Profesionales verificados:</strong> verificación biométrica e historial limpio.</li>
+      <li><strong>Cobertura hasta $750.000 CLP:</strong> si algo sale mal, te respaldamos.</li>
+      <li><strong>Precios transparentes:</strong> sin cobros sorpresa.</li>
+    </ul>
+    <button id="cerrarGarantiaBtn" class="mt-2 bg-primary text-on-primary font-label-md py-2.5 px-4 rounded-lg hover:opacity-90 transition-opacity">Entendido</button>
+  </div>
+</div>
+<script>(() => {
+  const modalGarantia = document.getElementById('modalGarantia');
+  document.getElementById('btnGarantia').addEventListener('click', (e) => { e.preventDefault(); modalGarantia.style.display = 'flex'; });
+  const cerrarGarantia = () => { modalGarantia.style.display = 'none'; };
+  document.getElementById('cerrarGarantiaBtn').addEventListener('click', cerrarGarantia);
+  document.getElementById('cerrarGarantiaCruz').addEventListener('click', cerrarGarantia);
+  modalGarantia.addEventListener('click', (e) => { if (e.target === modalGarantia) cerrarGarantia(); });
+})();</script>
