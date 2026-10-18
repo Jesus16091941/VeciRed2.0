@@ -923,7 +923,7 @@
     const serviceAmount = Number((amountNode?.textContent || '$15.000 CLP').replace(/[^0-9]/g, '')) || 15000;
     const retention = Math.round(serviceAmount * 0.10);
     const professionalNet = serviceAmount - retention;
-    const formatCLP = amount => '
+    const formatCLP = amount => String.fromCharCode(36) + String(Math.round(amount)).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' CLP';
     const textLine = (x, y, size, value, font = 'F1') => {
       const safe = String(value).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
       commands.push('BT /' + font + ' ' + size + ' Tf ' + x + ' ' + y + ' Td (' + safe + ') Tj ET');
