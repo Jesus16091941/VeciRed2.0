@@ -429,33 +429,33 @@
 </div>
 <!-- CTA Juan C. -->
 <div class="px-space-xs flex flex-col gap-2">
-<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2" type="button" data-go="INT-20.html" data-toast="Técnico seleccionado. Confirmando servicio…">
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2" type="button" data-go="INT-20.html?profesional=juan" data-toast="Técnico seleccionado. Confirmando servicio…">
 <span class="material-symbols-outlined text-[18px]">check_circle</span>
 <span>Contratar a Juan</span>
 </button>
-<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button" data-go="INT-21.html">
+<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button">
 <span class="material-symbols-outlined text-[18px] text-secondary">chat</span>
 <span>Chatear con Juan</span>
 </button>
 </div>
 <!-- CTA Roberto D. -->
 <div class="px-space-xs flex flex-col gap-2">
-<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2" type="button" data-go="INT-20.html" data-toast="Técnico seleccionado. Confirmando servicio…">
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2" type="button" data-go="INT-20.html?profesional=roberto" data-toast="Técnico seleccionado. Confirmando servicio…">
 <span class="material-symbols-outlined text-[18px]">check_circle</span>
 <span>Contratar a Roberto</span>
 </button>
-<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button" data-go="INT-21.html">
+<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button">
 <span class="material-symbols-outlined text-[18px] text-secondary">chat</span>
 <span>Chatear con Roberto</span>
 </button>
 </div>
 <!-- CTA Luisa M. -->
 <div class="px-space-xs flex flex-col gap-2">
-<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2" type="button" data-go="INT-20.html" data-toast="Técnico seleccionado. Confirmando servicio…">
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg py-3 rounded-lg shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2" type="button" data-go="INT-20.html?profesional=luisa" data-toast="Técnico seleccionado. Confirmando servicio…">
 <span class="material-symbols-outlined text-[18px]">check_circle</span>
 <span>Contratar a Luisa</span>
 </button>
-<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button" data-go="INT-21.html">
+<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button">
 <span class="material-symbols-outlined text-[18px] text-secondary">chat</span>
 <span>Chatear con Luisa</span>
 </button>
@@ -518,19 +518,11 @@
 </section>
 <!-- Script for lightweight UI interactivity -->
 <script>
-    document.querySelectorAll('button').forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        const text = this.innerText.trim();
-        if (text.includes('Contratar')) {
-          const techName = text.replace('Contratar a ', '');
-          const confirmed = confirm(`¿Deseas seleccionar a ${techName} e iniciar la custodia del pago en VeciPay?`);
-          if (confirmed) {
-            alert(`¡Excelente elección! Redirigiendo a la pantalla de pago seguro y confirmación de llegada de ${techName}...`);
-          }
-        } else if (text.includes('Chatear')) {
-          const techName = text.replace('Chatear con ', '');
-          alert(`Abriendo ventana de chat directo encriptado con ${techName}...`);
-        }
+    // En esta etapa, solo "Contratar a..." continúa a INT-20.
+    document.querySelectorAll('button:not([data-go])').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const match = this.innerText.trim().match(/^Chatear con (.+)$/);
+        if (match) alert('Para continuar con ' + match[1] + ', presiona «Contratar a ' + match[1] + '».');
       });
     });
   </script>
