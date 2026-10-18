@@ -176,8 +176,8 @@
 <span class="material-symbols-outlined text-secondary text-[20px]">near_me</span>
 <span class="font-label-lg text-label-lg text-primary font-bold">Ruta en Tiempo Real</span>
 </div>
-<span class="font-label-sm text-label-sm bg-secondary text-on-secondary px-2 py-0.5 rounded-full font-bold">
-              GPS EN VIVO
+<span class="font-label-sm text-label-sm bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
+              DEMO SIMULADA
             </span>
 </div>
 <!-- Stylized Dark Nav Map Graphic with Vector Route -->
@@ -199,30 +199,103 @@
 </div>
 </div>
 <!-- Origin / Live Motorbike Location Marker -->
-<div class="absolute bottom-[48px] left-[65px] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center animate-bounce duration-1000">
-<span class="bg-secondary text-on-secondary text-[10px] px-1.5 py-0.5 rounded shadow font-bold mb-0.5">Juan (0.8 km)</span>
+<div id="vr-route-professional-marker" class="absolute flex flex-col items-center -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-linear" style="left:17.5%;top:72.7%">
+<span id="vr-route-distance-label" class="bg-secondary text-on-secondary text-[10px] px-1.5 py-0.5 rounded shadow font-bold mb-0.5 whitespace-nowrap">Profesional · 1,3 km</span>
 <div class="w-9 h-9 rounded-full bg-secondary flex items-center justify-center shadow-lg ring-4 ring-secondary/30">
 <span class="material-symbols-outlined text-[18px] text-on-secondary">two_wheeler</span>
 </div>
 </div>
 <!-- Real-time Speed & Traffic Pill Overlay -->
-<div class="absolute bottom-2 left-2 right-2 bg-primary/90 backdrop-blur-md rounded-md p-2 flex items-center justify-between text-on-primary font-body-sm text-body-sm">
-<div class="flex items-center gap-1.5">
+<div class="absolute bottom-2 left-2 right-2 bg-primary/90 backdrop-blur-md rounded-md p-2 flex items-center justify-between text-on-primary font-body-sm text-body-sm gap-2">
+<div class="flex items-center gap-1.5 min-w-0">
 <span class="material-symbols-outlined text-[16px] text-secondary-container">speed</span>
-<span>25 km/h • Av. Nutibara</span>
+<span id="vr-route-speed-label">Ruta de demostración</span>
 </div>
-<div class="flex items-center gap-1 text-secondary-container font-label-md">
+<div class="flex items-center gap-1 text-secondary-container font-label-md whitespace-nowrap">
 <span class="material-symbols-outlined text-[16px]">timer</span>
-<span>Arribo: 15:42</span>
+<span id="vr-route-eta-label">Llegada: ~5 min</span>
 </div>
 </div>
 </div>
-<div class="mt-space-sm flex gap-2">
+<div class="mt-space-sm flex flex-col gap-2">
+<p id="vr-route-demo-status" class="text-sm text-on-surface-variant" role="status" aria-live="polite">Ruta de ejemplo preparada. Pulsa iniciar para simular el avance del profesional.</p>
+<div class="h-2 w-full overflow-hidden rounded-full bg-surface-container">
+<div id="vr-route-progress" class="h-full rounded-full bg-secondary transition-all duration-500" style="width:0%"></div>
+</div>
+<div class="grid grid-cols-3 gap-2">
+<button id="vr-route-start" type="button" class="h-10 rounded-lg bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">play_arrow</span>Iniciar</button>
+<button id="vr-route-pause" type="button" disabled class="h-10 rounded-lg bg-surface-container-low text-primary font-label-md text-label-md flex items-center justify-center gap-1 disabled:opacity-40"><span class="material-symbols-outlined text-[18px]">pause</span>Pausar</button>
+<button id="vr-route-reset" type="button" class="h-10 rounded-lg bg-surface-container-low text-primary font-label-md text-label-md flex items-center justify-center gap-1"><span class="material-symbols-outlined text-[18px]">restart_alt</span>Reiniciar</button>
+</div>
 <button class="w-full h-10 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md flex items-center justify-center gap-1.5 transition-colors" data-vr-share>
 <span class="material-symbols-outlined text-[18px]">share_location</span>
 <span>Compartir ruta con familiar</span>
 </button>
+<p class="text-xs text-on-surface-variant">Prototipo: el movimiento, la distancia y la hora de llegada son simulados. No usa GPS real ni comparte la ubicación de una persona.</p>
 </div>
+<script>
+(() => {
+  const marker = document.getElementById('vr-route-professional-marker');
+  const distanceLabel = document.getElementById('vr-route-distance-label');
+  const speedLabel = document.getElementById('vr-route-speed-label');
+  const etaLabel = document.getElementById('vr-route-eta-label');
+  const status = document.getElementById('vr-route-demo-status');
+  const progressBar = document.getElementById('vr-route-progress');
+  const startButton = document.getElementById('vr-route-start');
+  const pauseButton = document.getElementById('vr-route-pause');
+  const resetButton = document.getElementById('vr-route-reset');
+  if (!marker || !startButton || marker.dataset.demoReady) return;
+  marker.dataset.demoReady = 'true';
+  let progress = 0;
+  let interval = null;
+  function renderRoute() {
+    const left = 17.5 + (77.5 - 17.5) * progress / 100;
+    const top = 72.7 + (36.3 - 72.7) * progress / 100;
+    marker.style.left = left + '%';
+    marker.style.top = top + '%';
+    distanceLabel.textContent = progress >= 100 ? 'Profesional · llegó' : 'Profesional · ' + (1.3 * (1 - progress / 100)).toFixed(1).replace('.', ',') + ' km';
+    speedLabel.textContent = progress >= 100 ? 'Servicio alcanzado' : (progress === 0 ? 'Listo para iniciar' : 'Avance simulado · 25 km/h');
+    etaLabel.textContent = progress >= 100 ? 'Llegó' : 'Llegada: ~' + Math.max(1, Math.ceil(5 * (1 - progress / 100))) + ' min';
+    progressBar.style.width = progress + '%';
+  }
+  function stopRoute() {
+    if (interval) window.clearInterval(interval);
+    interval = null;
+    startButton.disabled = progress >= 100;
+    pauseButton.disabled = true;
+  }
+  startButton.addEventListener('click', () => {
+    if (interval || progress >= 100) return;
+    interval = window.setInterval(() => {
+      progress = Math.min(100, progress + 5);
+      renderRoute();
+      if (progress >= 100) {
+        stopRoute();
+        status.textContent = '¡Llegada simulada! El profesional alcanzó el domicilio de ejemplo.';
+      } else {
+        status.textContent = 'Recorrido simulado en curso…';
+      }
+    }, 700);
+    startButton.disabled = true;
+    pauseButton.disabled = false;
+    status.textContent = 'Recorrido de demostración iniciado.';
+  });
+  pauseButton.addEventListener('click', () => {
+    if (!interval) return;
+    stopRoute();
+    startButton.disabled = false;
+    status.textContent = 'Recorrido pausado. Puedes reanudarlo cuando quieras.';
+  });
+  resetButton.addEventListener('click', () => {
+    stopRoute();
+    progress = 0;
+    renderRoute();
+    startButton.disabled = false;
+    status.textContent = 'Ruta de ejemplo reiniciada.';
+  });
+  renderRoute();
+})();
+</script>
 </div>
 <!-- Card 3: VeciProtege Escrow Guarantee Shield -->
 <div class="bg-primary text-on-primary rounded-xl p-space-md shadow-md relative overflow-hidden">
