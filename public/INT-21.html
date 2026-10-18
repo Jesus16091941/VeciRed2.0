@@ -363,17 +363,13 @@
 <!-- Chat Input Composer -->
 <div class="p-space-md bg-surface-container-lowest rounded-b-xl">
 <div class="flex items-center gap-space-xs bg-surface-container-low rounded-xl px-space-sm py-1.5 focus-within:ring-2 focus-within:ring-primary focus-within:bg-surface-container-lowest transition-all">
-<!-- Attachment Actions -->
+<!-- Adjuntar imágenes, abrir cámara y grabar notas de voz -->
 <div class="flex items-center gap-1 text-on-surface-variant">
-<button class="p-1.5 rounded-lg hover:text-primary hover:bg-surface-container transition-colors" title="Adjuntar foto">
-<span class="material-symbols-outlined text-[22px]">add_photo_alternate</span>
-</button>
-<button class="p-1.5 rounded-lg hover:text-primary hover:bg-surface-container transition-colors" title="Tomar fotografía">
-<span class="material-symbols-outlined text-[22px]">photo_camera</span>
-</button>
-<button class="p-1.5 rounded-lg hover:text-primary hover:bg-surface-container transition-colors" title="Nota de voz">
-<span class="material-symbols-outlined text-[22px]">mic</span>
-</button>
+<button id="vr-chat-attach-image" type="button" class="p-1.5 rounded-lg hover:text-primary hover:bg-surface-container transition-colors" title="Adjuntar imagen" aria-label="Adjuntar imagen"><span class="material-symbols-outlined text-[22px]">add_photo_alternate</span></button>
+<button id="vr-chat-open-camera" type="button" class="p-1.5 rounded-lg hover:text-primary hover:bg-surface-container transition-colors" title="Tomar fotografía" aria-label="Tomar fotografía"><span class="material-symbols-outlined text-[22px]">photo_camera</span></button>
+<button id="vr-chat-record-audio" type="button" class="p-1.5 rounded-lg hover:text-primary hover:bg-surface-container transition-colors" title="Grabar nota de voz" aria-label="Grabar nota de voz"><span id="vr-chat-mic-icon" class="material-symbols-outlined text-[22px]">mic</span></button>
+<input id="vr-chat-image-input" type="file" accept="image/*" multiple hidden>
+<input id="vr-chat-camera-input" type="file" accept="image/*" capture="environment" hidden>
 </div>
 <!-- Textfield -->
 <input class="flex-1 bg-transparent px-space-xs py-2 text-on-surface placeholder:text-outline focus:outline-none font-body-md text-body-md" id="message-input" placeholder="Escribe un mensaje seguro a Juan Camilo..." type="text"/>
@@ -382,6 +378,12 @@
 <span>Enviar</span>
 <span class="material-symbols-outlined text-[18px]">send</span>
 </button>
+</div>
+<div id="vr-chat-media-status" class="hidden mt-2 px-2 text-sm text-on-surface-variant" role="status" aria-live="polite"></div>
+<div id="vr-chat-recording-panel" class="hidden mt-2 flex items-center justify-between gap-2 rounded-lg bg-surface-container p-3">
+<span id="vr-chat-recording-label" class="text-sm font-semibold text-primary">Grabando nota de voz…</span>
+<button id="vr-chat-stop-recording" type="button" class="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-on-primary">Detener y enviar</button>
+<button id="vr-chat-cancel-recording" type="button" class="rounded-lg px-2 py-2 text-sm text-primary">Cancelar</button>
 </div>
 <!-- Trust & Anti-Fraud Footer Notice -->
 <div class="mt-space-sm flex items-start gap-2 px-1">
@@ -516,9 +518,135 @@
 
     input.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
+        e.preventDefault();
         appendUserMessage(input.value);
       }
     });
+
+    // Adjuntos y notas de voz locales para la demostración (sin backend).
+    (() => {
+      const imageButton = document.getElementById('vr-chat-attach-image');
+      const cameraButton = document.getElementById('vr-chat-open-camera');
+      const recordButton = document.getElementById('vr-chat-record-audio');
+      const imageInput = document.getElementById('vr-chat-image-input');
+      const cameraInput = document.getElementById('vr-chat-camera-input');
+      const status = document.getElementById('vr-chat-media-status');
+      const recordingPanel = document.getElementById('vr-chat-recording-panel');
+      const recordingLabel = document.getElementById('vr-chat-recording-label');
+      const stopButton = document.getElementById('vr-chat-stop-recording');
+      const cancelButton = document.getElementById('vr-chat-cancel-recording');
+      let recorder = null, mediaStream = null, chunks = [], cancelled = false;
+
+      function showStatus(message) {
+        status.textContent = message;
+        status.classList.remove('hidden');
+      }
+      function addMediaMessage(kind, url, fileName) {
+        const row = document.createElement('div');
+        row.className = 'flex items-end justify-end gap-2 max-w-[90%] ml-auto my-3';
+        const card = document.createElement('div');
+        card.className = 'flex flex-col items-end gap-2 rounded-2xl rounded-br-xs bg-primary text-on-primary p-3 shadow-sm max-w-full';
+        const label = document.createElement('span');
+        label.className = 'text-xs opacity-80';
+        label.textContent = 'Tú • ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+        card.appendChild(label);
+        if (kind === 'image') {
+          const img = document.createElement('img');
+          img.src = url; img.alt = 'Imagen adjunta: ' + fileName;
+          img.className = 'max-w-full max-h-72 rounded-lg object-contain'; img.style.maxWidth = '260px';
+          card.appendChild(img);
+          const name = document.createElement('span');
+          name.className = 'text-xs break-all'; name.textContent = fileName; card.appendChild(name);
+        } else {
+          const audio = document.createElement('audio');
+          audio.src = url; audio.controls = true; audio.preload = 'metadata'; audio.className = 'w-full'; audio.style.minWidth = '220px';
+          card.appendChild(audio);
+          const controls = document.createElement('div');
+          controls.className = 'flex flex-wrap items-center gap-1 text-xs';
+          const speedLabel = document.createElement('span'); speedLabel.textContent = 'Velocidad:'; controls.appendChild(speedLabel);
+          [1, 1.25, 1.5, 2].forEach(speed => {
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.textContent = 'x' + speed;
+            btn.className = 'rounded-full border border-white/40 px-2 py-1 hover:bg-white/15';
+            btn.setAttribute('aria-label', 'Reproducir a velocidad x' + speed);
+            btn.addEventListener('click', () => {
+              audio.playbackRate = speed;
+              if (audio.paused) audio.play().catch(() => {});
+              controls.querySelectorAll('button').forEach(b => b.classList.toggle('font-bold', b === btn));
+            });
+            controls.appendChild(btn);
+          });
+          card.appendChild(controls);
+          const name = document.createElement('span'); name.className = 'text-xs opacity-80'; name.textContent = 'Nota de voz • ' + fileName; card.appendChild(name);
+        }
+        const note = document.createElement('span');
+        note.className = 'text-xs opacity-80'; note.textContent = 'Adjunto local de demostración'; card.appendChild(note);
+        row.appendChild(card); chatStream.appendChild(row); chatStream.scrollTop = chatStream.scrollHeight;
+      }
+      function addImageFiles(fileList) {
+        const files = Array.from(fileList || []).filter(file => file.type.startsWith('image/'));
+        if (!files.length) { showStatus('Selecciona un archivo de imagen.'); return; }
+        files.slice(0, 5).forEach(file => {
+          if (file.size > 12 * 1024 * 1024) { showStatus('La imagen ' + file.name + ' supera el límite de 12 MB.'); return; }
+          addMediaMessage('image', URL.createObjectURL(file), file.name);
+        });
+        showStatus(files.length > 5 ? 'Se adjuntaron hasta 5 imágenes por vez.' : 'Imagen agregada al chat de demostración.');
+      }
+      imageButton.addEventListener('click', () => imageInput.click());
+      cameraButton.addEventListener('click', () => cameraInput.click());
+      imageInput.addEventListener('change', () => { addImageFiles(imageInput.files); imageInput.value = ''; });
+      cameraInput.addEventListener('change', () => { addImageFiles(cameraInput.files); cameraInput.value = ''; });
+
+      function releaseMicrophone() {
+        if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+      }
+      function resetRecorder() {
+        releaseMicrophone(); recorder = null; chunks = [];
+        recordingPanel.classList.add('hidden'); recordButton.disabled = false;
+        recordButton.classList.remove('text-error');
+        document.getElementById('vr-chat-mic-icon').textContent = 'mic';
+      }
+      recordButton.addEventListener('click', async () => {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+          showStatus('Este navegador no permite grabar audio aquí. Prueba Chrome o Edge actualizado usando HTTPS.'); return;
+        }
+        try {
+          cancelled = false; chunks = [];
+          mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+          const options = {};
+          if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) options.mimeType = 'audio/webm;codecs=opus';
+          recorder = new MediaRecorder(mediaStream, options);
+          recorder.ondataavailable = event => { if (event.data && event.data.size) chunks.push(event.data); };
+          recorder.onerror = () => { showStatus('No se pudo grabar la nota de voz.'); resetRecorder(); };
+          recorder.onstop = () => {
+            const mimeType = (recorder && recorder.mimeType) || (chunks[0] && chunks[0].type) || 'audio/webm';
+            const blob = new Blob(chunks, {type:mimeType});
+            if (!cancelled && blob.size) {
+              addMediaMessage('audio', URL.createObjectURL(blob), 'nota-de-voz');
+              showStatus('Nota de voz agregada al chat.');
+            } else if (cancelled) showStatus('Grabación cancelada.');
+            resetRecorder();
+          };
+          recorder.start();
+          recordingPanel.classList.remove('hidden'); recordButton.disabled = true; recordButton.classList.add('text-error');
+          document.getElementById('vr-chat-mic-icon').textContent = 'radio_button_checked';
+          recordingLabel.textContent = 'Grabando nota de voz…';
+          showStatus('Micrófono activado. Pulsa “Detener y enviar” cuando termines.');
+        } catch (error) {
+          releaseMicrophone();
+          showStatus(error && error.name === 'NotAllowedError'
+            ? 'No diste permiso para usar el micrófono. Puedes habilitarlo en los permisos del sitio.'
+            : 'No se pudo acceder al micrófono. Comprueba los permisos del navegador y vuelve a intentarlo.');
+        }
+      });
+      stopButton.addEventListener('click', () => { if (recorder && recorder.state !== 'inactive') recorder.stop(); });
+      cancelButton.addEventListener('click', () => {
+        cancelled = true;
+        if (recorder && recorder.state !== 'inactive') recorder.stop(); else resetRecorder();
+      });
+      window.addEventListener('beforeunload', releaseMicrophone);
+    })();
   </script>
 </div></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant/40 py-space-xl"><div class="max-w-container-max mx-auto px-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 VeciRed Marketplace. Conexión local confiable.</span></div><nav class="flex flex-wrap items-center justify-center gap-space-md" data-active-classes="text-on-surface font-semibold"><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="terminos-de-servicio" href="INT-00-teryser.html">Términos de Servicio</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="politica-de-privacidad" href="INT-00-poldepri.html">Política de Privacidad</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="proteccion-de-datos" href="INT-00-prodeda.html">Protección de Datos</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="centro-de-ayuda" href="INT-00-cendeayu.html">Centro de Ayuda</a></nav></div></footer>
 
