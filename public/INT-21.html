@@ -51,7 +51,7 @@
 <h1 class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight truncate">Juan Camilo R.</h1>
 <span class="inline-flex items-center gap-1 bg-surface-container px-2 py-0.5 rounded-full text-primary font-label-sm text-label-sm">
 <span class="material-symbols-outlined text-[14px] text-secondary">verified</span>
-                Vecino Verificado
+                Técnico verificado
               </span>
 <span class="inline-flex items-center gap-1 bg-secondary-container/40 text-on-secondary-container px-2 py-0.5 rounded-full font-label-sm text-label-sm">
 <span class="material-symbols-outlined text-[14px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
@@ -158,11 +158,11 @@
 <div class="flex items-start gap-2.5">
 <span class="material-symbols-outlined text-secondary text-[20px] mt-0.5">location_on</span>
 <div>
-<span class="font-label-md text-label-md text-primary font-bold block">Huérfanos 1160, Apto 402</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Edificio Los Pinos • Santiago Centro, Santiago</span>
-<div class="mt-1.5 inline-flex items-center gap-1 text-primary bg-surface-container px-2 py-0.5 rounded text-label-sm font-label-sm">
+<span id="vr-chat-address-line" class="font-label-md text-label-md text-primary font-bold block">Huérfanos 1160</span>
+<span id="vr-chat-neighborhood-line" class="font-body-sm text-body-sm text-on-surface-variant">Santiago Centro, Santiago</span>
+<div id="vr-chat-access-badge" class="hidden mt-1.5 inline-flex items-center gap-1 text-primary bg-surface-container px-2 py-0.5 rounded text-label-sm font-label-sm">
 <span class="material-symbols-outlined text-[14px]">doorbell</span>
-                    Portería 24h informada para ingreso de moto
+                    Se puede avisar a conserjería si el edificio cuenta con ella
                   </div>
 </div>
 </div>
@@ -182,7 +182,7 @@
 </div>
 <!-- Stylized Dark Nav Map Graphic with Vector Route -->
 <div data-vr-map="ruta" data-vr-theme="dark" data-vr-route data-vr-pins='[{"km":1.3,"deg":225,"icon":"directions_car","tone":"secondary"}]' class="relative w-full h-56 rounded-lg overflow-hidden bg-tertiary shadow-inner">
-<div data-vr-decor class="absolute inset-0 bg-cover bg-center opacity-30" data-location="Santiago Centro, Santiago, Chile" style=""></div>
+<div id="vr-chat-map-location" data-vr-decor class="absolute inset-0 bg-cover bg-center opacity-30" data-location="Santiago Centro, Santiago, Chile" style=""></div>
 <!-- Map Vector Overlay Graphics -->
 <svg class="absolute inset-0 w-full h-full" preserveaspectratio="none" viewbox="0 0 400 220">
 <!-- City street schematic lines -->
@@ -293,9 +293,9 @@
 <div class="flex items-end gap-2 max-w-[85%]">
 <img class="w-8 h-8 rounded-full object-cover flex-shrink-0" data-alt="Small thumbnail avatar of technician Juan C. in polo shirt, friendly portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgjWYb9DiAwWnV_uYaoPQoZPKnX4oT1UW5JFRak7HGB3BwOau6UQk00QzR6bv2bZYaXKywlz-13uijUmiuRR99cZG9QMiwrJBJslhbRc3d24cwu16BPd67OFZHNr5V_7Jo9LRQj9rFVYVUa1uJ3x7LvZt1r8PJoky0RlfRLhfA-jecVdJFAHaMwXYJkF9iZLrqm_ZeXQwFdJNyyKh0bTyDCWQIKTuBTODv-zuEJr9Zt2ayghSw9QQ8"/>
 <div class="flex flex-col gap-1">
-<span class="font-label-sm text-label-sm text-on-surface-variant pl-1">Juan Camilo R. • 15:32</span>
-<div class="bg-surface-container-low text-on-surface rounded-2xl rounded-bl-xs p-space-md shadow-sm font-body-md text-body-md">
-                ¡Hola María! Buenas tardes. Ya voy saliendo hacia tu dirección en Santiago Centro con el kit de empaquetaduras y herramientas. Estaré allá en unos 12 minutos.
+<span id="vr-chat-tech-message-label" class="font-label-sm text-label-sm text-on-surface-variant pl-1">Juan Camilo R. • 15:32</span>
+<div id="vr-chat-greeting-message" class="bg-surface-container-low text-on-surface rounded-2xl rounded-bl-xs p-space-md shadow-sm font-body-md text-body-md">
+                ¡Hola María! Buenas tardes. Ya voy saliendo hacia la dirección que registraste. Te aviso cuando esté cerca.
               </div>
 </div>
 </div>
@@ -303,8 +303,8 @@
 <div class="flex items-end gap-2 max-w-[85%] ml-auto justify-end">
 <div class="flex flex-col items-end gap-1">
 <span class="font-label-sm text-label-sm text-on-surface-variant pr-1">Tú • 15:34</span>
-<div class="bg-primary text-on-primary rounded-2xl rounded-br-xs p-space-md shadow-sm font-body-md text-body-md">
-                ¡Hola Maestro Juan! Excelente, ya te estamos esperando. En portería ya dejé autorización a nombre de Juan Camilo para que ingreses con la moto al parqueadero de visitantes.
+<div id="vr-chat-client-message" class="bg-primary text-on-primary rounded-2xl rounded-br-xs p-space-md shadow-sm font-body-md text-body-md">
+                ¡Hola, gracias por avisar! Mi dirección es Huérfanos 1160, Santiago Centro. Avísame cuando estés cerca y te indico cómo llegar a la entrada.
               </div>
 <div class="flex items-center gap-1 text-on-surface-variant text-[12px] pr-1">
 <span>Leído</span>
@@ -314,19 +314,20 @@
 </div>
 <!-- Shared Location Card Embedded in Chat -->
 <div class="flex items-end gap-2 max-w-[85%] ml-auto justify-end">
-<div class="w-full max-w-sm bg-surface-container-high rounded-xl p-space-md shadow-sm">
+<div id="vr-chat-location-card" class="w-full max-w-sm bg-surface-container-high rounded-xl p-space-md shadow-sm">
 <div class="flex items-center gap-2 mb-2 text-primary font-label-md text-label-md">
 <span class="material-symbols-outlined text-secondary">share_location</span>
-<span class="font-bold">Ubicación y Datos de Ingreso</span>
+<span class="font-bold">Dirección para llegar</span>
 </div>
 <div class="space-y-1 text-on-surface font-body-sm text-body-sm">
-<p><strong>Edificio Los Pinos</strong>: Huérfanos 1160</p>
-<p>Torre 2 • Citófono / Apto 402</p>
-<p class="text-on-surface-variant">Portería cuenta con registro biométrico.</p>
+<p id="vr-chat-shared-address"><strong>Huérfanos 1160</strong></p>
+<p id="vr-chat-shared-neighborhood">Santiago Centro, Santiago</p>
+<p id="vr-chat-shared-unit" class="hidden"></p>
+<p id="vr-chat-shared-access" class="hidden text-on-surface-variant"></p>
 </div>
-<div class="mt-2 pt-2 bg-surface-container-lowest/50 rounded px-2 py-1 text-[11px] text-on-surface-variant flex items-center gap-1 font-semibold">
-<span class="material-symbols-outlined text-[14px] text-secondary">security</span>
-                Confirmado por el anfitrión
+<div id="vr-chat-location-confirmed" class="mt-2 pt-2 bg-surface-container-lowest/50 rounded px-2 py-1 text-[11px] text-on-surface-variant flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-[14px] text-secondary">check_circle</span>
+                Dirección registrada en tu cuenta
               </div>
 </div>
 </div>
@@ -334,9 +335,9 @@
 <div class="flex items-end gap-2 max-w-[85%]">
 <img class="w-8 h-8 rounded-full object-cover flex-shrink-0" data-alt="Juan Camilo R. technician avatar in navy shirt" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsgKTDG3xsT3vddRwCK7aqiXNTu6zc9fxu6Lw-DLiEMwx5ZMM8s26k36MoTcNxluRsYC8SMGR-iP3GEMVjL3ZNnWB560HPi0D3QqYPS8hSS9FOohb1BWQk4Y0KpJg4hp5QD9X2Gqg8w-2Wy1tCh-r3VyS4us_0bXsWh3Oo3MuPg1xWAxy6xcMx4SbUThp-rFhTKURBiUTC0ZPIgnml9cp51_o5aJU-mBtxHu9qmhA0MnrlXfoALVZB"/>
 <div class="flex flex-col gap-1">
-<span class="font-label-sm text-label-sm text-on-surface-variant pl-1">Juan Camilo R. • 15:36</span>
-<div class="bg-surface-container-low text-on-surface rounded-2xl rounded-bl-xs p-space-md shadow-sm font-body-md text-body-md">
-                Perfecto vecina, acabo de pasar la glorieta de Santa Gema. Nos vemos en breve.
+<span id="vr-chat-followup-label" class="font-label-sm text-label-sm text-on-surface-variant pl-1">Juan Camilo R. • 15:36</span>
+<div id="vr-chat-followup-message" class="bg-surface-container-low text-on-surface rounded-2xl rounded-bl-xs p-space-md shadow-sm font-body-md text-body-md">
+                Perfecto, gracias. Te aviso cuando esté cerca de la dirección que me compartiste.
               </div>
 </div>
 </div>
@@ -345,8 +346,8 @@
 <div class="px-space-md py-space-xs bg-surface-container-low/40">
 <div class="flex items-center gap-2 overflow-x-auto py-1">
 <span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">Respuestas rápidas:</span>
-<button class="px-3 py-1 bg-surface-container-lowest hover:bg-surface-container text-primary rounded-full text-label-sm font-label-sm whitespace-nowrap shadow-sm transition-colors" onclick="insertQuick('Ya llegué a la portería')">
-              Ya llegué a la portería
+<button data-vr-building-quick class="px-3 py-1 bg-surface-container-lowest hover:bg-surface-container text-primary rounded-full text-label-sm font-label-sm whitespace-nowrap shadow-sm transition-colors" onclick="insertQuick('Ya llegué a la entrada del edificio')">
+              Ya llegué a la entrada del edificio
             </button>
 <button class="px-3 py-1 bg-surface-container-lowest hover:bg-surface-container text-primary rounded-full text-label-sm font-label-sm whitespace-nowrap shadow-sm transition-colors" onclick="insertQuick('¿Necesitas que baje a abrir?')">
               ¿Necesitas que baje a abrir?
@@ -354,8 +355,8 @@
 <button class="px-3 py-1 bg-surface-container-lowest hover:bg-surface-container text-primary rounded-full text-label-sm font-label-sm whitespace-nowrap shadow-sm transition-colors" onclick="insertQuick('Ya estoy en casa')">
               Ya estoy en casa
             </button>
-<button class="px-3 py-1 bg-surface-container-lowest hover:bg-surface-container text-primary rounded-full text-label-sm font-label-sm whitespace-nowrap shadow-sm transition-colors" onclick="insertQuick('Por favor timbra al 402')">
-              Por favor timbra al 402
+<button data-vr-building-quick id="vr-chat-unit-quick" class="px-3 py-1 bg-surface-container-lowest hover:bg-surface-container text-primary rounded-full text-label-sm font-label-sm whitespace-nowrap shadow-sm transition-colors" onclick="insertQuick('Por favor, llama al citófono de mi departamento')">
+              Llama al citófono de mi departamento
             </button>
 </div>
 </div>
@@ -375,7 +376,7 @@
 </button>
 </div>
 <!-- Textfield -->
-<input class="flex-1 bg-transparent px-space-xs py-2 text-on-surface placeholder:text-outline focus:outline-none font-body-md text-body-md" id="message-input" placeholder="Escribe un mensaje seguro a Juan C...." type="text"/>
+<input class="flex-1 bg-transparent px-space-xs py-2 text-on-surface placeholder:text-outline focus:outline-none font-body-md text-body-md" id="message-input" placeholder="Escribe un mensaje seguro a Juan Camilo..." type="text"/>
 <!-- Send Action -->
 <button class="h-10 px-space-md rounded-lg bg-primary hover:bg-primary-container text-on-primary flex items-center gap-1 font-label-md text-label-md transition-all shadow-sm" id="send-button">
 <span>Enviar</span>
@@ -386,7 +387,7 @@
 <div class="mt-space-sm flex items-start gap-2 px-1">
 <span class="material-symbols-outlined text-secondary text-[18px] mt-0.5">verified_user</span>
 <p class="font-body-sm text-body-sm text-on-surface-variant leading-tight">
-<strong class="text-primary">Aviso de Tranquilidad Vecinal:</strong> Nunca entregues efectivo por adelantado. Tu pago permanece 100% retenido en custodia bancaria VeciPay hasta que compruebes que el grifo ha quedado perfectamente sellado y califiques el servicio.
+<strong class="text-primary">Aviso de Tranquilidad Vecinal:</strong> Coordina la llegada por este chat y revisa el trabajo antes de darlo por terminado. No compartas códigos de acceso ni datos personales innecesarios.
             </p>
 </div>
 </div>
@@ -404,6 +405,61 @@
     const input = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-button');
     const chatStream = document.getElementById('chat-stream');
+
+    // Personaliza el chat con los datos del vecino que inició sesión.
+    // Si no hay una cuenta vecina activa, usa el perfil de demostración de María Fuentes.
+    (function personalizeNeighborChat() {
+      const api = window.VeciRed;
+      const current = api && api.users && api.users.current ? api.users.current() : null;
+      const isNeighbor = current && (current.rol === 'client' || current.perfil === 'vecino' || (!current.rol && !current.perfil));
+      const neighbor = isNeighbor ? current : {
+        nombre: 'María Fuentes', direccion: 'Huérfanos 1160', barrio: 'Santiago Centro', depto: ''
+      };
+      const fullName = String(neighbor.nombre || 'vecino/a').trim();
+      const firstName = fullName.split(/\s+/)[0] || 'vecino/a';
+      const address = String(neighbor.direccion || '').trim();
+      const neighborhood = String(neighbor.barrio || '').trim();
+      const unit = String(neighbor.depto || '').trim();
+      const hasUnit = Boolean(unit);
+      const addressText = [address, unit].filter(Boolean).join(', ');
+      const neighborhoodText = neighborhood || 'Sector registrado en tu cuenta';
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      };
+      setText('vr-chat-address-line', addressText || 'Dirección no registrada');
+      setText('vr-chat-neighborhood-line', neighborhoodText);
+      setText('vr-chat-shared-address', addressText || 'Dirección no registrada');
+      setText('vr-chat-shared-neighborhood', neighborhoodText);
+      setText('vr-chat-greeting-message', '¡Hola ' + firstName + '! Buenas tardes. Ya voy saliendo hacia la dirección que registraste. Te aviso cuando esté cerca.');
+      setText('vr-chat-client-message', hasUnit
+        ? '¡Hola, gracias por avisar! Mi dirección es ' + [addressText, neighborhood].filter(Boolean).join(', ') + '. Si hay conserjería, puedo avisar que vienes; si no, coordinamos por este chat cuando estés afuera.'
+        : '¡Hola, gracias por avisar! Mi dirección es ' + [address, neighborhood].filter(Boolean).join(', ') + '. Avísame cuando estés cerca y te indico cómo llegar a la entrada.');
+      setText('vr-chat-followup-message', 'Perfecto, ' + firstName + '. Te aviso cuando esté cerca de ' + (address || 'la dirección que me compartiste') + '.');
+      const accessBadge = document.getElementById('vr-chat-access-badge');
+      const sharedUnit = document.getElementById('vr-chat-shared-unit');
+      const sharedAccess = document.getElementById('vr-chat-shared-access');
+      if (accessBadge) accessBadge.classList.toggle('hidden', !hasUnit);
+      if (sharedUnit) {
+        sharedUnit.classList.toggle('hidden', !hasUnit);
+        sharedUnit.textContent = hasUnit ? 'Departamento / torre: ' + unit : '';
+      }
+      if (sharedAccess) {
+        sharedAccess.classList.toggle('hidden', !hasUnit);
+        sharedAccess.textContent = hasUnit ? 'Si el edificio tiene conserjería, se puede avisar de la llegada del técnico.' : '';
+      }
+      document.querySelectorAll('[data-vr-building-quick]').forEach((el) => el.classList.toggle('hidden', !hasUnit));
+      const unitQuick = document.getElementById('vr-chat-unit-quick');
+      if (unitQuick && hasUnit) {
+        const unitLabel = /\d+/.test(unit) ? unit : 'mi departamento (' + unit + ')';
+        unitQuick.setAttribute('onclick', 'insertQuick(' + JSON.stringify('Por favor, llama al citófono de ' + unitLabel) + ')');
+        unitQuick.textContent = 'Llama al citófono';
+      }
+      const mapLocation = document.getElementById('vr-chat-map-location');
+      if (mapLocation) mapLocation.dataset.location = [address, neighborhood, 'Santiago, Chile'].filter(Boolean).join(', ');
+      const locationLabel = document.getElementById('spanUbicacion');
+      if (locationLabel) locationLabel.textContent = neighborhood || 'Tu barrio';
+    })();
 
     function appendUserMessage(msg) {
       if (!msg || msg.trim() === "") return;
@@ -433,11 +489,11 @@
         const replyElem = document.createElement('div');
         replyElem.className = "flex items-end gap-2 max-w-[85%]";
         replyElem.innerHTML = `
-          <img src="placeholder" data-alt="Juan Camilo R. technician avatar in navy shirt" class="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsgKTDG3xsT3vddRwCK7aqiXNTu6zc9fxu6Lw-DLiEMwx5ZMM8s26k36MoTcNxluRsYC8SMGR-iP3GEMVjL3ZNnWB560HPi0D3QqYPS8hSS9FOohb1BWQk4Y0KpJg4hp5QD9X2Gqg8w-2Wy1tCh-r3VyS4us_0bXsWh3Oo3MuPg1xWAxy6xcMx4SbUThp-rFhTKURBiUTC0ZPIgnml9cp51_o5aJU-mBtxHu9qmhA0MnrlXfoALVZB" data-alt="Juan Camilo R. technician avatar in navy shirt" class="w-8 h-8 rounded-full object-cover flex-shrink-0" />
           <div class="flex flex-col gap-1">
-            <span class="font-label-sm text-label-sm text-on-surface-variant pl-1">Juan Camilo R. • Justo ahora</span>
+            <span id="vr-chat-dynamic-reply-label" class="font-label-sm text-label-sm text-on-surface-variant pl-1">Juan Camilo R. • Justo ahora</span>
             <div class="bg-surface-container-low text-on-surface rounded-2xl rounded-bl-xs p-space-md shadow-sm font-body-md text-body-md">
-              ¡Copiado! Llego en un par de minutos, ya veo el edificio.
+              ¡Gracias por la información! Te aviso cuando esté cerca de la dirección que me compartiste.
             </div>
           </div>
         `;
