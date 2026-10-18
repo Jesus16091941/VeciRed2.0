@@ -53,7 +53,7 @@
 <span class="material-symbols-outlined text-[14px] text-secondary">verified</span>
                 Técnico verificado
               </span>
-<span class="inline-flex items-center gap-1 bg-secondary-container/40 text-on-secondary-container px-2 py-0.5 rounded-full font-label-sm text-label-sm">
+<span id="vr-chat-tech-badge" class="inline-flex items-center gap-1 bg-secondary-container/40 text-on-secondary-container px-2 py-0.5 rounded-full font-label-sm text-label-sm">
 <span class="material-symbols-outlined text-[14px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
                 Sello Oro
               </span>
@@ -1008,12 +1008,14 @@
   const role = document.getElementById('vr-chat-tech-role');
   const rating = document.getElementById('vr-chat-tech-rating');
   const reviews = document.getElementById('vr-chat-tech-reviews');
+  const badge = document.getElementById('vr-chat-tech-badge');
   const mainPhoto = document.getElementById('vr-chat-tech-photo-main');
   const formatCLP = value => String(Math.round(value)).replace(/\\B(?=(\\d{3})+(?!\\d))/g, '.');
   if (name) name.textContent = pro.chatName;
   if (role) role.textContent = pro.role;
   if (rating) rating.textContent = pro.rating;
   if (reviews) reviews.textContent = '(' + pro.reviews + ')';
+  if (badge) badge.lastChild.textContent = ' ' + pro.badge;
   if (mainPhoto) { mainPhoto.src = pro.image; mainPhoto.alt = pro.chatName + ', profesional seleccionado de VeciRed'; }
   document.querySelectorAll('img[data-alt*="Juan"], img[data-alt*="Juan Camilo"]').forEach(img => {
     img.src = pro.image;
