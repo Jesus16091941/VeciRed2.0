@@ -408,7 +408,7 @@
 
     // Personaliza el chat con los datos del vecino que inició sesión.
     // Si no hay una cuenta vecina activa, usa el perfil de demostración de María Fuentes.
-    (function personalizeNeighborChat() {
+    function personalizeNeighborChat() {
       const api = window.VeciRed;
       const current = api && api.users && api.users.current ? api.users.current() : null;
       const isNeighbor = current && (current.rol === 'client' || current.perfil === 'vecino' || (!current.rol && !current.perfil));
@@ -459,7 +459,8 @@
       if (mapLocation) mapLocation.dataset.location = [address, neighborhood, 'Santiago, Chile'].filter(Boolean).join(', ');
       const locationLabel = document.getElementById('spanUbicacion');
       if (locationLabel) locationLabel.textContent = neighborhood || 'Tu barrio';
-    })();
+    }
+    document.addEventListener('DOMContentLoaded', personalizeNeighborChat);
 
     function appendUserMessage(msg) {
       if (!msg || msg.trim() === "") return;
