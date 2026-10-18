@@ -318,7 +318,7 @@
 <!-- Quick Help & Legal Assistance Strip -->
 <div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
 <div class="flex flex-col gap-2 font-label-sm text-label-sm text-on-surface-variant">
-<a class="flex items-center justify-between p-2 rounded hover:bg-surface-container-low transition-colors" href="#" data-toast="Descargando comprobante VeciPay…">
+<a id="vr-download-vecipay" class="flex items-center justify-between p-2 rounded hover:bg-surface-container-low transition-colors" href="#" aria-label="Descargar comprobante de demostracion VeciPay en PDF">
 <span class="flex items-center gap-2 text-primary font-semibold">
 <span class="material-symbols-outlined text-[18px] text-secondary">description</span>
                 Comprobante de retención VeciPay (PDF)
@@ -908,3 +908,86 @@
   document.getElementById('cerrarGarantiaCruz').addEventListener('click', cerrarGarantia);
   modalGarantia.addEventListener('click', (e) => { if (e.target === modalGarantia) cerrarGarantia(); });
 })();</script>
+
+
+<script id="vr-vecipay-demo-pdf">
+(() => {
+  const link = document.getElementById('vr-download-vecipay');
+  if (!link || link.dataset.pdfReady) return;
+  link.dataset.pdfReady = 'true';
+  function makeDemoPdf() {
+    const commands = [];
+    const textLine = (x, y, size, value, font = 'F1') => {
+      const safe = String(value).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+      commands.push('BT /' + font + ' ' + size + ' Tf ' + x + ' ' + y + ' Td (' + safe + ') Tj ET');
+    };
+    commands.push('0.04 0.16 0.25 rg 0 690 612 102 re f');
+    textLine(42, 750, 10, 'VECIRED  |  VECIPAY', 'F2');
+    textLine(42, 719, 20, 'Comprobante de retencion de fondos', 'F2');
+    commands.push('1 0.88 0.63 rg 38 635 536 38 re f');
+    commands.push('0.45 0.22 0.02 rg');
+    textLine(52, 650, 11, 'DOCUMENTO DE DEMOSTRACION - SIN VALIDEZ LEGAL NI TRIBUTARIA', 'F2');
+    commands.push('0.12 0.2 0.28 rg');
+    textLine(42, 602, 10, 'Folio de ejemplo: VR-DEMO-2026-00128');
+    textLine(42, 582, 10, 'Fecha de emision: 18/10/2026');
+    textLine(42, 562, 10, 'Estado: SIMULADO - NO CORRESPONDE A UNA TRANSACCION REAL', 'F2');
+    commands.push('0.75 0.8 0.84 RG 42 545 m 570 545 l S');
+    textLine(42, 518, 13, 'Detalle del servicio', 'F2');
+    textLine(42, 493, 10, 'Servicio: Reparacion de griferia (ejemplo ficticio)');
+    textLine(42, 473, 10, 'Solicitante: Vecino de demostracion');
+    textLine(42, 453, 10, 'Profesional: Tecnico de ejemplo');
+    textLine(42, 433, 10, 'Referencia: VR-SERVICIO-DEMO-001');
+    commands.push('0.75 0.8 0.84 RG 42 414 m 570 414 l S');
+    textLine(42, 387, 13, 'Resumen de montos (valores ficticios)', 'F2');
+    textLine(42, 360, 10, 'Monto referencial del servicio');
+    textLine(420, 360, 10, '$85.000 CLP', 'F2');
+    textLine(42, 336, 10, 'Retencion ilustrativa (10%)');
+    textLine(420, 336, 10, '$8.500 CLP', 'F2');
+    commands.push('0.04 0.16 0.25 rg 38 285 536 34 re f');
+    commands.push('1 1 1 rg');
+    textLine(52, 297, 12, 'Neto estimado para el profesional: $76.500 CLP', 'F2');
+    commands.push('0.12 0.2 0.28 rg');
+    textLine(42, 250, 10, 'Este archivo se genera solo para mostrar el prototipo de VeciRed.');
+    textLine(42, 232, 10, 'No acredita pagos, retenciones, depositos ni obligaciones tributarias.');
+    textLine(42, 214, 10, 'Los nombres, folio, servicio y montos son inventados.');
+    commands.push('0.75 0.8 0.84 RG 42 190 m 570 190 l S');
+    textLine(42, 165, 9, 'VECIPAY DEMO | Prototipo no conectado a una plataforma de pagos');
+    textLine(42, 148, 9, 'Documento ilustrativo. Sin valor comercial, contable ni legal.');
+    const stream = commands.join('\n') + '\n';
+    const objects = [
+      '<< /Type /Catalog /Pages 2 0 R >>',
+      '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+      '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>',
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
+      '<< /Length ' + stream.length + ' >>\nstream\n' + stream + 'endstream'
+    ];
+    let pdf = '%PDF-1.4\n';
+    const offsets = [0];
+    objects.forEach((obj, index) => {
+      offsets.push(pdf.length);
+      pdf += (index + 1) + ' 0 obj\n' + obj + '\nendobj\n';
+    });
+    const xrefOffset = pdf.length;
+    pdf += 'xref\n0 ' + (objects.length + 1) + '\n0000000000 65535 f \n';
+    for (let i = 1; i < offsets.length; i++) pdf += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+    pdf += 'trailer\n<< /Size ' + (objects.length + 1) + ' /Root 1 0 R >>\nstartxref\n' + xrefOffset + '\n%%EOF';
+    return new Blob([pdf], { type: 'application/pdf' });
+  }
+  link.addEventListener('click', event => {
+    event.preventDefault();
+    const url = URL.createObjectURL(makeDemoPdf());
+    const download = document.createElement('a');
+    download.href = url;
+    download.download = 'VeciPay_Comprobante_DEMO_SIN_VALIDEZ.pdf';
+    document.body.appendChild(download);
+    download.click();
+    download.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+    if (window.VeciRed && typeof window.VeciRed.toast === 'function') {
+      window.VeciRed.toast('Comprobante de demostracion descargado. No tiene validez legal ni tributaria.');
+    }
+  });
+})();
+</script>
+
