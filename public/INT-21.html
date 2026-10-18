@@ -593,9 +593,96 @@
         showStatus(files.length > 5 ? 'Se adjuntaron hasta 5 imágenes por vez.' : 'Imagen agregada al chat de demostración.');
       }
       imageButton.addEventListener('click', () => imageInput.click());
-      cameraButton.addEventListener('click', () => cameraInput.click());
       imageInput.addEventListener('change', () => { addImageFiles(imageInput.files); imageInput.value = ''; });
-      cameraInput.addEventListener('change', () => { addImageFiles(cameraInput.files); cameraInput.value = ''; });
+
+      // Abrir una vista de cámara real; no usar el selector de archivos del sistema.
+      let cameraStream = null;
+      let cameraOverlay = null;
+      function closeCamera() {
+        if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+        if (cameraOverlay) cameraOverlay.remove();
+        cameraOverlay = null;
+      }
+      async function openCamera() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          showStatus('Este navegador no permite abrir la cámara aquí. Usa HTTPS y un navegador actualizado.');
+          return;
+        }
+        try {
+          cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' } },
+            audio: false
+          });
+          cameraOverlay = document.createElement('div');
+          cameraOverlay.className = 'fixed inset-0 z-[2000] flex items-center justify-center bg-black/80 p-4';
+          cameraOverlay.setAttribute('role', 'dialog');
+          cameraOverlay.setAttribute('aria-modal', 'true');
+          cameraOverlay.setAttribute('aria-label', 'Tomar fotografía');
+          const panel = document.createElement('div');
+          panel.className = 'w-full max-w-lg rounded-2xl bg-white p-4 shadow-xl flex flex-col gap-3';
+          const heading = document.createElement('h3');
+          heading.className = 'text-lg font-semibold text-slate-900';
+          heading.textContent = 'Tomar fotografía';
+          const video = document.createElement('video');
+          video.autoplay = true;
+          video.playsInline = true;
+          video.muted = true;
+          video.className = 'w-full max-h-[65vh] rounded-xl bg-black object-contain';
+          video.srcObject = cameraStream;
+          const controls = document.createElement('div');
+          controls.className = 'flex flex-wrap justify-end gap-2';
+          const closeButton = document.createElement('button');
+          closeButton.type = 'button';
+          closeButton.className = 'rounded-lg border border-slate-300 px-4 py-2 text-slate-700';
+          closeButton.textContent = 'Cancelar';
+          closeButton.addEventListener('click', closeCamera);
+          const captureButton = document.createElement('button');
+          captureButton.type = 'button';
+          captureButton.className = 'rounded-lg bg-emerald-700 px-4 py-2 font-semibold text-white';
+          captureButton.textContent = 'Tomar foto';
+          captureButton.addEventListener('click', () => {
+            if (!video.videoWidth || !video.videoHeight) {
+              showStatus('La cámara todavía se está iniciando. Espera un momento e inténtalo de nuevo.');
+              return;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => {
+              if (blob) {
+                const fileName = 'foto-vecired-' + new Date().toISOString().replace(/[:.]/g, '-') + '.jpg';
+                addMediaMessage('image', URL.createObjectURL(blob), fileName);
+                showStatus('Fotografía tomada y agregada al chat de demostración.');
+              } else {
+                showStatus('No se pudo procesar la fotografía. Inténtalo otra vez.');
+              }
+              closeCamera();
+            }, 'image/jpeg', 0.92);
+          });
+          controls.append(closeButton, captureButton);
+          panel.append(heading, video, controls);
+          cameraOverlay.appendChild(panel);
+          cameraOverlay.addEventListener('click', event => {
+            if (event.target === cameraOverlay) closeCamera();
+          });
+          document.body.appendChild(cameraOverlay);
+          await video.play().catch(() => {});
+        } catch (error) {
+          if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+          cameraStream = null;
+          showStatus(error && error.name === 'NotAllowedError'
+            ? 'No diste permiso para usar la cámara. Puedes habilitarla en los permisos del sitio.'
+            : error && error.name === 'NotFoundError'
+              ? 'No se encontró una cámara disponible en este dispositivo.'
+              : 'No se pudo abrir la cámara. Comprueba los permisos del navegador y vuelve a intentarlo.');
+        }
+      }
+      cameraButton.addEventListener('click', openCamera);
+      window.addEventListener('beforeunload', () => {
+        if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+      });
 
       function releaseMicrophone() {
         if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
