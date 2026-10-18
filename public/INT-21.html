@@ -421,7 +421,8 @@
       const neighborhood = String(neighbor.barrio || '').trim();
       const unit = String(neighbor.depto || '').trim();
       const hasUnit = Boolean(unit);
-      const addressText = [address, unit].filter(Boolean).join(', ');
+      const unitText = unit && /depto|departamento|torre|block|bloque/i.test(unit) ? unit : (unit ? 'Depto. ' + unit : '');
+      const addressText = [address, unitText].filter(Boolean).join(', ');
       const neighborhoodText = neighborhood || 'Sector registrado en tu cuenta';
       const setText = (id, value) => {
         const el = document.getElementById(id);
