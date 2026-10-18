@@ -41,14 +41,14 @@
 <!-- Technician Profile & Dynamic ETA Status -->
 <div class="flex items-center gap-space-md min-w-0">
 <div class="relative flex-shrink-0">
-<img class="w-16 h-16 rounded-full object-cover shadow-sm ring-2 ring-surface-container" data-alt="Close-up portrait of Juan C., an experienced Chilen plumber and gas technician in his late fifties with friendly eyes, warm smile, neat grey beard, wearing a professional navy blue polo work uniform with certified technician insignia, warm workshop background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpAt0hu8WnzpIsDW3mteOq-jg1bPKXJSuOuhcQk5pKEkiZXr4EAnLMrQ_LPPLhwDpj0-chwWkKqBlkOtsOZB_4p-EFp_ymzCqj4s7HF0SJ3-cI0_HpkW0AFce3hk9i2eesmpg03Q8LDeg1BirbYUQkqfqq76H0o1WtoplJQBEFBuFY9N-3MSX4EqCw1b30IHvctDO-GC85fTP6iKVk8a9t9-uZuWjjZkMItT5eEyNYASHbdIol5cd0"/>
+<img id="vr-chat-tech-photo-main" class="w-16 h-16 rounded-full object-cover shadow-sm ring-2 ring-surface-container" data-alt="Close-up portrait of Juan C., an experienced Chilen plumber and gas technician in his late fifties with friendly eyes, warm smile, neat grey beard, wearing a professional navy blue polo work uniform with certified technician insignia, warm workshop background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpAt0hu8WnzpIsDW3mteOq-jg1bPKXJSuOuhcQk5pKEkiZXr4EAnLMrQ_LPPLhwDpj0-chwWkKqBlkOtsOZB_4p-EFp_ymzCqj4s7HF0SJ3-cI0_HpkW0AFce3hk9i2eesmpg03Q8LDeg1BirbYUQkqfqq76H0o1WtoplJQBEFBuFY9N-3MSX4EqCw1b30IHvctDO-GC85fTP6iKVk8a9t9-uZuWjjZkMItT5eEyNYASHbdIol5cd0"/>
 <span class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-secondary ring-2 ring-surface-container-lowest flex items-center justify-center">
 <span class="material-symbols-outlined text-[10px] text-on-secondary font-bold">check</span>
 </span>
 </div>
 <div class="flex flex-col min-w-0">
 <div class="flex flex-wrap items-center gap-space-xs">
-<h1 class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight truncate">Juan Camilo R.</h1>
+<h1 id="vr-chat-tech-name" class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight truncate">Juan Camilo R.</h1>
 <span class="inline-flex items-center gap-1 bg-surface-container px-2 py-0.5 rounded-full text-primary font-label-sm text-label-sm">
 <span class="material-symbols-outlined text-[14px] text-secondary">verified</span>
                 Técnico verificado
@@ -59,12 +59,12 @@
               </span>
 </div>
 <div class="flex flex-wrap items-center gap-x-space-sm gap-y-1 mt-0.5">
-<span class="font-body-sm text-body-sm text-on-surface-variant">Maestro Gasfíter Certificado SENA</span>
+<span id="vr-chat-tech-role" class="font-body-sm text-body-sm text-on-surface-variant">Maestro Gasfíter Certificado SENA</span>
 <span class="text-outline-variant">•</span>
 <div class="flex items-center gap-1">
 <span class="material-symbols-outlined text-[15px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="font-label-md text-label-md text-on-surface font-bold">5.0</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">(64 reseñas)</span>
+<span id="vr-chat-tech-rating" class="font-label-md text-label-md text-on-surface font-bold">5.0</span>
+<span id="vr-chat-tech-reviews" class="font-body-sm text-body-sm text-on-surface-variant">(64 reseñas)</span>
 </div>
 </div>
 <div class="mt-1.5 flex items-center gap-2">
@@ -998,5 +998,38 @@
 })();
 </script>
 
+
+<script id="vr-selected-professional-chat">
+(() => {
+  const profiles = {"juan":{"name":"Juan C.","chatName":"Juan Camilo R.","role":"Maestro Gasfíter Certificado SENA","rating":"5.0","reviews":"64 reseñas","badge":"Sello Oro VeciRed","amount":15000,"image":"https://lh3.googleusercontent.com/aida/AEtjO1XUWgT-DqfbPGcSkTJTsTZKe6M6Y5a5R1stsiW9TA2-d-OR-kUtyTuKsI7sDo5mbGCM_rYNhMPststj_aN5vJr-8hRSAzrbk7Z4jT9LEEzRvSmHsmnrHbJ0K9ykFBm5RNqPbNduPvOApJoIbKQpYwbwom0Ti2pkp56isJ7hqBzLe8c6O0ysqr8YRiQM4cDDTqDwM6mEKJpf0_yPQZFvqzBGROSUSs7gV6Ukr6APvATfHHl2F07-1dE064A"},"roberto":{"name":"Roberto D.","chatName":"Roberto D.","role":"Fontanero Profesional (12+ años exp.)","rating":"4.8","reviews":"89 reseñas","badge":"Sello Vecino Verificado","amount":13500,"image":"https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"},"luisa":{"name":"Luisa M.","chatName":"Luisa M.","role":"Especialista en Reparaciones","rating":"4.6","reviews":"32 trabajos","badge":"Garantía directa 45 días","amount":10500,"image":"https://lh3.googleusercontent.com/aida/AEtjO1VM3m0LFMZF4f5oEGm-esaoDJyfnYOs8FHnpdBmytqNsBTsO_y5MorZLX5ATH0FmqmoW23rkSA_VAYQLUuquJpXKWjTL7Amt4wK4ycqGHegPJG-iWrgiCQHmMHSNZrrfIn2nUWOk88VaAL4AAhINmBkRLzn2HiYhV-M6iGjeoY0YHLWo2Gv0sqSd00uSwg5ltqlt8ff6V0YZKi7FggFxM5DC0ryinyiiEGcLWr9z-0X0uR2nFIldZUf8wk"}};
+  const key = new URLSearchParams(window.location.search).get('profesional') || 'juan';
+  const pro = profiles[key] || profiles.juan;
+  const name = document.getElementById('vr-chat-tech-name');
+  const role = document.getElementById('vr-chat-tech-role');
+  const rating = document.getElementById('vr-chat-tech-rating');
+  const reviews = document.getElementById('vr-chat-tech-reviews');
+  const mainPhoto = document.getElementById('vr-chat-tech-photo-main');
+  const formatCLP = value => String(Math.round(value)).replace(/\\B(?=(\\d{3})+(?!\\d))/g, '.');
+  if (name) name.textContent = pro.chatName;
+  if (role) role.textContent = pro.role;
+  if (rating) rating.textContent = pro.rating;
+  if (reviews) reviews.textContent = '(' + pro.reviews + ')';
+  if (mainPhoto) { mainPhoto.src = pro.image; mainPhoto.alt = pro.chatName + ', profesional seleccionado de VeciRed'; }
+  document.querySelectorAll('img[data-alt*="Juan"], img[data-alt*="Juan Camilo"]').forEach(img => {
+    img.src = pro.image;
+    img.dataset.alt = pro.chatName + ', profesional seleccionado de VeciRed';
+  });
+  document.querySelectorAll('span').forEach(el => {
+    if (el.children.length === 0 && /Juan Camilo R\./.test(el.textContent)) {
+      el.textContent = el.textContent.replace(/Juan Camilo R\./g, pro.chatName);
+    }
+  });
+  const agreed = document.getElementById('vr-agreed-amount');
+  const escrow = document.getElementById('vr-escrow-amount');
+  const amountText = '$' + formatCLP(pro.amount) + ' CLP';
+  if (agreed) agreed.textContent = amountText;
+  if (escrow) escrow.textContent = amountText;
+})();
+</script>
 </body>
 </html>
