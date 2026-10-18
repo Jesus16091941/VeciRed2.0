@@ -93,21 +93,21 @@
 <div class="md:col-span-6 bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
 <div class="flex items-center gap-space-md">
 <div class="relative shrink-0">
-<img alt="Roberto D. Maestro Gasfíter" class="w-14 h-14 rounded-full object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"/>
+<img id="vr-confirmed-tech-photo" alt="Roberto D. Maestro Gasfíter" class="w-14 h-14 rounded-full object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"/>
 <span class="absolute -bottom-1 -right-1 bg-secondary text-on-secondary rounded-full p-0.5 flex items-center justify-center shadow">
 <span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">verified</span>
 </span>
 </div>
 <div class="flex flex-col min-w-0">
 <div class="flex items-center gap-1.5">
-<h3 class="font-label-lg text-label-lg text-primary font-bold truncate">Roberto D.</h3>
+<h3 id="vr-confirmed-tech-name" class="font-label-lg text-label-lg text-primary font-bold truncate">Roberto D.</h3>
 <span class="font-label-sm text-label-sm bg-surface-container text-on-surface-variant px-1.5 py-0.2 rounded font-medium">Técnico Certificado</span>
 </div>
-<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Maestro Gasfíter &amp; Sanitario</p>
+<p id="vr-confirmed-tech-role" class="font-body-sm text-body-sm text-on-surface-variant truncate">Maestro Gasfíter &amp; Sanitario</p>
 <div class="flex items-center gap-2 mt-1">
 <div class="flex items-center text-amber-600 font-label-sm text-label-sm font-semibold">
 <span class="material-symbols-outlined text-[15px] text-amber-500 mr-0.5" style="font-variation-settings: 'FILL' 1;">star</span>
-                  4.9
+                  <span id="vr-confirmed-tech-rating">4.8</span>
                 </div>
 <span class="text-outline text-[12px]">•</span>
 <span class="font-label-sm text-label-sm text-secondary font-semibold">Sello Vecino Verificado</span>
@@ -127,7 +127,7 @@
 <span>Monto pactado</span>
 </div>
 <div class="font-headline-lg text-headline-lg text-primary font-bold">
-            $13.500 <span class="font-label-sm text-label-sm text-on-surface-variant font-normal">CLP</span>
+            <span id="vr-confirmed-amount">13.500</span> <span class="font-label-sm text-label-sm text-on-surface-variant font-normal">CLP</span>
 </div>
 <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Visita y mano de obra base</span>
 </div>
@@ -170,7 +170,7 @@
 <div class="flex flex-col">
 <h4 class="font-label-lg text-label-lg text-primary font-bold">Modo de Pago Seguro Directo</h4>
 <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-relaxed">
-            El pago de <strong class="text-on-surface">$13.500 CLP</strong> se realiza directamente en efectivo o transferencia bancaria acordada entre las partes, únicamente una vez que el trabajo haya sido verificado y finalizado a tu plena satisfacción.
+            El pago de <strong id="vr-payment-amount" class="text-on-surface">$13.500 CLP</strong> se realiza directamente en efectivo o transferencia bancaria acordada entre las partes, únicamente una vez que el trabajo haya sido verificado y finalizado a tu plena satisfacción.
           </p>
 </div>
 </div>
@@ -332,3 +332,29 @@
   document.getElementById('cerrarGarantiaCruz').addEventListener('click', cerrarGarantia);
   modalGarantia.addEventListener('click', (e) => { if (e.target === modalGarantia) cerrarGarantia(); });
 })();</script>
+
+<script id="vr-selected-professional">
+(() => {
+  const profiles = {"juan":{"name":"Juan C.","chatName":"Juan Camilo R.","role":"Maestro Gasfíter Certificado SENA","rating":"5.0","reviews":"64 reseñas","badge":"Sello Oro VeciRed","amount":15000,"image":"https://lh3.googleusercontent.com/aida/AEtjO1XUWgT-DqfbPGcSkTJTsTZKe6M6Y5a5R1stsiW9TA2-d-OR-kUtyTuKsI7sDo5mbGCM_rYNhMPststj_aN5vJr-8hRSAzrbk7Z4jT9LEEzRvSmHsmnrHbJ0K9ykFBm5RNqPbNduPvOApJoIbKQpYwbwom0Ti2pkp56isJ7hqBzLe8c6O0ysqr8YRiQM4cDDTqDwM6mEKJpf0_yPQZFvqzBGROSUSs7gV6Ukr6APvATfHHl2F07-1dE064A"},"roberto":{"name":"Roberto D.","chatName":"Roberto D.","role":"Fontanero Profesional (12+ años exp.)","rating":"4.8","reviews":"89 reseñas","badge":"Sello Vecino Verificado","amount":13500,"image":"https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"},"luisa":{"name":"Luisa M.","chatName":"Luisa M.","role":"Especialista en Reparaciones","rating":"4.6","reviews":"32 trabajos","badge":"Garantía directa 45 días","amount":10500,"image":"https://lh3.googleusercontent.com/aida/AEtjO1VM3m0LFMZF4f5oEGm-esaoDJyfnYOs8FHnpdBmytqNsBTsO_y5MorZLX5ATH0FmqmoW23rkSA_VAYQLUuquJpXKWjTL7Amt4wK4ycqGHegPJG-iWrgiCQHmMHSNZrrfIn2nUWOk88VaAL4AAhINmBkRLzn2HiYhV-M6iGjeoY0YHLWo2Gv0sqSd00uSwg5ltqlt8ff6V0YZKi7FggFxM5DC0ryinyiiEGcLWr9z-0X0uR2nFIldZUf8wk"}};
+  const key = new URLSearchParams(window.location.search).get('profesional') || 'roberto';
+  const pro = profiles[key] || profiles.roberto;
+  const name = document.getElementById('vr-confirmed-tech-name');
+  const role = document.getElementById('vr-confirmed-tech-role');
+  const rating = document.getElementById('vr-confirmed-tech-rating');
+  const photo = document.getElementById('vr-confirmed-tech-photo');
+  const amount = document.getElementById('vr-confirmed-amount');
+  const payment = document.getElementById('vr-payment-amount');
+  const formatCLP = value => String(Math.round(value)).replace(/\\B(?=(\\d{3})+(?!\\d))/g, '.');
+  if (name) name.textContent = pro.name;
+  if (role) role.textContent = pro.role;
+  if (rating) rating.textContent = pro.rating;
+  if (photo) { photo.src = pro.image; photo.alt = pro.name + ' ' + pro.role; }
+  if (amount) amount.textContent = formatCLP(pro.amount);
+  if (payment) payment.textContent = '$' + formatCLP(pro.amount) + ' CLP';
+  const chatLink = document.querySelector('a[data-path="chat-coordinacion"]');
+  if (chatLink) chatLink.href = 'INT-21.html?profesional=' + encodeURIComponent(key);
+})();
+</script>
+
+</body>
+</html>
