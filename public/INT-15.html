@@ -421,7 +421,7 @@
   var target=document.getElementById('btn-propuestas');
   if(!target) return;
   var next=new URLSearchParams();
-  ['latitud','longitud','radio','categoria','fecha','franja','presupuesto','tecnico'].forEach(function(key){
+  ['latitud','longitud','radio','categoria','fecha','franja','presupuesto','tecnico','profile','destino'].forEach(function(key){
     var value=params.get(key);
     if(value!==null) next.set(key,value);
   });
@@ -431,3 +431,21 @@
 })();
 </script>
 
+<script id="vr-request-destination-summary">
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var profileId=params.get('profile')||'';
+  var mode=params.get('destino')||(profileId?'specific':'general');
+  var people={'seed-t-roberto':'Roberto Díaz','seed-t-lucia':'Lucía Muñoz','seed-t-carlosv':'Carlos Vargas','seed-t-carlost':'Carlos Torres','seed-t-andresp':'Andrés Pizarro','seed-t-juan':'Juan Camilo Ramírez','seed-t-luisa':'Luisa María Mendoza','seed-t-valentina':'Valentina Rivas','mateo-s':'Mateo S.','seed-e-hernan':'Hernán Soto','seed-e-marta':'Marta Leiva','seed-e-jorge':'Jorge Contreras'};
+  var heading=Array.from(document.querySelectorAll('h2,h3')).find(function(el){return /Buscando técnicos verificados cerca de tu ubicación/i.test(el.textContent);});
+  var notice=Array.from(document.querySelectorAll('span,p')).find(function(el){return /técnicos disponibles en tu cuadrante/i.test(el.textContent);});
+  if(mode==='specific' && people[profileId]){
+    if(heading) heading.textContent='Solicitud dirigida a '+people[profileId];
+    if(notice) notice.textContent='Solicitud dirigida a '+people[profileId]+'; no se enviará como una solicitud general.';
+    var count=document.getElementById('counter-tecnicos');
+    if(count) count.textContent='1';
+  } else if(mode==='general' && heading) {
+    heading.textContent='Buscando técnicos verificados cerca de tu ubicación...';
+  }
+})();
+</script>
