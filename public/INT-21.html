@@ -1079,6 +1079,19 @@
     const title = document.querySelector('.p-space-md.bg-surface-container-low.rounded-t-xl span.font-label-lg');
     if (title) title.textContent = 'Chat seguro con ' + pro.name;
     input.placeholder = 'Escribe tu consulta para ' + pro.short + '...';
+
+    // Desde el chat previo, permitir contratar al profesional sin saltarse
+    // la pantalla de confirmación INT-20.
+    const chatHeader = stream.closest('main')?.querySelector('.p-space-md.bg-surface-container-low.rounded-t-xl');
+    if (chatHeader && !document.getElementById('vr-prechat-hire-link')) {
+      const hireLink = document.createElement('a');
+      hireLink.id = 'vr-prechat-hire-link';
+      hireLink.href = 'INT-20.html?profesional=' + encodeURIComponent(key);
+      hireLink.className = 'inline-flex items-center justify-center gap-2 mt-2 px-4 py-2 rounded-lg bg-primary text-white font-semibold text-sm hover:opacity-90 transition-opacity self-start';
+      hireLink.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>Continuar con ' + pro.short + ' y confirmar contratación</span>';
+      chatHeader.appendChild(hireLink);
+    }
+
     const status = Array.from(document.querySelectorAll('body span')).find(el => /Aceptado & Confirmado/i.test(el.textContent));
     if (status) status.textContent = 'Chat previo a la contratación';
   }
