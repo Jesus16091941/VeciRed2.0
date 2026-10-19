@@ -704,36 +704,37 @@
 
 <script id="vr-download-service-receipts">
 (function(){
+  function escapeHTML(value){
+    return String(value==null?'':value).replace(/[&<>"']/g,function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+  }
   function downloadReceipt(button){
     var get=function(name){return button.getAttribute('data-'+name)||'No informado';};
-    var receipt=[
-      'VECIRED — COMPROBANTE DE SERVICIO',
-      'Documento demostrativo del prototipo; no es una factura tributaria.',
-      '',
-      'Código de servicio: '+get('service-id'),
-      'Trabajo: '+get('service-title'),
-      'Categoría: '+get('category'),
-      'Profesional: '+get('professional'),
-      'Fecha del servicio: '+get('date'),
-      'Monto registrado: '+get('amount'),
-      'Estado: '+get('status'),
-      'Garantía: '+get('warranty'),
-      '',
-      'Emitido desde la agenda de VeciRed.'
-    ].join('\\r\\n');
-    var blob=new Blob(['\\ufeff',receipt],{type:'text/plain;charset=utf-8'});
+    var fields=[
+      ['Código de servicio',get('service-id')],
+      ['Trabajo realizado',get('service-title')],
+      ['Categoría',get('category')],
+      ['Profesional',get('professional')],
+      ['Fecha del servicio',get('date')],
+      ['Monto registrado',get('amount')],
+      ['Estado',get('status')],
+      ['Garantía',get('warranty')]
+    ];
+    var rows=fields.map(function(field){return '<tr><th>'+escapeHTML(field[0])+'</th><td>'+escapeHTML(field[1])+'</td></tr>';}).join('');
+    var html='<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Comprobante '+escapeHTML(get('service-id'))+' — VeciRed</title><style>'+
+      'body{font-family:Arial,sans-serif;background:#f3f6fb;color:#13263b;margin:0;padding:32px}.receipt{max-width:760px;margin:0 auto;background:#fff;border:1px solid #d8e1ec;border-radius:16px;padding:32px;box-shadow:0 8px 28px #00142812}.brand{font-size:24px;font-weight:700;color:#001428}.subtitle{color:#006a61;font-weight:700;margin-top:6px}.status{display:inline-block;background:#d9f5ee;color:#00574f;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:700;margin:18px 0}table{width:100%;border-collapse:collapse;margin:12px 0 24px}th,td{text-align:left;padding:13px 10px;border-bottom:1px solid #e5ebf2;vertical-align:top}th{width:38%;color:#526274;font-size:13px}td{font-weight:600}.notice{background:#fff6df;border:1px solid #f1d58b;border-radius:10px;padding:12px;font-size:12px;color:#6b5214}.footer{font-size:12px;color:#68788a;margin-top:24px}.print{background:#001428;color:white;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer;margin-top:16px}@media print{body{background:#fff;padding:0}.receipt{box-shadow:none;border:0;max-width:none;padding:0}.print{display:none}}</style></head><body><main class="receipt"><div class="brand">VeciRed</div><div class="subtitle">Comprobante de servicio</div><div class="status">'+escapeHTML(get('status'))+'</div><table>'+rows+'</table><div class="notice">Documento demostrativo generado desde el prototipo de VeciRed. No corresponde a una factura tributaria ni reemplaza un comprobante fiscal oficial.</div><div class="footer">Conserva este archivo como respaldo informativo del servicio registrado en la agenda de VeciRed.</div><button class="print" onclick="window.print()">Imprimir / Guardar como PDF</button></main></body></html>';
+    var blob=new Blob([html],{type:'text/html;charset=utf-8'});
     var url=URL.createObjectURL(blob);
-    var link=document.createElement('a');
-    link.href=url;
-    link.download='Comprobante-'+get('service-id')+'.txt';
+    var link=document.createElement('a');link.href=url;
+    link.download='Comprobante-'+get('service-id')+'.html';
     document.body.appendChild(link);link.click();link.remove();
     setTimeout(function(){URL.revokeObjectURL(url);},1000);
   }
   document.addEventListener('click',function(event){
     var button=event.target.closest('[data-vr-receipt]');
     if(!button)return;
-    event.preventDefault();event.stopPropagation();
-    downloadReceipt(button);
+    event.preventDefault();event.stopPropagation();downloadReceipt(button);
   },true);
 })();
 </script>
