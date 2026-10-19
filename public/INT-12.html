@@ -228,12 +228,12 @@ main [data-vr-map="tecnicos"] {
 <!-- Filtros compactos junto al radio -->
 <div class="flex flex-wrap items-center gap-2 min-w-0">
 <div class="flex items-center gap-1.5">
-<button class="px-3 py-1.5 rounded-lg bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors whitespace-nowrap">Todos</button>
-<button class="px-3 py-1.5 rounded-lg bg-secondary text-on-secondary font-label-md text-label-md font-semibold shadow-sm flex items-center gap-1 whitespace-nowrap">
+<button type="button" data-vr-category="all" aria-pressed="true" class="px-3 py-1.5 rounded-lg bg-secondary text-on-secondary font-label-md text-label-md font-semibold shadow-sm flex items-center gap-1 whitespace-nowrap">Todos</button>
+<button type="button" data-vr-category="plumbing" aria-pressed="false" class="px-3 py-1.5 rounded-lg bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors whitespace-nowrap">
 <span class="material-symbols-outlined text-sm">plumbing</span>Plomería
 </button>
-<button class="px-3 py-1.5 rounded-lg bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors whitespace-nowrap">Electricidad</button>
-<button class="px-3 py-1.5 rounded-lg bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors whitespace-nowrap">Cerrajería</button>
+<button type="button" data-vr-category="electricity" aria-pressed="false" class="px-3 py-1.5 rounded-lg bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors whitespace-nowrap">Electricidad</button>
+<button type="button" data-vr-category="locksmith" aria-pressed="false" class="px-3 py-1.5 rounded-lg bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors whitespace-nowrap">Cerrajería</button>
 </div>
 <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-container/40 text-on-secondary-container whitespace-nowrap">
 <span class="relative flex h-2.5 w-2.5 shrink-0">
@@ -903,6 +903,59 @@ main [data-vr-map="tecnicos"] {
     };
     try { sessionStorage.setItem('vecired:selected-professional-contract', JSON.stringify(selected)); } catch (_) {}
   }, true);
+})();
+</script>
+
+
+
+<script id="vr-filter-technicians">
+(() => {
+  const buttons = Array.from(document.querySelectorAll('[data-vr-category]'));
+  if (!buttons.length) return;
+  const select = document.getElementById('vrSortTechnicians');
+  const header = select && select.closest('div.flex.flex-col');
+  const feed = header && header.nextElementSibling;
+  if (!feed) return;
+
+  function getCategory(card) {
+    const text = (card.textContent || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (/cerrajer|cerradura|chapas|llaves/.test(text)) return 'locksmith';
+    if (/electricista|electricidad|electrico|electrica/.test(text)) return 'electricity';
+    if (/fontan|gasfiter|plomer|fuga|filtracion|calefon|monomando/.test(text)) return 'plumbing';
+    return 'other';
+  }
+
+  function applyFilter(category) {
+    const cards = Array.from(feed.children).filter(card =>
+      card.querySelector('h4') && card.querySelector('button[data-go]')
+    );
+    let visible = 0;
+    cards.forEach(card => {
+      const matches = category === 'all' || getCategory(card) === category;
+      card.hidden = !matches;
+      card.style.display = matches ? '' : 'none';
+      if (matches) visible++;
+    });
+
+    buttons.forEach(button => {
+      const active = button.dataset.vrCategory === category;
+      button.setAttribute('aria-pressed', String(active));
+      button.classList.toggle('bg-secondary', active);
+      button.classList.toggle('text-on-secondary', active);
+      button.classList.toggle('font-semibold', active);
+      button.classList.toggle('shadow-sm', active);
+      button.classList.toggle('bg-surface-container', !active);
+      button.classList.toggle('text-primary', !active);
+    });
+
+    const count = Array.from(document.querySelectorAll('span')).find(el =>
+      /18 disponibles ahora|\d+ profesionales? disponibles? ahora/i.test(el.textContent.trim())
+    );
+    if (count) count.textContent = visible + (visible === 1 ? ' profesional disponible ahora' : ' profesionales disponibles ahora');
+  }
+
+  buttons.forEach(button => button.addEventListener('click', () => applyFilter(button.dataset.vrCategory)));
+  applyFilter('all');
 })();
 </script>
 
