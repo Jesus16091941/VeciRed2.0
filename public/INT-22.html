@@ -869,7 +869,7 @@
       var professional=card.getAttribute('data-service-professional')||'';
       var start=toICSDate(date,'1000');
       var end=toICSDate(date,'1130');
-      events.push(['BEGIN:VEVENT','UID:'+code+'@vecired.local','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')+'Z','DTSTART;TZID=America/Santiago:'+start,'DTEND;TZID=America/Santiago:'+end,'SUMMARY:'+escapeICS(title),'DESCRIPTION:'+escapeICS('Código: '+code+'\nProfesional: '+professional+'\nExportado desde VeciRed. Importación de calendario de una sola vez.'),'END:VEVENT'].join('\r\n'));
+      events.push(['BEGIN:VEVENT','UID:'+code+'@vecired.local','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z'),'DTSTART;TZID=America/Santiago:'+start,'DTEND;TZID=America/Santiago:'+end,'SUMMARY:'+escapeICS(title),'DESCRIPTION:'+escapeICS('Código: '+code+'\nProfesional: '+professional+'\nExportado desde VeciRed. Importación de calendario de una sola vez.'),'END:VEVENT'].join('\r\n'));
     });
     if(!events.length){alert('No hay servicios agendados con fecha para exportar.');return;}
     var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//VeciRed//Agenda de servicios//ES','CALSCALE:GREGORIAN','METHOD:PUBLISH'].concat(events).concat(['END:VCALENDAR']).join('\r\n');
