@@ -1056,6 +1056,9 @@ document.addEventListener('DOMContentLoaded', function () {
         gpsStatus.dataset.lng=lng;
         gpsStatus.dataset.source='gps';
         if(addressNode) addressNode.textContent='Ubicación GPS actual ('+lat.toFixed(5)+', '+lng.toFixed(5)+')';
+        var savedLocation={lat:lat,lng:lng,accuracy:position.coords.accuracy,label:'Tu ubicación',place:'Ubicación GPS activa',fallback:false};
+        try{sessionStorage.setItem('vecired:location',JSON.stringify(savedLocation));}catch(storageError){}
+        if(window.VeciRed && window.VeciRed.store) window.VeciRed.store.set('location',savedLocation);
         if(typeof window.vrSetMapLocation==='function') window.vrSetMapLocation(lat,lng,true);
         updatePublishButton();
       },function(error){
