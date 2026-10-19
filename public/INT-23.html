@@ -346,92 +346,181 @@
 </div>
 </div>
 </div>
-<script>
-  // Interactive Multi-Criteria Star System
+<script id="vr-review-functional">
+(() => {
+  const params = new URLSearchParams(location.search);
+  const professionalKey = ['juan','roberto','luisa'].includes(params.get('profesional')) ? params.get('profesional') : 'roberto';
+  const profileIds = {juan:'seed-t-juan', roberto:'seed-t-roberto', luisa:'seed-t-luisa'};
+  const profiles = {
+    juan:{name:'Juan C.', service:'Servicio realizado'},
+    roberto:{name:'Roberto D.', service:'Reparación de Grifo y Fuga Menor'},
+    luisa:{name:'Luisa M.', service:'Servicio realizado'}
+  };
+  const pro = profiles[professionalKey];
+  const form = document.getElementById('evaluationForm');
+  const submitBtn = document.getElementById('submitReviewBtn');
+  const scores = {punctuality:0, quality:0, courtesy:0};
+  const selectedTags = new Set();
+  let photos = [];
+  let busy = false;
+
   document.querySelectorAll('[data-rating-group]').forEach(group => {
-    const stars = group.querySelectorAll('.star-btn');
+    const type = group.dataset.ratingGroup;
+    const stars = Array.from(group.querySelectorAll('.star-btn'));
     const badge = group.querySelector('.score-badge');
-    let currentScore = 5;
-
+    group.setAttribute('role','group');
+    group.setAttribute('aria-label', ({punctuality:'Puntualidad',quality:'Calidad del trabajo',courtesy:'Atención y trato vecinal'})[type] || type);
+    if (badge) badge.textContent = '0.0';
     stars.forEach(star => {
+      const icon = star.querySelector('.material-symbols-outlined');
+      star.classList.remove('text-[#eab308]');
+      star.classList.add('text-outline-variant');
+      if (icon) icon.style.fontVariationSettings = "'FILL' 0";
+      star.setAttribute('aria-pressed','false');
       star.addEventListener('click', () => {
-        const val = parseInt(star.getAttribute('data-val'));
-        currentScore = val;
-        badge.textContent = val.toFixed(1);
-
-        stars.forEach(s => {
-          const sVal = parseInt(s.getAttribute('data-val'));
-          const icon = s.querySelector('.material-symbols-outlined');
-          if (sVal <= val) {
-            s.classList.remove('text-outline-variant');
-            s.classList.add('text-[#eab308]');
-            icon.style.fontVariationSettings = "'FILL' 1";
-          } else {
-            s.classList.remove('text-[#eab308]');
-            s.classList.add('text-outline-variant');
-            icon.style.fontVariationSettings = "'FILL' 0";
-          }
+        const value = Number(star.dataset.val);
+        scores[type] = value;
+        if (badge) badge.textContent = value.toFixed(1);
+        stars.forEach(item => {
+          const active = Number(item.dataset.val) <= value;
+          item.classList.toggle('text-[#eab308]', active);
+          item.classList.toggle('text-outline-variant', !active);
+          const itemIcon = item.querySelector('.material-symbols-outlined');
+          if (itemIcon) itemIcon.style.fontVariationSettings = active ? "'FILL' 1" : "'FILL' 0";
+          item.setAttribute('aria-pressed', String(Number(item.dataset.val) === value));
         });
       });
     });
   });
 
-  // Quick Praise Tag Toggle
   document.querySelectorAll('.quick-chip').forEach(chip => {
+    chip.setAttribute('aria-pressed','false');
     chip.addEventListener('click', () => {
-      chip.classList.toggle('bg-secondary');
-      chip.classList.toggle('text-on-secondary');
-      chip.classList.toggle('bg-surface-container-low');
-      chip.classList.toggle('text-on-surface-variant');
-      
+      const active = chip.getAttribute('aria-pressed') !== 'true';
+      chip.setAttribute('aria-pressed', String(active));
+      if (active) selectedTags.add(chip.innerText.trim());
+      else selectedTags.delete(chip.innerText.trim());
+      chip.classList.toggle('bg-secondary', active);
+      chip.classList.toggle('text-on-secondary', active);
+      chip.classList.toggle('bg-surface-container-low', !active);
+      chip.classList.toggle('text-on-surface-variant', !active);
       const icon = chip.querySelector('.material-symbols-outlined');
-      if (chip.classList.contains('bg-secondary')) {
-        icon.classList.remove('text-secondary');
-        icon.classList.add('text-on-secondary');
-      } else {
-        icon.classList.add('text-secondary');
-        icon.classList.remove('text-on-secondary');
+      if (icon) {
+        icon.classList.toggle('text-secondary', !active);
+        icon.classList.toggle('text-on-secondary', active);
       }
     });
   });
 
-  // Character counter for text area
   const reviewText = document.getElementById('reviewText');
   const charCount = document.getElementById('charCount');
-  if (reviewText && charCount) {
-    reviewText.addEventListener('input', () => {
-      const len = reviewText.value.length;
-      charCount.textContent = `${len} / 500 ${len >= 20 ? '(longitud óptima)' : '(mínimo 20 caracteres recomendados)'}`;
-      if (len >= 20) {
-        charCount.classList.add('text-secondary');
-        charCount.classList.remove('text-on-surface-variant');
-      } else {
-        charCount.classList.remove('text-secondary');
-        charCount.classList.add('text-on-surface-variant');
-      }
+  if (reviewText && charCount) reviewText.addEventListener('input', () => {
+    const len = reviewText.value.length;
+    charCount.textContent = len + ' / 500' + (len >= 20 ? ' (longitud óptima)' : ' (mínimo 20 caracteres recomendados)');
+  });
+
+  const photoSection = Array.from(document.querySelectorAll('label')).find(el => el.textContent.includes('Agregar fotos del trabajo terminado'));
+  const oldGrid = photoSection && photoSection.parentElement.parentElement.querySelector('.grid');
+  if (oldGrid) {
+    oldGrid.id = 'vr-review-photo-grid';
+    oldGrid.innerHTML = '';
+    oldGrid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-space-sm mt-space-xs';
+  }
+  const grid = document.getElementById('vr-review-photo-grid');
+  const picker = document.createElement('input');
+  picker.type = 'file'; picker.accept = 'image/jpeg,image/png,image/webp'; picker.multiple = true;
+  picker.className = 'hidden'; picker.setAttribute('aria-label','Seleccionar fotos del trabajo');
+  if (grid) grid.parentElement.appendChild(picker);
+
+  function renderPhotos() {
+    if (!grid) return;
+    grid.innerHTML = '';
+    photos.forEach((photo,index) => {
+      const tile = document.createElement('div');
+      tile.className = 'relative group rounded-xl overflow-hidden shadow-sm aspect-video bg-surface-container-high';
+      const img = document.createElement('img'); img.src = photo.data; img.alt = photo.name || 'Foto adjunta a la evaluación';
+      img.className = 'w-full h-full object-cover';
+      const controls = document.createElement('div');
+      controls.className = 'absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity flex items-center justify-center gap-space-xs';
+      const view = document.createElement('button'); view.type='button'; view.title='Ampliar foto'; view.setAttribute('aria-label','Ampliar foto');
+      view.className='w-8 h-8 rounded-full bg-surface-container-lowest/90 text-primary flex items-center justify-center shadow';
+      view.innerHTML='<span class="material-symbols-outlined text-[16px]">visibility</span>';
+      view.addEventListener('click',()=>{ const w=window.open(); if(w){w.document.write('<title>Vista previa de foto</title><img style="max-width:100%;height:auto" src="'+photo.data+'">');w.document.close();} });
+      const del = document.createElement('button'); del.type='button'; del.title='Eliminar foto'; del.setAttribute('aria-label','Eliminar foto');
+      del.className='w-8 h-8 rounded-full bg-surface-container-lowest/90 text-error flex items-center justify-center shadow';
+      del.innerHTML='<span class="material-symbols-outlined text-[16px]">delete</span>';
+      del.addEventListener('click',()=>{photos.splice(index,1);renderPhotos();});
+      controls.append(view,del); tile.append(img,controls); grid.appendChild(tile);
+    });
+    const add = document.createElement('button');
+    add.type='button'; add.className='rounded-xl p-space-md flex flex-col items-center justify-center text-center bg-surface-container-low hover:bg-surface-container transition-all aspect-video group';
+    add.innerHTML='<span class="w-10 h-10 rounded-full bg-surface-container-lowest text-secondary flex items-center justify-center shadow-sm mb-2"><span class="material-symbols-outlined text-[22px]">cloud_upload</span></span><span class="font-label-md text-label-md text-primary font-semibold">Subir otra foto</span><span class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">JPG, PNG o WebP · máximo 5 fotos</span>';
+    add.disabled = photos.length >= 5; add.classList.toggle('opacity-50',add.disabled);
+    add.addEventListener('click',()=>picker.click()); grid.appendChild(add);
+  }
+  function resizePhoto(file) {
+    return new Promise((resolve,reject)=>{
+      if (!file.type.startsWith('image/')) return reject(new Error('Selecciona solo archivos de imagen.'));
+      if (file.size > 10*1024*1024) return reject(new Error('Cada foto debe pesar 10 MB o menos.'));
+      const reader=new FileReader();
+      reader.onerror=()=>reject(new Error('No se pudo leer una foto.'));
+      reader.onload=()=>{
+        const img=new Image();
+        img.onerror=()=>reject(new Error('No se pudo abrir una foto.'));
+        img.onload=()=>{
+          const scale=Math.min(1,1200/img.width,1200/img.height);
+          const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
+          const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,canvas.width,canvas.height);
+          resolve({name:file.name,data:canvas.toDataURL('image/jpeg',0.72)});
+        };
+        img.src=reader.result;
+      };
+      reader.readAsDataURL(file);
     });
   }
+  picker.addEventListener('change',async()=>{
+    const chosen=Array.from(picker.files||[]);
+    picker.value='';
+    for (const file of chosen) {
+      if (photos.length>=5) break;
+      try { photos.push(await resizePhoto(file)); }
+      catch(error) { alert(error.message || 'No se pudo agregar la foto.'); }
+    }
+    renderPhotos();
+  });
+  renderPhotos();
 
-  // Submission feedback micro-interaction
-  const submitBtn = document.getElementById('submitReviewBtn');
-  if (submitBtn) {
-    submitBtn.addEventListener('click', () => {
-      submitBtn.innerHTML = `
-        <span class="material-symbols-outlined text-[20px] animate-spin">progress_activity</span>
-        <span>Guardando reseña mutua...</span>
-      `;
-      submitBtn.disabled = true;
-
-      setTimeout(() => {
-        submitBtn.innerHTML = `
-          <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-          <span>¡Evaluación Publicada!</span>
-        `;
-        submitBtn.classList.remove('bg-primary');
-        submitBtn.classList.add('bg-secondary');
-      }, 900);
-    });
-  }
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (busy) return;
+    const missing=Object.keys(scores).filter(key=>!scores[key]);
+    if (missing.length) {
+      const labels={punctuality:'la puntualidad',quality:'la calidad del trabajo',courtesy:'la atención y el trato vecinal'};
+      alert('Antes de enviar, puntúa: '+missing.map(key=>labels[key]).join(', ')+'.');
+      const group=document.querySelector('[data-rating-group="'+missing[0]+'"]');
+      if(group) group.scrollIntoView({behavior:'smooth',block:'center'});
+      return;
+    }
+    const avg=Number(((scores.punctuality+scores.quality+scores.courtesy)/3).toFixed(1));
+    const entry={
+      id:'review-'+Date.now(), professionalKey, profileId:profileIds[professionalKey], professionalName:pro.name,
+      ratings:{...scores}, overall:avg, tags:Array.from(selectedTags), comment:(reviewText?.value||'').trim(),
+      photos:photos.map(p=>p.data), photoNames:photos.map(p=>p.name), service:pro.service,
+      request:'VECI-8492', date:new Date().toISOString()
+    };
+    let all=[];
+    try { all=JSON.parse(localStorage.getItem('vecired:professional-reviews:v1')||'[]'); if(!Array.isArray(all))all=[]; }
+    catch(_){all=[];}
+    all.unshift(entry);
+    try { localStorage.setItem('vecired:professional-reviews:v1',JSON.stringify(all)); }
+    catch(_) { alert('No se pudo guardar la evaluación porque el navegador se quedó sin espacio. Prueba quitando algunas fotos.'); return; }
+    busy=true; submitBtn.disabled=true;
+    submitBtn.innerHTML='<span class="material-symbols-outlined text-[20px]">check_circle</span><span>¡Evaluación guardada!</span>';
+    submitBtn.classList.remove('bg-primary');submitBtn.classList.add('bg-secondary');
+    setTimeout(()=>{ location.href='INT-13.html?profile='+encodeURIComponent(profileIds[professionalKey])+'&review=sent'; },500);
+  });
+})();
+</script>
 </div></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant/40 py-space-xl"><div class="max-w-container-max mx-auto px-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 VeciRed Marketplace. Conexión local confiable.</span></div><nav class="flex flex-wrap items-center justify-center gap-space-md" data-active-classes="text-on-surface font-semibold"><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="terminos-de-servicio" href="INT-00-teryser.html">Términos de Servicio</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="politica-de-privacidad" href="INT-00-poldepri.html">Política de Privacidad</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="proteccion-de-datos" href="INT-00-prodeda.html">Protección de Datos</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="centro-de-ayuda" href="INT-00-cendeayu.html">Centro de Ayuda</a></nav></div></footer>
 
 <!-- Banner compartido (replicado desde INT-01) -->
