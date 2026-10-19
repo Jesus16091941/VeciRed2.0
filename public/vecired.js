@@ -495,9 +495,13 @@
         var img = document.createElement('img');
         img.src = 'logo.svg';
         img.alt = 'VeciRed — Servicios hiperlocales';
-        img.className = 'h-8 w-auto';
+        img.className = 'brand-logo';
         img.setAttribute('data-vr-brand-logo', 'true');
         img.style.display = 'block';
+        img.style.width = '160px';
+        img.style.height = '40px';
+        img.style.objectFit = 'contain';
+        img.style.objectPosition = 'left center';
         group.replaceChildren(img);
       });
     });
@@ -1582,6 +1586,7 @@
       }
     }
     renderAccountBanners();
+    wireBrandLogo();
     bindCurrentUser();
     wireScrollbar();
     wireLogo();
