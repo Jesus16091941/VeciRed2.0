@@ -1167,12 +1167,84 @@
     window.setTimeout(() => {
       history.push({
         role: 'professional',
-        text: '¡Gracias por tu mensaje! Revisemos los detalles para que tengas claro el servicio antes de continuar.',
+        text: generateProfessionalReply(text),
         time: timeNow()
       });
       saveHistory();
       renderConversation(!preview);
-    }, 1200);
+    }, 900);
+  };
+
+  // Respuestas contextuales para la demo: consideran el mensaje actual,
+  // el historial reciente y el tipo de profesional seleccionado.
+  function generateProfessionalReply(message) {
+    const clean = value => String(value || '').toLocaleLowerCase('es-CL')
+      .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').trim();
+    const msg = clean(message);
+    const previous = history.slice(-6);
+    const lastPro = [...previous].reverse().find(item => item.role === 'professional');
+    const lastNeighbor = [...previous].reverse().find(item => item.role === 'neighbor');
+    const hasOrder = !preview;
+    const role = key === 'juan' ? 'gasfitería' : key === 'roberto' ? 'fontanería y reparaciones' : 'reparaciones del hogar';
+    const price = money(pro.amount);
+
+    if (/^(hola|holaa|buenas|buenos dias|buenas tardes|buenas noches|que tal)[!. ,]*$/.test(msg)) {
+      return '¡Hola! Gracias por escribirme. Cuéntame qué problema tienes y qué te gustaría resolver; así puedo orientarte mejor.';
+    }
+    if (/gracias|muchas gracias|te agradezco/.test(msg)) {
+      return '¡De nada! La idea es que tengas claro el trabajo antes de avanzar. Si te queda alguna duda sobre el problema, el precio o el horario, dime y lo revisamos.';
+    }
+    if (/cuanto|precio|valor|costo|cobran|sale|presupuesto|cotiz/.test(msg)) {
+      return hasOrder
+        ? 'El valor que aparece en esta orden es ' + price + '. La retención de VeciPay se mantiene asociada a la orden de demostración; si cambió el trabajo solicitado, conviene aclarar el nuevo alcance antes de realizarlo.'
+        : 'Como referencia, mi propuesta para este servicio es de ' + price + '. El valor final podría variar si al revisar el problema aparece un trabajo adicional; antes de contratar, te explicaría cualquier cambio para que lo aceptes.';
+    }
+    if (/cuando|horario|hora|disponible|disponibilidad|hoy|manana|mañana|agenda|agendar|llegar|demora/.test(msg)) {
+      return hasOrder
+        ? 'Revisemos el horario acordado en la orden antes de hacer cambios. ¿Te sirve el bloque que aparece en los detalles o necesitas coordinar otro horario?'
+        : 'Podemos revisar un horario que te acomode. ¿Te sirve hoy o prefieres que coordinemos para otro día? La disponibilidad definitiva tendría que confirmarse al contratar.';
+    }
+    if (/direccion|ubicacion|donde queda|domicilio|comuna|barrio/.test(msg)) {
+      return 'Para coordinar la visita, confirma la comuna y la dirección por los medios de la solicitud. Por seguridad, comparte los datos exactos solo cuando sean necesarios para coordinar el servicio.';
+    }
+    if (/foto|imagen|video|adjunt|enviar.*(ver|mostrar)|te muestro/.test(msg)) {
+      return 'Sí, una foto o un video breve puede ayudar a entender mejor el problema. Si la plataforma te permite adjuntarlo, envíalo por aquí; si no, descríbeme qué se ve y dónde ocurre.';
+    }
+    if (/fuga|gote|llave|grifer|lavaplatos|lavamanos|ducha|caneria|cañeria|desague|inodoro|wc|agua|filtra|filtracion/.test(msg)) {
+      if (key === 'luisa') return 'Entiendo. Para orientarte mejor, ¿el problema ocurre todo el tiempo o solo cuando usas la llave, ducha o desagüe? Si puedes, dime también en qué parte lo notas.';
+      return 'Entiendo. Para acotar el problema, ¿el agua gotea constantemente o solo cuando abres la llave? Dime también de qué parte viene la fuga; con eso puedo orientarte mejor antes de la visita.';
+    }
+    if (/enchufe|interruptor|luz|electri|cable|cortocircuit|automatico|tablero/.test(msg)) {
+      return 'Gracias por explicarlo. Para entender mejor, ¿el problema afecta a un solo enchufe o luz, o a varias partes de la vivienda? Por seguridad, no manipules cables expuestos ni equipos que puedan estar energizados.';
+    }
+    if (/limpiar|aseo|suciedad|limpieza/.test(msg)) {
+      return 'Claro. Para calcular bien el trabajo, ¿qué espacio necesitas limpiar y aproximadamente qué tamaño tiene? También sirve saber si buscas una limpieza general o una más profunda.';
+    }
+    if (/mueble|puerta|cajon|bisagra|madera|armar|carpinter/.test(msg)) {
+      return 'Entiendo. ¿Me cuentas qué mueble o pieza es y qué le está pasando exactamente? Si tienes medidas o una foto, ayudarían a estimar el trabajo.';
+    }
+    if (/si|sí|claro|exacto|correcto|asi es|así es|eso mismo/.test(msg) && lastPro && /¿|\?/.test(lastPro.text)) {
+      return 'Perfecto, gracias por confirmarlo. Con ese dato ya entiendo mejor lo que necesitas. ¿Hay algún otro detalle importante que deba considerar antes de coordinar?';
+    }
+    if (/no|nop|para nada/.test(msg) && lastPro && /¿|\?/.test(lastPro.text)) {
+      return 'Entendido, gracias por aclararlo. Entonces no asumiré ese detalle. ¿Me puedes contar un poco más de lo que sí está ocurriendo para orientarte correctamente?';
+    }
+    if (/contratar|aceptar|tomar el servicio|continuar|confirmar/.test(msg)) {
+      return hasOrder
+        ? 'La orden ya está abierta en este prototipo. Antes de realizar el trabajo, revisemos que el servicio, el monto y el horario de la orden estén correctos.'
+        : 'Antes de confirmar, revisa la propuesta, el alcance del trabajo y el precio. Si todo está claro, puedes volver a la comparación y seleccionar la propuesta que prefieras.';
+    }
+    if (/problema|arreglar|reparar|no funciona|se rompio|se rompió|esta malo|está malo|fallando/.test(msg)) {
+      return 'Te ayudo a precisar el trabajo. ¿Desde cuándo ocurre y qué pasa exactamente cuando intentas usarlo? Si me dices dónde sucede y si ocurre siempre o a ratos, podré orientarte mejor.';
+    }
+    if (msg.length < 18 && lastPro && /¿|\?/.test(lastPro.text)) {
+      return 'Gracias por responder. Para no sacar conclusiones equivocadas, ¿me puedes dar un poquito más de detalle sobre eso?';
+    }
+    if (lastNeighbor && clean(lastNeighbor.text) !== msg) {
+      return 'Entiendo lo que me comentas. Para darte una orientación más útil, ¿me puedes describir qué resultado esperas y qué está pasando ahora? Así podemos aclarar el alcance antes de avanzar.';
+    }
+    return 'Gracias por contarme. Para entender bien lo que necesitas, ¿qué es lo más importante que debería revisar del servicio? Con ese detalle podemos aclarar el alcance y evitar confusiones antes de avanzar.';
+  };
   };
 })();
 </script>
