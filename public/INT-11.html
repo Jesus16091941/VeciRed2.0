@@ -128,7 +128,7 @@
 <span class="material-symbols-outlined text-primary text-[20px]">tune</span>
 <h3 class="text-headline-sm font-headline-sm text-primary">Filtros</h3>
 </div>
-<button class="text-label-sm font-label-sm text-secondary hover:text-on-secondary-container underline cursor-pointer" type="button">
+<button id="vr-clear-filters" class="text-label-sm font-label-sm text-secondary hover:text-on-secondary-container underline cursor-pointer" type="button">
                 Limpiar todo
               </button>
 </div>
@@ -136,7 +136,7 @@
 <div class="py-space-md border-b border-surface-container">
 <div class="flex items-center justify-between mb-space-2xs">
 <label class="text-label-md font-label-md text-on-surface">Radio de Cobertura</label>
-<span class="bg-secondary-container/30 text-on-secondary-container font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">
+<span id="vr-distance-label" class="bg-secondary-container/30 text-on-secondary-container font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">
                   Hasta 3.5 km
                 </span>
 </div>
@@ -145,7 +145,7 @@
               </p>
 <!-- Slider component UI -->
 <div class="relative w-full pt-1 pb-2">
-<input class="w-full accent-secondary bg-surface-container-highest rounded-lg h-2 cursor-pointer" max="5" min="1" step="0.5" type="range" value="3.5"/>
+<input id="vr-distance" class="w-full accent-secondary bg-surface-container-highest rounded-lg h-2 cursor-pointer" max="5" min="1" step="0.5" type="range" value="3.5" aria-label="Radio de cobertura en kilómetros"/>
 <div class="flex justify-between text-[11px] font-label-sm text-outline mt-1 font-semibold">
 <span>1 km</span>
 <span>2 km</span>
@@ -157,7 +157,7 @@
 <!-- Sello de Confianza / Trust Verification Toggle -->
 <div class="py-space-md border-b border-surface-container">
 <label class="flex items-start gap-space-xs cursor-pointer group">
-<input checked="" class="mt-1 w-4 h-4 rounded text-secondary accent-secondary cursor-pointer" type="checkbox"/>
+<input id="vr-verified" checked="" class="mt-1 w-4 h-4 rounded text-secondary accent-secondary cursor-pointer" type="checkbox"/>
 <div class="flex-1">
 <div class="flex items-center gap-1.5">
 <span class="text-label-md font-label-md text-on-surface group-hover:text-primary transition-colors">
@@ -177,7 +177,7 @@
 <div class="space-y-space-xs">
 <label class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
 <div class="flex items-center gap-2">
-<input checked="" class="accent-primary" name="rating-filter" type="radio"/>
+<input checked="" class="accent-primary" name="rating-filter" type="radio" value="4.5"/>
 <span class="flex items-center text-body-sm font-body-sm text-on-surface">
 <span class="text-secondary font-bold mr-1">★ 4.5</span> o superior
                     </span>
@@ -186,7 +186,7 @@
 </label>
 <label class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
 <div class="flex items-center gap-2">
-<input class="accent-primary" name="rating-filter" type="radio"/>
+<input class="accent-primary" name="rating-filter" type="radio" value="4.0"/>
 <span class="flex items-center text-body-sm font-body-sm text-on-surface">
 <span class="text-secondary font-bold mr-1">★ 4.0</span> o superior
                     </span>
@@ -195,7 +195,7 @@
 </label>
 <label class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
 <div class="flex items-center gap-2">
-<input class="accent-primary" name="rating-filter" type="radio"/>
+<input class="accent-primary" name="rating-filter" type="radio" value="0"/>
 <span class="text-body-sm font-body-sm text-on-surface">Cualquier puntaje</span>
 </div>
 <span class="text-label-sm font-label-sm text-outline bg-surface-container px-2 py-0.5 rounded-full">42</span>
@@ -207,15 +207,15 @@
 <label class="text-label-md font-label-md text-on-surface block mb-space-xs">Rango de Tarifa Visita</label>
 <div class="space-y-2">
 <label class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface cursor-pointer">
-<input class="accent-primary" name="price-filter" type="radio"/>
+<input class="accent-primary" name="price-filter" type="radio" value="economico"/>
 <span>$ Económico (Hasta $10.500 CLP)</span>
 </label>
 <label class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface cursor-pointer">
-<input checked="" class="accent-primary" name="price-filter" type="radio"/>
+<input checked="" class="accent-primary" name="price-filter" type="radio" value="estandar"/>
 <span>$$ Estándar ($10.500 - $18.000 CLP)</span>
 </label>
 <label class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface cursor-pointer">
-<input class="accent-primary" name="price-filter" type="radio"/>
+<input class="accent-primary" name="price-filter" type="radio" value="especialista"/>
 <span>$$$ Especialistas certificados (&gt; $18.000)</span>
 </label>
 </div>
@@ -223,13 +223,13 @@
 <!-- Service Urgency & Extra guarantees -->
 <div class="py-space-md space-y-space-xs">
 <label class="flex items-start gap-space-xs cursor-pointer">
-<input class="mt-1 w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+<input id="vr-emergency" class="mt-1 w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
 <span class="text-body-sm font-body-sm text-on-surface">
                   Atención de Emergencia (24/7)
                 </span>
 </label>
 <label class="flex items-start gap-space-xs cursor-pointer">
-<input checked="" class="mt-1 w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
+<input id="vr-free" checked="" class="mt-1 w-4 h-4 rounded text-primary accent-primary cursor-pointer" type="checkbox"/>
 <span class="text-body-sm font-body-sm text-on-surface">
                   Presupuesto o diagnóstico sin costo
                 </span>
@@ -237,7 +237,7 @@
 </div>
 <!-- Apply CTA Button -->
 <div class="pt-space-sm">
-<button class="w-full h-11 bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer" type="button" data-toast="Filtros aplicados.">
+<button id="vr-apply-filters" class="w-full h-11 bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md rounded-lg flex items-center justify-center gap-2 transition-colors cursor-pointer" type="button">
 <span>Aplicar Filtros</span>
 <span class="bg-surface-container-lowest/20 px-2 py-0.5 rounded text-[11px] font-bold">24</span>
 </button>
@@ -292,7 +292,7 @@
 <!-- Technician Cards Grid (3 Columns) -->
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-space-lg">
 <!-- Card 1: Roberto D. (Plomero Master) -->
-<article data-cat="plomeria" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<article data-cat="plomeria" data-rating="4.9" data-price="12000" data-distance="0.8" data-verified="true" data-emergency="false" data-free="true" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
 <div>
 <!-- Top Image & Quick Badges -->
 <div class="relative h-48 w-full bg-surface-container overflow-hidden">
@@ -349,7 +349,7 @@
 </div>
 </article>
 <!-- Card 2: Lucía M. (Electricista) -->
-<article data-cat="electricidad" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<article data-cat="electricidad" data-rating="5" data-price="13500" data-distance="1.2" data-verified="true" data-emergency="true" data-free="true" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
 <div>
 <div class="relative h-48 w-full bg-surface-container overflow-hidden">
 <img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a Hispanic woman certified electrician in a navy work vest with tools visible in background, confident smile, clean well-lit electrical service workshop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAcChc2QzcOE_mnpYEKaiN0D245YXuz7cFUundX2m1mbsRzXY3jAEEcAtQOs2647lMmmL6uK4iS1PhekMgbjPCrmA3Q4cfP4njyEY4gBc363gOPRi3iHMrEfV9dyymnyoTh9oKns7L6uXxfhmguwRo_ppSPDJFI3lp-B0NSxsgbC-MnB3l9mpRqqnLlQph2QQeMUWV_fn6xN7MKqBL0r5KX4sYRe83FyOtInU6D5ro45SYIqS0T-tn"/>
@@ -401,7 +401,7 @@
 </div>
 </article>
 <!-- Card 3: Carlos V. (Cerrajería de Alta Seguridad) -->
-<article data-cat="cerrajeria" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<article data-cat="cerrajeria" data-rating="4.9" data-price="10500" data-distance="1.5" data-verified="true" data-emergency="false" data-free="true" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
 <div>
 <div class="relative h-48 w-full bg-surface-container overflow-hidden">
 <img class="w-full h-full object-cover" data-alt="Portrait of an experienced male master locksmith holding professional lock picks and precision key machine in a tidy local hardware shop, warm ambient light, friendly professional aura." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrHQTwupdxneS31R7Yf3mX_HI7dYfr2trUHqx6IVi2PbKviCvf5CaL5FixmlAiV9MGMTeTJg-4gt5y4vD_3NK3GSLcYzMGwQMkbrqqCJAUhjxwNLL6QYZpbMZKD-4Yancg_0xupE4PqQdAqXoHzhcSAGJlEqqxZXz4sMveeeqrXoBfDxXlLoUQImZ6tT8IWSHf9Xn-DZXak3bxrPcPro8riibNaqXiNiBxB-eVaP07C_G9n9BSVnyi"/>
@@ -453,7 +453,7 @@
 </div>
 </article>
 <!-- Card 4: Andrés P. (Pintor y Acabados) -->
-<article data-cat="pintura" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<article data-cat="pintura" data-rating="4.8" data-price="9000" data-distance="2.1" data-verified="true" data-emergency="false" data-free="true" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
 <div>
 <div class="relative h-48 w-full bg-surface-container overflow-hidden">
 <img class="w-full h-full object-cover" data-alt="Portrait of a clean, skilled house painter specialist wearing painters overalls, holding a high quality brush next to a freshly painted modern interior wall in warm neutral tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKgbZSnrpgybrQisELeRfeIFmXuZZjYXkta4yDjwayuIowC49iIOllOdBazuWyleyt9Bgx_Wb6xTASygWUyXcpE5ZchifLU8hjDGsgSZt75Zb2roVPRDh1p55j9Eg99kkkOjcnWffDIGL1nM4EHYvhG9DLxWWS_GBM7x2Z2bDWVyjNEGyqx0tBeyQSGp3WbcoB4VhU88Ydndq9FNmpZTO-ayYHOnlAQ3kOAvgu6So9mMvigo8DJnwk"/>
@@ -504,7 +504,7 @@
 </div>
 </article>
 <!-- Card 5: Mateo S. (Electrodomésticos) -->
-<article data-cat="refrigeracion" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<article data-cat="refrigeracion" data-rating="4.9" data-price="10500" data-distance="2.7" data-verified="true" data-emergency="false" data-free="false" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
 <div>
 <div class="relative h-48 w-full bg-surface-container overflow-hidden">
 <img class="w-full h-full object-cover" data-alt="Professional technician inspecting the electronic motherboard of an appliance in a modern workshop with specialized diagnostic equipment, clean professional workwear." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqaFP-XGke4ao9My5ukkkSphDr2sDzQrJxHhN19iMGIW-TMRxsL3pifl2tbZ8hlu71miQFYt7GPoboRn86btqCWzUoNqgHfg1F6y6LPmd_FDU5ofMzVC4A7YhUbb_t-EyAkLcAuERfcKVdjKswO4wuot9Il0zOS9cb9zLwCAAOc68Do5WzsaDu1FKMpvbEsCeHhVf_15AJdBXQnJqANnSy0bw91mydtLaqCTFbc1syElBxyk0Rjm5d"/>
@@ -555,7 +555,7 @@
 </div>
 </article>
 <!-- Card 6: Valentina R. (Paisajismo & Jardinería) -->
-<article data-cat="jardineria" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<article data-cat="jardineria" data-rating="4.8" data-price="19500" data-distance="3.1" data-verified="true" data-emergency="false" data-free="true" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
 <div>
 <div class="relative h-48 w-full bg-surface-container overflow-hidden">
 <img class="w-full h-full object-cover" data-alt="A portrait of a cheerful female landscape gardener with gardening gloves and shears in an upscale residential garden with lush greenery, sunlight, natural aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH9DXwu1o9LDr3YE02w8Ka_0mFT66SpEAveelBLEwI9iEnznJ1bMHohbR-7MorfLtVvhsX6weG6wZGM6rWTwJiBTHzHpF5skGvi2NyhT1rpEqIM7gIdBScEi8WVXEFvHWAlN2L4dqluxz0o9x195JHDj-cH2gu1P8vQeVoLbUdpHbytmXksrYUqEhT7RZhdcCPiacTEJzRNLiRrM5NxacWz5EBLzMEEfGM4xp6wmZ40nIrejwzPeRY"/>
@@ -659,21 +659,31 @@
   var pageSize = 6;
   var currentPage = 1;
   var activeCategory = '';
+  var appliedFilters = null;
   var labels = {};
   Array.prototype.forEach.call(select.options, function (o) { if (o.value) labels[o.value] = o.textContent; });
+
+  var distance = document.getElementById('vr-distance');
+  var distanceLabel = document.getElementById('vr-distance-label');
+  var verified = document.getElementById('vr-verified');
+  var emergency = document.getElementById('vr-emergency');
+  var free = document.getElementById('vr-free');
+  var applyButton = document.getElementById('vr-apply-filters');
+  var clearButton = document.getElementById('vr-clear-filters');
+
+  function selectedRadio(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : (name === 'rating-filter' ? '0' : 'todos');
+  }
 
   function makeButton(label, page, active, disabled, icon) {
     var button = document.createElement('button');
     button.type = 'button';
     button.className = 'w-9 h-9 flex items-center justify-center rounded-lg transition-colors';
     button.disabled = !!disabled;
-    if (disabled) {
-      button.className += ' text-outline opacity-40 cursor-not-allowed';
-    } else if (active) {
-      button.className += ' bg-primary text-on-primary font-label-md text-label-md font-bold';
-    } else {
-      button.className += ' hover:bg-surface-container text-on-surface font-label-md text-label-md';
-    }
+    if (disabled) button.className += ' text-outline opacity-40 cursor-not-allowed';
+    else if (active) button.className += ' bg-primary text-on-primary font-label-md text-label-md font-bold';
+    else button.className += ' hover:bg-surface-container text-on-surface font-label-md text-label-md';
     if (icon) {
       var span = document.createElement('span');
       span.className = 'material-symbols-outlined text-[18px]';
@@ -685,24 +695,39 @@
       button.setAttribute('aria-label', 'Página ' + page);
       if (active) button.setAttribute('aria-current', 'page');
     }
-    if (!disabled && !active && page) {
-      button.addEventListener('click', function () {
-        currentPage = page;
-        render();
-      });
-    }
+    if (!disabled && !active && page) button.addEventListener('click', function () { currentPage = page; render(); });
     return button;
   }
 
+  function matchesSidebar(card) {
+    if (!appliedFilters) return true;
+    var f = appliedFilters;
+    var rating = Number(card.dataset.rating || 0);
+    var price = Number(card.dataset.price || 0);
+    var km = Number(card.dataset.distance || 999);
+    if (km > f.distance) return false;
+    if (f.verified && card.dataset.verified !== 'true') return false;
+    if (rating < f.rating) return false;
+    if (f.price === 'economico' && price > 10500) return false;
+    if (f.price === 'estandar' && (price < 10500 || price > 18000)) return false;
+    if (f.price === 'especialista' && price <= 18000) return false;
+    if (f.emergency && card.dataset.emergency !== 'true') return false;
+    if (f.free && card.dataset.free !== 'true') return false;
+    return true;
+  }
+
   function render() {
+    var term = (search.value || '').trim().toLocaleLowerCase('es-CL');
     var filtered = cards.filter(function (card) {
-      return !activeCategory || card.getAttribute('data-cat') === activeCategory;
+      var categoryMatch = !activeCategory || card.getAttribute('data-cat') === activeCategory;
+      var textMatch = !term || card.textContent.toLocaleLowerCase('es-CL').indexOf(term) !== -1;
+      return categoryMatch && textMatch && matchesSidebar(card);
     });
     var total = filtered.length;
     var totalPages = Math.max(1, Math.ceil(total / pageSize));
     if (currentPage > totalPages) currentPage = totalPages;
     if (currentPage < 1) currentPage = 1;
-    var startIndex = (currentPage - 1) * pageSize;
+    var startIndex = total ? (currentPage - 1) * pageSize : 0;
     var endIndex = Math.min(startIndex + pageSize, total);
 
     cards.forEach(function (card) {
@@ -713,28 +738,26 @@
     });
 
     if (count) count.textContent = total + (total === 1 ? ' profesional' : ' profesionales');
-    paginationInfo.textContent = total === 0
-      ? 'No hay profesionales para esta categoría'
+    if (paginationInfo) paginationInfo.textContent = total === 0
+      ? 'No hay profesionales que coincidan con los filtros seleccionados.'
       : 'Mostrando ' + (startIndex + 1) + '–' + endIndex + ' de ' + total + ' profesionales en Santiago Centro';
+    var empty = document.getElementById('vr-empty');
+    if (empty) empty.hidden = total !== 0;
 
-    paginationControls.replaceChildren();
-    if (totalPages > 1) {
-      paginationControls.appendChild(makeButton('Anterior', currentPage - 1, false, currentPage === 1, 'chevron_left'));
-      for (var page = 1; page <= totalPages; page++) {
-        paginationControls.appendChild(makeButton(String(page), page, page === currentPage, false, ''));
-      }
-      paginationControls.appendChild(makeButton('Siguiente', currentPage + 1, false, currentPage === totalPages, 'chevron_right'));
-    } else if (total > 0) {
-      paginationControls.appendChild(makeButton('1', 1, true, false, ''));
+    if (paginationControls) {
+      paginationControls.replaceChildren();
+      if (totalPages > 1) {
+        paginationControls.appendChild(makeButton('Anterior', currentPage - 1, false, currentPage === 1, 'chevron_left'));
+        for (var page = 1; page <= totalPages; page++) paginationControls.appendChild(makeButton(String(page), page, page === currentPage, false, ''));
+        paginationControls.appendChild(makeButton('Siguiente', currentPage + 1, false, currentPage === totalPages, 'chevron_right'));
+      } else if (total > 0) paginationControls.appendChild(makeButton('1', 1, true, false, ''));
     }
   }
 
-  function apply(cat, updateUrl) {
+  function applyCategory(cat, updateUrl) {
     if (cat && !labels[cat]) cat = '';
     activeCategory = cat;
     select.value = cat;
-    search.value = cat ? labels[cat] : '';
-    currentPage = 1;
     chip.hidden = !cat;
     chip.style.display = cat ? '' : 'none';
     chipLabel.textContent = cat ? labels[cat] : '';
@@ -743,12 +766,63 @@
       if (cat) url.searchParams.set('cat', cat); else url.searchParams.delete('cat');
       history.replaceState(null, '', url);
     }
+    currentPage = 1;
     render();
   }
 
-  select.addEventListener('change', function () { apply(select.value, true); });
-  document.getElementById('vr-cat-clear').addEventListener('click', function () { apply('', true); });
-  apply(new URLSearchParams(location.search).get('cat') || '', false);
+  function applySidebarFilters() {
+    appliedFilters = {
+      distance: Number(distance.value),
+      verified: verified.checked,
+      rating: Number(selectedRadio('rating-filter')),
+      price: selectedRadio('price-filter'),
+      emergency: emergency.checked,
+      free: free.checked
+    };
+    if (distanceLabel) distanceLabel.textContent = 'Hasta ' + Number(distance.value).toLocaleString('es-CL') + ' km';
+    currentPage = 1;
+    render();
+    if (applyButton) {
+      var span = applyButton.querySelector('span.bg-surface-container-lowest\\/20');
+      if (span) span.textContent = count ? count.textContent.split(' ')[0] : '';
+    }
+  }
+
+  distance.addEventListener('input', function () {
+    if (distanceLabel) distanceLabel.textContent = 'Hasta ' + Number(distance.value).toLocaleString('es-CL') + ' km';
+  });
+  applyButton.addEventListener('click', applySidebarFilters);
+  clearButton.addEventListener('click', function () {
+    distance.value = '3.5';
+    verified.checked = false;
+    document.querySelector('input[name="rating-filter"][value="0"]').checked = true;
+    document.querySelector('input[name="price-filter"][value="todos"]').checked = true;
+    emergency.checked = false;
+    free.checked = false;
+    appliedFilters = null;
+    if (distanceLabel) distanceLabel.textContent = 'Hasta 3.5 km';
+    var url = new URL(location.href);
+    url.searchParams.delete('cat');
+    history.replaceState(null, '', url);
+    applyCategory('', false);
+  });
+  select.addEventListener('change', function () { applyCategory(select.value, true); });
+  document.getElementById('vr-cat-clear').addEventListener('click', function () { applyCategory('', true); });
+  search.addEventListener('input', function () { currentPage = 1; render(); });
+
+  // Añade una opción neutral para poder mostrar todos los rangos de tarifa.
+  var standardPrice = document.querySelector('input[name="price-filter"][value="estandar"]');
+  if (standardPrice) {
+    var parent = standardPrice.closest('label');
+    var priceGroup = parent && parent.parentElement;
+    if (priceGroup && !document.querySelector('input[name="price-filter"][value="todos"]')) {
+      var label = document.createElement('label');
+      label.className = 'flex items-center gap-2 text-body-sm font-body-sm text-on-surface cursor-pointer';
+      label.innerHTML = '<input class="accent-primary" name="price-filter" type="radio" value="todos" checked/><span>Todos los rangos</span>';
+      priceGroup.insertBefore(label, priceGroup.firstChild);
+    }
+  }
+  applyCategory(new URLSearchParams(location.search).get('cat') || '', false);
 })();
 </script>
 
