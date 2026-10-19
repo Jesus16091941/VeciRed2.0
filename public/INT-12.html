@@ -147,6 +147,12 @@ main [data-vr-map="tecnicos"] {
 </div>
 <span class="material-symbols-outlined text-outline text-sm ml-1 group-hover:text-primary transition-colors">tune</span>
 </button>
+<!-- Radio de búsqueda junto a la ubicación exacta -->
+<div id="vrRadiusSelector" class="flex items-center gap-1.5 bg-surface-container-low p-1 rounded-xl shrink-0 whitespace-nowrap" role="group" aria-label="Radio de búsqueda">
+<button class="px-3 py-2 rounded-lg text-on-surface-variant font-label-md text-label-md hover:text-primary hover:bg-surface-container transition-all whitespace-nowrap" data-vr-set-radius="1000" aria-pressed="false"><span>1 km</span><span class="vr-radius-active hidden ml-1 text-[11px] font-bold">(Activo)</span></button>
+<button class="px-3 py-2 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md shadow-sm font-bold transition-all whitespace-nowrap" data-vr-set-radius="3000" data-vr-active aria-pressed="true"><span>3 km</span><span class="vr-radius-active ml-1 text-[11px] font-bold">(Activo)</span></button>
+<button class="px-3 py-2 rounded-lg text-on-surface-variant font-label-md text-label-md hover:text-primary hover:bg-surface-container transition-all whitespace-nowrap" data-vr-set-radius="5000" aria-pressed="false"><span>5 km</span><span class="vr-radius-active hidden ml-1 text-[11px] font-bold">(Activo)</span></button>
+</div>
 <!-- Search Technician/Service Field -->
 <div class="relative flex-1 min-w-[240px] max-w-lg">
 <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-lg pointer-events-none">search</span>
@@ -156,15 +162,7 @@ main [data-vr-map="tecnicos"] {
 </div>
 <!-- Right: Hyperlocal Radius Pills + Category Filters + Live Node Status -->
 <div class="flex flex-wrap items-center gap-2.5">
-<!-- Radius Selector Pills -->
-<div class="flex items-center bg-surface-container-low p-1 rounded-xl">
-<button class="px-3 py-1.5 rounded-lg text-on-surface-variant font-label-md text-label-md hover:text-primary hover:bg-surface-container transition-all" data-vr-set-radius="1000" aria-pressed="false">1 km</button>
-<button class="px-3.5 py-1.5 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md shadow-sm font-bold flex items-center gap-1.5" data-vr-set-radius="3000" data-vr-active aria-pressed="true">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span>
-            3 km (Activo)
-          </button>
-<button class="px-3 py-1.5 rounded-lg text-on-surface-variant font-label-md text-label-md hover:text-primary hover:bg-surface-container transition-all" data-vr-set-radius="5000" aria-pressed="false">5 km</button>
-</div>
+
 <!-- Specialty Filter Buttons -->
 <div class="hidden md:flex items-center gap-1.5">
 <button class="px-3 py-1.5 rounded-lg bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors">Todos</button>
@@ -692,5 +690,27 @@ main [data-vr-map="tecnicos"] {
     }
   });
   render();
+})();
+</script>
+
+<script id="vr-radius-active-label-script">
+(() => {
+  const selector = document.getElementById('vrRadiusSelector');
+  if (!selector) return;
+  const buttons = Array.from(selector.querySelectorAll('[data-vr-set-radius]'));
+  const updateActiveLabel = (selected) => {
+    buttons.forEach(button => {
+      const active = button === selected;
+      button.toggleAttribute('data-vr-active', active);
+      button.setAttribute('aria-pressed', String(active));
+      const label = button.querySelector('.vr-radius-active');
+      if (label) label.classList.toggle('hidden', !active);
+    });
+  };
+  selector.addEventListener('click', event => {
+    const button = event.target.closest('[data-vr-set-radius]');
+    if (button) updateActiveLabel(button);
+  });
+  updateActiveLabel(buttons.find(button => button.getAttribute('aria-pressed') === 'true') || buttons[1]);
 })();
 </script>
