@@ -1179,7 +1179,7 @@
   // el historial reciente y el tipo de profesional seleccionado.
   function generateProfessionalReply(message) {
     const clean = value => String(value || '').toLocaleLowerCase('es-CL')
-      .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').trim();
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
     const msg = clean(message);
     const previous = history.slice(-6);
     const lastPro = [...previous].reverse().find(item => item.role === 'professional');
