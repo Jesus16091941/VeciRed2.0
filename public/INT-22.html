@@ -826,17 +826,26 @@
       calendarDays.appendChild(btn);
     }
   }
+  function chooseTabForMonth(value){
+    if(!value)return;
+    var hasUpcoming=cards.some(function(card){return serviceDate(card).slice(0,7)===value&&card.getAttribute('data-service-kind')==='upcoming';});
+    var hasHistory=cards.some(function(card){return serviceDate(card).slice(0,7)===value&&card.getAttribute('data-service-kind')==='history';});
+    if(!hasUpcoming&&hasHistory)activeTab='history';
+    else if(hasUpcoming)activeTab='upcoming';
+  }
   function changeMonth(delta){
     var p=currentMonth.split('-'), d=new Date(Number(p[0]),Number(p[1])-1+delta,1);
     currentMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     filterMonth=currentMonth;
     if(monthInput)monthInput.value=currentMonth;
     selectedDay='';
+    chooseTabForMonth(currentMonth);
     selectionLabel.textContent='Selecciona un día para filtrar los servicios.';
     renderCalendar();applyFilters();
   }
   if(monthInput)monthInput.addEventListener('change',function(){
     currentMonth=monthInput.value||currentMonth;filterMonth=monthInput.value;selectedDay='';
+    chooseTabForMonth(filterMonth);
     selectionLabel.textContent='Selecciona un día para filtrar los servicios.';
     renderCalendar();applyFilters();
   });
