@@ -320,11 +320,11 @@
 <!-- Card Actions -->
 <div class="flex flex-wrap items-center justify-between gap-space-sm pt-space-2xs">
 <div class="flex items-center gap-space-sm">
-<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-low text-primary font-label-md text-label-md transition-colors" type="button" data-toast="Descargando comprobante…">
-<span class="material-symbols-outlined text-[16px]">receipt_long</span>
-<span>Ver Comprobante</span>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-low text-primary font-label-md text-label-md transition-colors" type="button" data-vr-receipt data-service-id="VECI-8120" data-service-title="Revisión Eléctrica y Cambio de Breakers" data-professional="Juan Camilo Ramírez" data-category="Electricidad" data-date="02 Oct 2026, 15:30 hrs" data-amount="$19.500 CLP" data-status="Completado y verificado" data-warranty="48 días restantes de cobertura por defectos de mano de obra">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span>Descargar comprobante</span>
 </button>
-<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-secondary font-label-md text-label-md font-semibold transition-colors" type="button" data-go="INT-14.html">
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-secondary font-label-md text-label-md font-semibold transition-colors" type="button" data-go="INT-14.html?profile=seed-t-juan&amp;destino=specific&amp;tecnico=juan" aria-label="Volver a contratar a Juan Camilo Ramírez">
 <span class="material-symbols-outlined text-[16px]">replay</span>
 <span>Volver a Contratar a Juan</span>
 </button>
@@ -354,8 +354,8 @@
 <span class="font-label-lg text-label-lg text-primary font-bold">$24.000 CLP</span>
 <span class="block font-body-sm text-[11px] text-outline">Garantía concluida</span>
 </div>
-<button class="p-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-primary transition-colors" title="Descargar orden de servicio" type="button">
-<span class="material-symbols-outlined text-[18px]">download</span>
+<button class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-primary text-xs font-semibold transition-colors" title="Descargar comprobante del servicio finalizado" type="button" data-vr-receipt data-service-id="VECI-7714" data-service-title="Mantenimiento Preventivo de Calefón a Gas" data-professional="Roberto Díaz" data-category="Gasfitería y Plomería" data-date="18 de Agosto de 2026" data-amount="$24.000 CLP" data-status="Finalizado con éxito" data-warranty="Garantía concluida">
+<span class="material-symbols-outlined text-[18px]">download</span><span>Descargar comprobante</span>
 </button>
 </div>
 </div>
@@ -699,5 +699,41 @@
   }
   render();
   window.addEventListener('storage',function(event){if(event.key===key) render();});
+})();
+</script>
+
+<script id="vr-download-service-receipts">
+(function(){
+  function downloadReceipt(button){
+    var get=function(name){return button.getAttribute('data-'+name)||'No informado';};
+    var receipt=[
+      'VECIRED — COMPROBANTE DE SERVICIO',
+      'Documento demostrativo del prototipo; no es una factura tributaria.',
+      '',
+      'Código de servicio: '+get('service-id'),
+      'Trabajo: '+get('service-title'),
+      'Categoría: '+get('category'),
+      'Profesional: '+get('professional'),
+      'Fecha del servicio: '+get('date'),
+      'Monto registrado: '+get('amount'),
+      'Estado: '+get('status'),
+      'Garantía: '+get('warranty'),
+      '',
+      'Emitido desde la agenda de VeciRed.'
+    ].join('\\r\\n');
+    var blob=new Blob(['\\ufeff',receipt],{type:'text/plain;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var link=document.createElement('a');
+    link.href=url;
+    link.download='Comprobante-'+get('service-id')+'.txt';
+    document.body.appendChild(link);link.click();link.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  }
+  document.addEventListener('click',function(event){
+    var button=event.target.closest('[data-vr-receipt]');
+    if(!button)return;
+    event.preventDefault();event.stopPropagation();
+    downloadReceipt(button);
+  },true);
 })();
 </script>
