@@ -727,13 +727,13 @@
     var pins = [];
     host.querySelectorAll('[data-vr-pin]').forEach(function (el) {
       var parts = el.getAttribute('data-vr-pin').split(',');
-      pins.push({ km: Number(parts[0]), deg: Number(parts[1] || 0), icon: pinIcon(el) });
+      pins.push({ km: Number(parts[0]), deg: Number(parts[1] || 0), icon: pinIcon(el), label: (el.textContent || '').trim() });
       el.remove();
     });
     if (host.hasAttribute('data-vr-pins')) {
       try {
         JSON.parse(host.getAttribute('data-vr-pins')).forEach(function (p) {
-          pins.push({ km: p.km, deg: p.deg, icon: generatedIcon(p) });
+          pins.push({ km: p.km, deg: p.deg, icon: generatedIcon(p), label: (p.label || p.name || p.text || '').toString().trim() });
         });
       } catch (e) { /* JSON de pines inválido */ }
     }
@@ -776,7 +776,35 @@
         }).addTo(map)
       : L.circleMarker([0, 0], { radius: 7, color: '#ffffff', weight: 3, fillColor: '#001428', fillOpacity: 1, interactive: false }).addTo(map);
     if (draggable) L.control.zoom({ position: 'topright' }).addTo(map);
-    var markers = pins.map(function (p) { return { pin: p, marker: L.marker([0, 0], { icon: p.icon, keyboard: false, riseOnHover: true }).addTo(map) }; });
+    var openUserMarker = null;
+    var markers = pins.map(function (p) {
+      var marker = L.marker([0, 0], { icon: p.icon, keyboard: false, riseOnHover: true }).addTo(map);
+      var label = p.label || 'Usuario de VeciRed';
+      var popupContent = document.createElement('div');
+      popupContent.className = 'vr-map-user-popup';
+      popupContent.textContent = label;
+      marker.bindPopup(popupContent, { closeButton: false, autoPan: true, closeOnClick: false, className: 'vr-map-user-popup-container' });
+      marker.on('click', function () {
+        if (openUserMarker === marker && marker.isPopupOpen()) {
+          marker.closePopup();
+          openUserMarker = null;
+        } else {
+          if (openUserMarker && openUserMarker !== marker) openUserMarker.closePopup();
+          marker.openPopup();
+          openUserMarker = marker;
+        }
+      });
+      marker.on('popupclose', function () {
+        if (openUserMarker === marker) openUserMarker = null;
+      });
+      return { pin: p, marker: marker };
+    });
+    map.on('click', function () {
+      if (openUserMarker) {
+        openUserMarker.closePopup();
+        openUserMarker = null;
+      }
+    });
     var route = host.hasAttribute('data-vr-route') ? L.polyline([], { color: '#14b8a6', weight: 5, dashArray: '8 6', opacity: 0.9 }).addTo(map) : null;
 
     var state = { host: host, map: map, theme: theme, radius: radius };
