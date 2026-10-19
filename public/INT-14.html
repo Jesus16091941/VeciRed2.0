@@ -490,77 +490,18 @@
 <span class="text-[10px] text-slate-500">Máximo Perímetro</span>
 </button>
 </div>
-<!-- Embedded Interactive Map Widget -->
-<div data-vr-map="solicitud" data-vr-theme="dark" data-vr-radius="3000" class="relative w-full h-56 rounded-2xl overflow-hidden border border-slate-200 bg-[#0f2942] shadow-inner">
-<!-- Map Graphical Canvas Simulation -->
-<div data-vr-decor class="absolute inset-0 opacity-65 bg-[radial-gradient(#1e40af_1px,transparent_1px)] [background-size:20px_20px]"></div>
-<!-- Map Streets and Water Lines (SVG) -->
-<svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-<path d="M-50,140 Q150,110 350,160 T850,120" fill="none" opacity="0.6" stroke="#334155" stroke-width="6"></path>
-<path d="M220,-20 L260,250" fill="none" opacity="0.5" stroke="#334155" stroke-width="4"></path>
-<path d="M480,-20 Q440,120 520,250" fill="none" opacity="0.5" stroke="#334155" stroke-width="4"></path>
-<path d="M-20,60 L750,90" fill="none" stroke="#1e293b" stroke-width="2"></path>
-<!-- Coverage Radius Circle around User Pin -->
-<circle cx="50%" cy="50%" fill="rgba(37, 99, 235, 0.18)" r="90" stroke="#3b82f6" stroke-dasharray="4 3" stroke-width="2"></circle>
-<circle cx="50%" cy="50%" fill="rgba(37, 99, 235, 0.1)" r="50" stroke="#60a5fa" stroke-width="1.5"></circle>
-</svg>
-<!-- Center User Pin -->
-<div data-vr-pin="0,0" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 pointer-events-none">
-<div class="pulse-radar">
-<div class="w-10 h-10 rounded-full bg-blue-600 border-2 border-white shadow-lg flex items-center justify-center text-white text-sm">
-<i class="fa-solid fa-house"></i>
-</div>
-</div>
-<div class="mt-1.5 px-2 py-0.5 rounded-full bg-slate-900/90 text-white text-[10px] font-bold tracking-wide border border-white/20 whitespace-nowrap shadow-md backdrop-blur-xs">
-                Tu Hogar (<span data-vr-user="direccion">Huérfanos 1160</span>)
-              </div>
-</div>
-<!-- Technician Pins in 3km perimeter -->
-<!-- Roberto D (Plumber) -->
-<div data-vr-pin="1.18,-24" class="absolute top-[32%] left-[42%] -translate-x-1/2 -translate-y-1/2 z-10">
-<div class="group relative cursor-pointer">
-<div class="w-8 h-8 rounded-full bg-emerald-500 border-2 border-white shadow-md flex items-center justify-center text-white text-xs">
-<i class="fa-solid fa-wrench"></i>
-</div>
-<div class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-slate-900 text-white rounded text-[10px] whitespace-nowrap z-20">
-                  Roberto D. (800m) ★ 4.9
-                </div>
-</div>
-</div>
-<!-- Technician 2 -->
-<div data-vr-pin="0.68,135" class="absolute top-[58%] left-[58%] -translate-x-1/2 -translate-y-1/2 z-10">
-<div class="w-7 h-7 rounded-full bg-emerald-500 border-2 border-white shadow-md flex items-center justify-center text-white text-[10px]">
-<i class="fa-solid fa-faucet"></i>
-</div>
-</div>
-<!-- Technician 3 -->
-<div data-vr-pin="1.02,45" class="absolute top-[38%] left-[62%] -translate-x-1/2 -translate-y-1/2 z-10">
-<div class="w-7 h-7 rounded-full bg-emerald-500 border-2 border-white shadow-md flex items-center justify-center text-white text-[10px]">
-<i class="fa-solid fa-toolbox"></i>
-</div>
-</div>
-<!-- Technician 4 -->
-<div data-vr-pin="1.11,-167" class="absolute top-[68%] left-[46%] -translate-x-1/2 -translate-y-1/2 z-10">
-<div class="w-6 h-6 rounded-full bg-emerald-500/80 border border-white flex items-center justify-center text-white text-[9px]">
-<i class="fa-solid fa-wrench"></i>
-</div>
-</div>
-<!-- Floating Map Badge: Active Technicians -->
-<div class="absolute top-3 left-3 z-20 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 text-white text-xs font-semibold backdrop-blur-md border border-white/10 shadow-lg">
-<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-<span>14 técnicos certificados en el perímetro</span>
-</div>
-<!-- Map Controls -->
-<div class="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-md rounded-lg p-1 border border-white/10">
-<button class="w-6 h-6 flex items-center justify-center text-white text-xs hover:bg-white/20 rounded" data-vr-ctl="zoom-in" data-vr-target="solicitud" aria-label="Acercar">
-<i class="fa-solid fa-plus"></i>
-</button>
-<button class="w-6 h-6 flex items-center justify-center text-white text-xs hover:bg-white/20 rounded" data-vr-ctl="zoom-out" data-vr-target="solicitud" aria-label="Alejar">
-<i class="fa-solid fa-minus"></i>
-</button>
-</div>
-</div>
-</section>
+<!-- Mapa real con OpenStreetMap y ubicación GPS -->
+<div data-vr-map="solicitud" data-vr-theme="dark" data-vr-radius="3000" class="relative w-full h-56 rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
+  <div id="vr-request-map" class="absolute inset-0 w-full h-full" role="application" aria-label="Mapa de ubicación y radio de búsqueda"></div>
+  <div class="absolute top-3 left-3 z-[500] flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 text-white text-xs font-semibold shadow-lg pointer-events-none">
+    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <span id="vr-map-status">Mapa listo · ubicación de referencia</span>
+  </div>
+  <div class="absolute bottom-3 right-3 z-[500] flex items-center gap-1.5 bg-slate-900/85 rounded-lg p-1 border border-white/10">
+    <button class="w-7 h-7 flex items-center justify-center text-white text-xs hover:bg-white/20 rounded" type="button" data-vr-ctl="zoom-in" data-vr-target="solicitud" aria-label="Acercar mapa"><i class="fa-solid fa-plus"></i></button>
+    <button class="w-7 h-7 flex items-center justify-center text-white text-xs hover:bg-white/20 rounded" type="button" data-vr-ctl="zoom-out" data-vr-target="solicitud" aria-label="Alejar mapa"><i class="fa-solid fa-minus"></i></button>
+  </div>
+</div></section>
 <!-- Bottom Action Bar -->
 <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
 <button class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center justify-center gap-2" type="button" data-toast="Borrador guardado.">
@@ -1034,6 +975,62 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // Mapa real: OpenStreetMap + Leaflet. La ubicación inicial es solo una referencia, no GPS confirmado.
+  var mapElement=document.getElementById('vr-request-map');
+  var requestMap=null;
+  var userMapMarker=null;
+  var searchRadiusCircle=null;
+  var mapStatus=document.getElementById('vr-map-status');
+  var mapCenter=[-33.4489,-70.6693];
+  var demoTechMarkers=[];
+  function offsetCoordinate(lat,lng,distanceMeters,bearingDegrees){
+    var earth=6378137, bearing=bearingDegrees*Math.PI/180;
+    var dLat=(distanceMeters*Math.cos(bearing))/earth;
+    var dLng=(distanceMeters*Math.sin(bearing))/(earth*Math.cos(lat*Math.PI/180));
+    return [lat+dLat*180/Math.PI,lng+dLng*180/Math.PI];
+  }
+  function setMapLocation(lat,lng,fromGps){
+    if(!requestMap || !window.L) return;
+    mapCenter=[lat,lng];
+    if(userMapMarker) userMapMarker.setLatLng(mapCenter);
+    else userMapMarker=L.marker(mapCenter).addTo(requestMap);
+    userMapMarker.bindPopup(fromGps?'Tu ubicación GPS':'Ubicación de referencia');
+    if(searchRadiusCircle) searchRadiusCircle.setLatLng(mapCenter);
+    else searchRadiusCircle=L.circle(mapCenter,{radius:selectedRadius,color:'#2563eb',weight:2,fillColor:'#3b82f6',fillOpacity:0.13}).addTo(requestMap);
+    searchRadiusCircle.setRadius(selectedRadius);
+    demoTechMarkers.forEach(function(marker){requestMap.removeLayer(marker);});
+    demoTechMarkers=[];
+    // Marcadores ilustrativos del prototipo; no representan técnicos rastreados en tiempo real.
+    [{name:'Técnico de demostración 1',distance:800,bearing:315},{name:'Técnico de demostración 2',distance:1200,bearing:60},{name:'Técnico de demostración 3',distance:2100,bearing:170},{name:'Técnico de demostración 4',distance:2400,bearing:245}].forEach(function(tech){
+      if(tech.distance>selectedRadius) return;
+      var point=offsetCoordinate(lat,lng,tech.distance,tech.bearing);
+      var marker=L.circleMarker(point,{radius:6,color:'#ffffff',weight:2,fillColor:'#059669',fillOpacity:1}).addTo(requestMap);
+      marker.bindTooltip(tech.name+' · posición ilustrativa');
+      demoTechMarkers.push(marker);
+    });
+    requestMap.setView(mapCenter,fromGps?15:14);
+    if(mapStatus) mapStatus.textContent=fromGps?'GPS activo · radio de '+(selectedRadius/1000)+' km':'Ubicación de referencia · solicita GPS';
+  }
+  if(mapElement && window.L){
+    requestMap=L.map(mapElement,{scrollWheelZoom:false}).setView(mapCenter,14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      maxZoom:19,
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
+    }).addTo(requestMap);
+    setMapLocation(mapCenter[0],mapCenter[1],false);
+    requestMap.whenReady(function(){setTimeout(function(){requestMap.invalidateSize();},100);});
+    window.vrSetMapLocation=setMapLocation;
+    document.querySelectorAll('[data-vr-ctl][data-vr-target="solicitud"]').forEach(function(button){
+      button.addEventListener('click',function(){
+        if(!requestMap) return;
+        if(button.getAttribute('data-vr-ctl')==='zoom-in') requestMap.zoomIn();
+        if(button.getAttribute('data-vr-ctl')==='zoom-out') requestMap.zoomOut();
+      });
+    });
+  }else if(mapStatus){
+    mapStatus.textContent='No se pudo cargar el mapa. Revisa tu conexión.';
+  }
+
   // Radio de búsqueda y GPS: el radio se aplica alrededor de la ubicación actual del mapa.
   var radiusHeading = Array.from(document.querySelectorAll('h2')).find(function (h) { return /Radio Hiperlocal de Búsqueda/i.test(h.textContent); });
   var radiusSection = radiusHeading ? radiusHeading.closest('section') : null;
@@ -1046,45 +1043,34 @@ document.addEventListener('DOMContentLoaded', function () {
     gpsButton.type='button'; gpsButton.innerHTML='<i class="fa-solid fa-location-crosshairs mr-1"></i> Usar mi ubicación GPS';
     gpsButton.onclick=function(){
       gpsStatus.textContent='Solicitando permiso de ubicación…';
-      if(window.VeciRed && typeof window.VeciRed.locate==='function'){
-        window.VeciRed.locate({force:true}).then(function(loc){
-          if(loc && !loc.fallback){
-            gpsLabel='GPS activo · precisión aproximada de '+Math.round(loc.accuracy||0)+' m';
-            gpsStatus.textContent=gpsLabel;
-            gpsStatus.dataset.lat=loc.lat;gpsStatus.dataset.lng=loc.lng;
-            if(addressNode) addressNode.textContent=[loc.street,loc.label,loc.place].filter(Boolean).join(', ')||'Ubicación GPS actual';
-          }else{
-            gpsLabel='GPS no disponible · se mantiene Santiago Centro como referencia';
-            gpsStatus.textContent=gpsLabel;
-            if(addressNode) addressNode.textContent='Santiago Centro (ubicación de referencia)';
-          }
-          updatePublishButton();
-        }).catch(function(){
-          gpsStatus.textContent='No se pudo obtener el GPS. Se mantiene Santiago Centro como referencia.';
-          if(addressNode) addressNode.textContent='Santiago Centro (ubicación de referencia)';
-        });
+      if(!navigator.geolocation){
+        gpsStatus.textContent='Este navegador no permite consultar el GPS. Se mantiene Santiago Centro como referencia.';
         return;
       }
-      if(!navigator.geolocation){gpsStatus.textContent='Este navegador no permite consultar el GPS. Se mantiene Santiago Centro como referencia.';return;}
       navigator.geolocation.getCurrentPosition(function(position){
-        gpsLabel='GPS activo · precisión aproximada de '+Math.round(position.coords.accuracy)+' m';
+        var lat=position.coords.latitude;
+        var lng=position.coords.longitude;
+        gpsLabel='GPS activo · precisión aproximada de '+Math.round(position.coords.accuracy||0)+' m';
         gpsStatus.textContent=gpsLabel;
-        gpsStatus.dataset.lat=position.coords.latitude;gpsStatus.dataset.lng=position.coords.longitude;
-        if(addressNode) addressNode.textContent='Ubicación GPS actual';
+        gpsStatus.dataset.lat=lat;
+        gpsStatus.dataset.lng=lng;
+        gpsStatus.dataset.source='gps';
+        if(addressNode) addressNode.textContent='Ubicación GPS actual ('+lat.toFixed(5)+', '+lng.toFixed(5)+')';
+        if(typeof window.vrSetMapLocation==='function') window.vrSetMapLocation(lat,lng,true);
         updatePublishButton();
-      },function(){
-        gpsLabel='GPS no disponible · se mantiene Santiago Centro como referencia';
-        gpsStatus.textContent=gpsLabel;
-        if(addressNode) addressNode.textContent='Santiago Centro (ubicación de referencia)';
-      },{enableHighAccuracy:true,timeout:10000,maximumAge:60000});
-    };
-    gpsRow.appendChild(gpsStatus);gpsRow.appendChild(gpsButton);
+      },function(error){
+        var reason=error && error.code===1?'Permiso denegado. Activa la ubicación para este sitio.':error && error.code===3?'La ubicación tardó demasiado. Inténtalo otra vez.':'No se pudo obtener el GPS. Revisa la configuración de ubicación.';
+        gpsStatus.textContent=reason;
+      },{enableHighAccuracy:true,timeout:15000,maximumAge:30000});
+    };    gpsRow.appendChild(gpsStatus);gpsRow.appendChild(gpsButton);
     var radiusIntro=radiusSection.querySelector('p');
     if(radiusIntro) radiusIntro.after(gpsRow);
   }
   radiusButtons.forEach(function(button){
     button.addEventListener('click',function(){
       selectedRadius=Number(button.getAttribute('data-vr-set-radius'))||3000;
+      if(searchRadiusCircle) searchRadiusCircle.setRadius(selectedRadius);
+      if(mapCenter && requestMap) setMapLocation(mapCenter[0],mapCenter[1],gpsStatus && gpsStatus.dataset.source==='gps');
       updatePublishButton();
     });
   });
@@ -1104,6 +1090,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if(matchingTech) query.set('tecnico',technician);
     query.set('categoria',category);
     query.set('radio',String(selectedRadius));
+    if(gpsStatus && gpsStatus.dataset.lat && gpsStatus.dataset.lng){
+      query.set('latitud',gpsStatus.dataset.lat);
+      query.set('longitud',gpsStatus.dataset.lng);
+    }
     query.set('fecha',selectedDate);
     if(selectedDate==='otra fecha' && dateInput && dateInput.value) query.set('fecha',dateInput.value);
     query.set('franja',selectedTime);
