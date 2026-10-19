@@ -483,10 +483,10 @@ main [data-vr-map="tecnicos"] {
 <p class="font-body-sm text-body-sm text-on-surface-variant">18 profesionales listos a menos de 3 km</p>
 </div>
 <div class="relative w-full">
-<select class="w-full appearance-none bg-surface-container-lowest pl-3 pr-8 py-1.5 rounded-xl font-label-md text-label-md text-primary font-semibold shadow-sm focus:outline-none cursor-pointer">
-<option>Ordenar: Más cercanos (Predeterminado)</option>
-<option>Mejor Calificados (5.0 ★)</option>
-<option>Menor Tarifa Base</option>
+<select id="vrSortTechnicians" aria-label="Ordenar técnicos" class="w-full appearance-none bg-surface-container-lowest pl-3 pr-8 py-1.5 rounded-xl font-label-md text-label-md text-primary font-semibold shadow-sm focus:outline-none cursor-pointer">
+<option value="distance">Ordenar: Más cercanos (Predeterminado)</option>
+<option value="rating">Mejor Calificados (5.0 ★)</option>
+<option value="price">Menor Tarifa Base</option>
 </select>
 <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-sm">expand_more</span>
 </div>
@@ -815,6 +815,55 @@ main [data-vr-map="tecnicos"] {
         btnCategorias.setAttribute('aria-expanded', 'false');
       }
     });
+  })();
+
+  // INT-12: ordena las fichas reales del directorio según el criterio elegido.
+  (function () {
+    var select = document.getElementById('vrSortTechnicians');
+    if (!select) return;
+
+    var header = select.closest('div.flex.flex-col');
+    var feed = header && header.nextElementSibling;
+    if (!feed) return;
+
+    function numberFrom(text, regex) {
+      var match = String(text || '').match(regex);
+      return match ? Number(match[1].replace(/\\./g, '').replace(',', '.')) : Number.POSITIVE_INFINITY;
+    }
+
+    function getValue(card, type) {
+      var text = card.textContent || '';
+      if (type === 'distance') return numberFrom(text, /(\\d+(?:[.,]\\d+)?)\\s*km/i);
+      if (type === 'price') return numberFrom(text, /Desde\\s*\\$\\s*([\\d.]+)/i);
+      var star = Array.from(card.querySelectorAll('.material-symbols-outlined')).find(function (el) {
+        return el.textContent.trim().toLowerCase() === 'star';
+      });
+      var ratingText = star && star.parentElement ? star.parentElement.textContent : '';
+      return numberFrom(ratingText, /([0-5](?:[.,]\\d+)?)/);
+    }
+
+    function sortCards() {
+      var cards = Array.from(feed.children).filter(function (card) {
+        return card.querySelector('h4') && card.querySelector('button[data-go]');
+      });
+      if (cards.length < 2) return;
+
+      var fixedContent = Array.from(feed.children).find(function (child) {
+        return cards.indexOf(child) === -1;
+      }) || null;
+
+      cards.sort(function (a, b) {
+        var difference = getValue(a, select.value) - getValue(b, select.value);
+        return difference || a.querySelector('h4').textContent.localeCompare(b.querySelector('h4').textContent, 'es');
+      });
+
+      cards.forEach(function (card) {
+        feed.insertBefore(card, fixedContent);
+      });
+    }
+
+    select.addEventListener('change', sortCards);
+    sortCards();
   })();
 </script>
 
