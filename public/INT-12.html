@@ -25,6 +25,40 @@
   #vrRadiusSelector .vr-radius-active { font-size: 10px; }
   main > div > section:first-child { padding-left: .75rem; padding-right: .75rem; }
 }
+/* INT-12 map user cards: compact by default, expand on tap */
+.vr-map-user-marker { cursor: pointer; pointer-events: auto; }
+.vr-map-user-card { transform-origin: center bottom; transition: width .18s ease, padding .18s ease, border-radius .18s ease, box-shadow .18s ease; }
+.vr-divicon:not(.vr-map-user-marker--expanded) .vr-map-user-marker .vr-map-user-card {
+  width: auto !important;
+  max-width: 180px;
+  padding: .35rem .5rem !important;
+  border-radius: 999px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.16) !important;
+  ring: 0 !important;
+}
+.vr-divicon:not(.vr-map-user-marker--expanded) .vr-map-user-marker [data-vr-expanded-detail] { display: none !important; }
+.vr-divicon:not(.vr-map-user-marker--expanded) .vr-map-user-marker .vr-map-user-card img {
+  width: 1.5rem !important; height: 1.5rem !important; border-radius: 999px !important;
+}
+.vr-divicon:not(.vr-map-user-marker--expanded) .vr-map-user-marker .vr-map-user-card h4 { font-size: 11px !important; line-height: 1.2 !important; }
+.vr-divicon:not(.vr-map-user-marker--expanded) .vr-map-user-marker .vr-map-user-card p { font-size: 10px !important; line-height: 1.2 !important; }
+.vr-divicon:not(.vr-map-user-marker--expanded) .vr-map-user-marker .vr-map-user-card > div:first-child { gap: .35rem !important; }
+.vr-divicon.vr-map-user-marker--expanded .vr-map-user-marker .vr-map-user-card {
+  width: 18rem !important;
+  max-width: min(18rem, calc(100vw - 56px)) !important;
+  padding: .75rem !important;
+  border-radius: .75rem !important;
+  white-space: normal !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.24) !important;
+  ring: 2px !important;
+}
+.vr-divicon.vr-map-user-marker--expanded .vr-map-user-marker .vr-map-user-card img {
+  width: 3rem !important; height: 3rem !important; border-radius: .75rem !important;
+}
+.vr-divicon.vr-map-user-marker--expanded .vr-map-user-marker .vr-map-user-card h4 { font-size: 15px !important; line-height: 1.4 !important; }
+.vr-divicon.vr-map-user-marker--expanded .vr-map-user-marker .vr-map-user-card p { font-size: 12px !important; line-height: 1.5 !important; }
+.vr-divicon.vr-map-user-marker--expanded .vr-map-user-marker .vr-map-user-card > div:first-child { gap: .625rem !important; }
+.vr-divicon.vr-map-user-marker--expanded { z-index: 1000 !important; }
 /* INT-12 responsive layout repair */
 main > div > div > .grid.grid-cols-1 {
   height: calc(100vh - 190px) !important;
