@@ -347,9 +347,15 @@
 <script id="vr-selected-professional">
 (() => {
   const profiles = {"juan":{"name":"Juan C.","chatName":"Juan Camilo R.","role":"Maestro Gasfíter Certificado SENA","rating":"5.0","reviews":"64 reseñas","badge":"Sello Oro VeciRed","amount":15000,"image":"https://lh3.googleusercontent.com/aida/AEtjO1XUWgT-DqfbPGcSkTJTsTZKe6M6Y5a5R1stsiW9TA2-d-OR-kUtyTuKsI7sDo5mbGCM_rYNhMPststj_aN5vJr-8hRSAzrbk7Z4jT9LEEzRvSmHsmnrHbJ0K9ykFBm5RNqPbNduPvOApJoIbKQpYwbwom0Ti2pkp56isJ7hqBzLe8c6O0ysqr8YRiQM4cDDTqDwM6mEKJpf0_yPQZFvqzBGROSUSs7gV6Ukr6APvATfHHl2F07-1dE064A"},"roberto":{"name":"Roberto D.","chatName":"Roberto D.","role":"Fontanero Profesional (12+ años exp.)","rating":"4.8","reviews":"89 reseñas","badge":"Sello Vecino Verificado","amount":13500,"image":"https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"},"luisa":{"name":"Luisa M.","chatName":"Luisa M.","role":"Especialista en Reparaciones","rating":"4.6","reviews":"32 trabajos","badge":"Garantía directa 45 días","amount":10500,"image":"https://lh3.googleusercontent.com/aida/AEtjO1VM3m0LFMZF4f5oEGm-esaoDJyfnYOs8FHnpdBmytqNsBTsO_y5MorZLX5ATH0FmqmoW23rkSA_VAYQLUuquJpXKWjTL7Amt4wK4ycqGHegPJG-iWrgiCQHmMHSNZrrfIn2nUWOk88VaAL4AAhINmBkRLzn2HiYhV-M6iGjeoY0YHLWo2Gv0sqSd00uSwg5ltqlt8ff6V0YZKi7FggFxM5DC0ryinyiiEGcLWr9z-0X0uR2nFIldZUf8wk"}};
-  const rawKey = new URLSearchParams(window.location.search).get('profesional') || 'roberto';
+  const params = new URLSearchParams(window.location.search);
+  let selected = null;
+  try { selected = JSON.parse(sessionStorage.getItem('vecired:selected-professional-contract') || 'null'); } catch (_) {}
+  const rawKey = params.get('profesional') || 'roberto';
   const key = Object.prototype.hasOwnProperty.call(profiles, rawKey) ? rawKey : 'roberto';
-  const pro = profiles[key];
+  // Si se llega desde INT-12, el contrato utiliza la ficha que realmente se seleccionó.
+  const pro = selected && selected.source === 'INT-12' && selected.name
+    ? { ...profiles[key], ...selected }
+    : profiles[key];
   const name = document.getElementById('vr-confirmed-tech-name');
   const role = document.getElementById('vr-confirmed-tech-role');
   const rating = document.getElementById('vr-confirmed-tech-rating');
@@ -360,11 +366,14 @@
   if (name) name.textContent = pro.name;
   if (role) role.textContent = pro.role;
   if (rating) rating.textContent = pro.rating;
-  if (photo) { photo.src = pro.image; photo.alt = pro.name + ' ' + pro.role; }
-  if (amount) amount.textContent = formatCLP(pro.amount);
-  if (payment) payment.textContent = '$' + formatCLP(pro.amount) + ' CLP';
+  if (photo && pro.image) { photo.src = pro.image; photo.alt = pro.name + ' ' + pro.role; }
+  if (amount) amount.textContent = pro.amount ? formatCLP(pro.amount) : 'Por confirmar';
+  if (payment) payment.textContent = pro.amount ? '$' + formatCLP(pro.amount) + ' CLP' : 'Tarifa por confirmar con el profesional';
   const chatLink = document.querySelector('a[data-path="chat-coordinacion"]');
-  if (chatLink) chatLink.href = 'INT-21.html?profesional=' + encodeURIComponent(key) + '&continuar=1';
+  if (chatLink) {
+    const chatKey = Object.prototype.hasOwnProperty.call(profiles, pro.key) ? pro.key : key;
+    chatLink.href = 'INT-21.html?profesional=' + encodeURIComponent(chatKey) + '&continuar=1';
+  }
 })();
 </script>
 
