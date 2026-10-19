@@ -674,7 +674,8 @@
   function locate(options) {
     var force = options && options.force;
     if (!force && pendingLocate) return pendingLocate;
-    if (!force && currentLocation && !currentLocation.fallback) return Promise.resolve(currentLocation);
+    // No reutilizar indefinidamente una ubicación guardada: otra pantalla (p. ej. INT-20)
+    // puede haber escrito una etiqueta genérica. Volver a consultar el GPS al abrir cada módulo.
     if (!('geolocation' in navigator) || !window.isSecureContext) return Promise.resolve(useFallback('unsupported'));
 
     pendingLocate = new Promise(function (resolve) {
