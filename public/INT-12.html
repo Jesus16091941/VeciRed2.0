@@ -872,3 +872,37 @@ main [data-vr-map="tecnicos"] {
   })();
 </script>
 
+
+
+<script id="vr-contract-selected-from-int12">
+(() => {
+  // Guardar el profesional elegido antes de navegar a la confirmación del contrato.
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-go="INT-20.html"]');
+    if (!button) return;
+    const card = button.closest('.bg-surface-container-lowest') || button.parentElement?.parentElement;
+    if (!card) return;
+    const name = card.querySelector('h4, h3');
+    if (!name) return;
+    const paragraphs = Array.from(card.querySelectorAll('p'));
+    const role = paragraphs.find(p => /gasf|fontan|plomer|electric|carpinter|aseo|limpieza|profesional|técnic|especialista|reparaci/i.test(p.textContent || ''));
+    const ratingNode = Array.from(card.querySelectorAll('span, p')).find(el => /^\s*\d[.,]\d\s*$/.test(el.textContent || ''));
+    const text = card.textContent || '';
+    const priceMatch = text.match(/Desde\s*\$\s*([\d.]+)/i) || text.match(/\$\s*([\d.]+)\s*CLP/i);
+    const image = card.querySelector('img');
+    const slug = (name.textContent || 'profesional').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const selected = {
+      key: slug || 'profesional',
+      name: name.textContent.trim(),
+      chatName: name.textContent.trim(),
+      role: role ? role.textContent.trim() : 'Profesional de VeciRed',
+      rating: ratingNode ? ratingNode.textContent.trim().replace(',', '.') : '—',
+      amount: priceMatch ? Number(priceMatch[1].replace(/\./g, '')) : 0,
+      image: image ? image.src : '',
+      source: 'INT-12'
+    };
+    try { sessionStorage.setItem('vecired:selected-professional-contract', JSON.stringify(selected)); } catch (_) {}
+  }, true);
+})();
+</script>
+
