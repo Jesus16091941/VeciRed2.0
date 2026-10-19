@@ -96,7 +96,7 @@ main [data-vr-map="tecnicos"] {
 }
 </style>
 
-</head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-outline-variant/40 shadow-[0_1px_8px_rgba(15,41,66,0.04)]"><div class="h-16 max-w-container-max mx-auto px-space-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[32px]" aria-hidden="true">hub</span><span class="font-headline-sm text-headline-sm text-primary tracking-tight">VeciRed</span></div><div class="hidden lg:flex items-center gap-space-2xs bg-surface-container-low border border-outline-variant/60 rounded-full px-space-sm py-1"><span class="material-symbols-outlined text-secondary text-[16px]">location_on</span><span class="font-label-sm text-label-sm text-secondary uppercase">Tu Barrio:</span><span id="spanUbicacion" class="font-label-sm text-label-sm text-on-surface font-semibold">Detectando ubicación...</span></div></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="text-primary font-bold border-b-2 border-primary">
+</head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-outline-variant/40 shadow-[0_1px_8px_rgba(15,41,66,0.04)]"><div class="h-16 max-w-container-max mx-auto px-space-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[32px]" aria-hidden="true">hub</span><span class="font-headline-sm text-headline-sm text-primary tracking-tight">VeciRed</span></div><button id="btnBannerLocation" type="button" data-vr-ctl="locate" title="Actualizar ubicación con GPS" class="hidden lg:flex items-center gap-space-2xs bg-surface-container-low border border-outline-variant/60 rounded-full px-space-sm py-1 hover:bg-surface-container transition-colors cursor-pointer text-left"><span class="material-symbols-outlined text-secondary text-[16px]">my_location</span><span class="font-label-sm text-label-sm text-secondary uppercase">Tu Barrio:</span><span id="spanUbicacion" class="font-label-sm text-label-sm text-on-surface font-semibold">Detectando ubicación...</span></button></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="text-primary font-bold border-b-2 border-primary">
   <a id="btnComoFunciona" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 cursor-pointer" data-path="como-funciona" href="INT-01.html">Cómo funciona</a>
 
   <div class="relative inline-block">
@@ -156,15 +156,12 @@ main [data-vr-map="tecnicos"] {
 <div class="max-w-[1720px] mx-auto flex flex-col gap-2">
 <!-- Left: Geo Anchor & Quick Search Input -->
 <div class="flex flex-wrap items-center gap-2.5 min-w-0">
-<!-- Exact Neighborhood Address Pill Button -->
-<button class="group flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface transition-all text-left shrink-0" type="button" data-vr-ctl="locate">
-<span class="material-symbols-outlined text-secondary text-lg group-hover:scale-110 transition-transform">my_location</span>
-<div class="flex flex-col">
-<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Tu Ubicación Exacta</span>
-<span class="font-label-md text-label-md text-primary font-bold truncate max-w-[220px] sm:max-w-xs" data-vr-place>Agustinas 1235, Santiago Centro / Barrio Lastarria</span>
+<!-- Buscador en el espacio de ubicación exacta -->
+<div class="relative flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-container-low border border-outline-variant/40 min-w-[240px] flex-1 max-w-[420px]">
+<span class="material-symbols-outlined text-secondary text-lg">search</span>
+<input id="vrMapSearch" class="w-full min-w-0 bg-transparent text-primary placeholder:text-outline font-body-md text-body-md focus:outline-none" placeholder="Buscar oficio, técnico o tarea..." type="search" value="Fuga de agua en lavaplatos" aria-label="Buscar oficio, técnico o tarea"/>
+<button type="button" class="shrink-0 rounded-lg px-2 py-1 text-xs font-semibold text-secondary hover:bg-surface-container" onclick="document.getElementById('vrMapSearch').value='';document.getElementById('vrMapSearch').focus();" aria-label="Limpiar búsqueda">Limpiar</button>
 </div>
-<span class="material-symbols-outlined text-outline text-sm ml-1 group-hover:text-primary transition-colors">tune</span>
-</button>
 <!-- Radio de búsqueda junto a la ubicación exacta -->
 <div id="vrRadiusSelector" class="flex items-center gap-1 bg-surface-container-low p-1 rounded-xl shrink-0 whitespace-nowrap" role="group" aria-label="Radio de búsqueda">
 <button class="px-2.5 py-1.5 rounded-lg text-on-surface-variant font-label-md text-label-md hover:text-primary hover:bg-surface-container transition-all whitespace-nowrap" data-vr-set-radius="1000" aria-pressed="false"><span>1 km</span><span class="vr-radius-active hidden ml-1 text-[11px] font-bold">(Activo)</span></button>
@@ -196,14 +193,7 @@ main [data-vr-map="tecnicos"] {
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md h-[calc(100vh-164px)] min-h-[700px]">
 <!-- LEFT: Hyperlocal Radar Vector Canvas (Approx 65% width) -->
 <section class="lg:col-span-7 xl:col-span-8 relative h-full rounded-2xl overflow-hidden shadow-sm bg-surface-container-low flex flex-col">
-<!-- Buscador flotante sobre el mapa -->
-<div class="absolute top-4 left-4 z-[35] w-[min(420px,calc(100%-2rem))]">
-<div class="relative rounded-xl bg-white/95 backdrop-blur-md shadow-lg ring-1 ring-slate-900/10">
-<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-lg pointer-events-none">search</span>
-<input class="w-full h-11 pl-10 pr-16 bg-transparent text-primary placeholder:text-outline font-body-md text-body-md rounded-xl focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Buscar oficio, técnico o tarea rápida..." type="text" value="Fuga de agua en lavaplatos"/>
-<span class="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center px-1.5 py-0.5 rounded bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-mono">⌘K</span>
-</div>
-</div>
+
 <!-- Vector Map Graphic Simulation Canvas -->
 <div data-vr-map="tecnicos" data-vr-radius="3000" class="relative flex-1 w-full h-full overflow-hidden bg-[#e8eef6] select-none">
 <!-- Procedural Vector Map Representation (Santiago/Barrio Lastarria - Santiago Centro Sector) -->
