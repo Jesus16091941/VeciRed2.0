@@ -668,14 +668,13 @@
 
   /**
    * Obtiene la ubicación del usuario.
-   * - En computadores se usa Santiago Centro por defecto (salvo que el usuario pida su GPS con un botón).
+   * - Se intenta obtener GPS tanto en computadores como en móviles.
    * - Si el usuario niega el permiso, no hay GPS o la precisión es muy baja, también se usa Santiago Centro.
    */
   function locate(options) {
     var force = options && options.force;
     if (!force && pendingLocate) return pendingLocate;
     if (!force && currentLocation && !currentLocation.fallback) return Promise.resolve(currentLocation);
-    if (!force && isDesktop) return Promise.resolve(useFallback('desktop'));
     if (!('geolocation' in navigator) || !window.isSecureContext) return Promise.resolve(useFallback('unsupported'));
 
     pendingLocate = new Promise(function (resolve) {
