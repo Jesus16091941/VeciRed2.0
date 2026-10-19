@@ -483,6 +483,26 @@
     });
   }
 
+  function wireBrandLogo() {
+    // Reemplaza el icono genérico del encabezado por el logotipo oficial.
+    document.querySelectorAll('header').forEach(function (header) {
+      header.querySelectorAll('.material-symbols-outlined').forEach(function (icon) {
+        if ((icon.textContent || '').trim() !== 'hub') return;
+        var label = icon.nextElementSibling;
+        if (!label || (label.textContent || '').trim() !== 'VeciRed') return;
+        var group = icon.parentElement;
+        if (!group || group.querySelector('img[data-vr-brand-logo]')) return;
+        var img = document.createElement('img');
+        img.src = 'logo.svg';
+        img.alt = 'VeciRed — Servicios hiperlocales';
+        img.className = 'h-8 w-auto';
+        img.setAttribute('data-vr-brand-logo', 'true');
+        img.style.display = 'block';
+        group.replaceChildren(img);
+      });
+    });
+  }
+
   function wireLogo() {
     var logo = document.querySelector('header img, nav img');
     if (!logo || logo.closest('a, button')) return;
@@ -1516,6 +1536,7 @@
       return;
     }
     renderAccountBanners();
+    wireBrandLogo();
     bindCurrentUser();
   });
 
