@@ -106,7 +106,33 @@ main [data-vr-map="tecnicos"] {
   </div>
 
   <a id="btnGarantia" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 cursor-pointer" data-path="garantia-de-confianza" href="INT-00-teryser.html">Garantía de confianza</a>
-</nav><div class="flex items-center gap-space-md"><div class="hidden sm:flex items-center gap-space-2xs px-space-sm py-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm"><span class="inline-block w-2 h-2 rounded-full bg-secondary"></span><span>42 técnicos activos</span></div><button aria-label="Notificaciones" class="relative p-space-xs rounded-full hover:bg-surface-container hover:text-on-surface text-on-surface-variant transition-colors" type="button"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span></button><div class="flex items-center gap-space-xs pl-space-xs"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"/><span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span></div></div></div></header><main class="w-full pt-20 bg-surface min-h-screen"><div class="flex flex-col w-full">
+</nav><div class="flex items-center gap-space-md"><div class="hidden sm:flex items-center gap-space-2xs px-space-sm py-1 rounded-full bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm"><span class="inline-block w-2 h-2 rounded-full bg-secondary"></span><span>42 técnicos activos</span></div><div class="relative cursor-pointer group">
+<button id="vrNotificationButton" type="button" aria-label="Abrir notificaciones" aria-expanded="false" aria-controls="vrNotificationPanel" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-surface-container-high transition-colors relative">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span id="vrNotificationBadge" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-error text-on-error font-label-sm text-[10px] flex items-center justify-center font-bold">3</span>
+</button>
+<div id="vrNotificationPanel" class="hidden absolute right-0 top-full mt-3 w-[min(360px,calc(100vw-32px))] bg-surface-container-lowest border border-outline-variant/50 rounded-xl shadow-xl z-[70] overflow-hidden" role="dialog" aria-label="Centro de notificaciones">
+  <div class="flex items-center justify-between gap-3 px-4 py-3 border-b border-outline-variant/30">
+    <div><h3 class="font-semibold text-primary">Notificaciones</h3><p id="vrNotificationSummary" class="text-xs text-on-surface-variant">Tienes 3 avisos pendientes</p></div>
+    <div class="flex items-center gap-3">
+      <button id="vrMarkNotificationsUnread" type="button" class="text-xs font-semibold text-secondary hover:underline">Desmarcar leídas</button>
+      <button id="vrMarkNotificationsRead" type="button" class="text-xs font-semibold text-secondary hover:underline">Marcar leídas</button>
+    </div>
+  </div>
+  <div class="p-2 space-y-1">
+    <a href="INT-18.html" data-vr-notification="propuestas" class="vr-notification-item flex gap-3 p-3 rounded-lg hover:bg-surface-container-low transition-colors">
+      <span class="material-symbols-outlined text-secondary mt-0.5">request_quote</span><span class="min-w-0 flex-1"><span class="block text-sm font-semibold text-primary">Recibiste 2 propuestas</span><span class="block text-xs text-on-surface-variant mt-1">Revisa las ofertas para tu solicitud de gasfitería.</span><span class="block text-[11px] text-outline mt-1">Mis solicitudes</span></span><span class="vr-notification-dot w-2 h-2 rounded-full bg-secondary mt-2 shrink-0"></span>
+    </a>
+    <a href="INT-21.html" data-vr-notification="mensaje" class="vr-notification-item flex gap-3 p-3 rounded-lg hover:bg-surface-container-low transition-colors">
+      <span class="material-symbols-outlined text-primary mt-0.5">chat</span><span class="min-w-0 flex-1"><span class="block text-sm font-semibold text-primary">Tienes un mensaje nuevo</span><span class="block text-xs text-on-surface-variant mt-1">Un profesional dejó información para coordinar el servicio.</span><span class="block text-[11px] text-outline mt-1">Mensajes</span></span><span class="vr-notification-dot w-2 h-2 rounded-full bg-secondary mt-2 shrink-0"></span>
+    </a>
+    <a href="INT-22.html" data-vr-notification="agenda" class="vr-notification-item flex gap-3 p-3 rounded-lg hover:bg-surface-container-low transition-colors">
+      <span class="material-symbols-outlined text-primary mt-0.5">calendar_month</span><span class="min-w-0 flex-1"><span class="block text-sm font-semibold text-primary">Revisa tu agenda</span><span class="block text-xs text-on-surface-variant mt-1">Consulta tus próximos servicios y solicitudes pendientes.</span><span class="block text-[11px] text-outline mt-1">Agenda</span></span><span class="vr-notification-dot w-2 h-2 rounded-full bg-secondary mt-2 shrink-0"></span>
+    </a>
+  </div>
+  <div class="px-4 py-2 border-t border-outline-variant/30 bg-surface-container-low"><p class="text-[11px] text-on-surface-variant">Avisos de demostración del prototipo VeciRed.</p></div>
+</div>
+</div><div class="flex items-center gap-space-xs pl-space-xs"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"/><span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span></div></div></div></header><main class="w-full pt-20 bg-surface min-h-screen"><div class="flex flex-col w-full">
 <!-- Top Hyperlocal Context & Filtering Bar -->
 <section class="w-full bg-surface-container-lowest shadow-sm px-space-lg py-3 sticky top-20 z-40">
 <div class="max-w-[1720px] mx-auto flex flex-col xl:flex-row xl:items-center justify-between gap-3">
@@ -592,3 +618,79 @@ main [data-vr-map="tecnicos"] {
 </div>
 </div>
 </div></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant/40 py-space-xl"><div class="max-w-container-max mx-auto px-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 VeciRed Marketplace. Conexión local confiable.</span></div><nav class="flex flex-wrap items-center justify-center gap-space-md" data-active-classes="text-on-surface font-semibold"><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="terminos-de-servicio" href="INT-00-teryser.html">Términos de Servicio</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="politica-de-privacidad" href="INT-00-poldepri.html">Política de Privacidad</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="proteccion-de-datos" href="INT-00-prodeda.html">Protección de Datos</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="centro-de-ayuda" href="INT-00-cendeayu.html">Centro de Ayuda</a></nav></div></footer>
+
+<script id="vr-notifications-script">
+(() => {
+  const button = document.getElementById('vrNotificationButton');
+  const panel = document.getElementById('vrNotificationPanel');
+  const badge = document.getElementById('vrNotificationBadge');
+  const summary = document.getElementById('vrNotificationSummary');
+  const markRead = document.getElementById('vrMarkNotificationsRead');
+  const markUnread = document.getElementById('vrMarkNotificationsUnread');
+  if (!button || !panel || !badge || !summary || !markRead || !markUnread) return;
+  let userId = 'demo';
+  try {
+    const user = JSON.parse(sessionStorage.getItem('vecired:user') || 'null');
+    if (user && (user.id || user.correo)) userId = user.id || user.correo;
+  } catch (e) {}
+  const storageKey = 'vecired:notifications-read:' + userId;
+  const getRead = () => {
+    try { return JSON.parse(localStorage.getItem(storageKey) || '[]'); } catch (e) { return []; }
+  };
+  const render = () => {
+    const read = getRead();
+    let unread = 0;
+    panel.querySelectorAll('[data-vr-notification]').forEach(item => {
+      const isRead = read.includes(item.getAttribute('data-vr-notification'));
+      item.classList.toggle('bg-surface-container-low', isRead);
+      item.querySelector('.vr-notification-dot').classList.toggle('invisible', isRead);
+      const title = item.querySelector('.text-sm');
+      title.classList.toggle('font-semibold', !isRead);
+      if (!isRead) unread++;
+    });
+    badge.textContent = unread;
+    badge.classList.toggle('hidden', unread === 0);
+    summary.textContent = unread ? 'Tienes ' + unread + (unread === 1 ? ' aviso pendiente' : ' avisos pendientes') : 'Estás al día';
+    markRead.disabled = unread === 0;
+    markRead.classList.toggle('opacity-40', unread === 0);
+  };
+  const setAllRead = () => {
+    const ids = Array.from(panel.querySelectorAll('[data-vr-notification]')).map(item => item.getAttribute('data-vr-notification'));
+    try { localStorage.setItem(storageKey, JSON.stringify(ids)); } catch (e) {}
+    render();
+  };
+  const setAllUnread = () => {
+    try { localStorage.setItem(storageKey, JSON.stringify([])); } catch (e) {}
+    render();
+  };
+  button.addEventListener('click', event => {
+    event.stopPropagation();
+    const opening = panel.classList.contains('hidden');
+    panel.classList.toggle('hidden');
+    button.setAttribute('aria-expanded', String(opening));
+  });
+  panel.addEventListener('click', event => {
+    const item = event.target.closest('[data-vr-notification]');
+    if (!item) return;
+    const id = item.getAttribute('data-vr-notification');
+    const read = getRead();
+    if (!read.includes(id)) read.push(id);
+    try { localStorage.setItem(storageKey, JSON.stringify(read)); } catch (e) {}
+  });
+  markRead.addEventListener('click', setAllRead);
+  markUnread.addEventListener('click', setAllUnread);
+  document.addEventListener('click', event => {
+    if (!panel.contains(event.target) && !button.contains(event.target)) {
+      panel.classList.add('hidden');
+      button.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      panel.classList.add('hidden');
+      button.setAttribute('aria-expanded', 'false');
+    }
+  });
+  render();
+})();
+</script>
