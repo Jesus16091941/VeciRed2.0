@@ -626,6 +626,8 @@
     if(count) count.textContent=requests.length+' pendiente'+(requests.length===1?'':'s');
     requests.forEach(function(item){
       var card=node('article','rounded-xl border border-amber-200 bg-amber-50/50 p-4');
+      var requestDate=String(item.fecha||item.date||'');
+      if(/^\d{4}-\d{2}-\d{2}/.test(requestDate)) card.setAttribute('data-service-date',requestDate.slice(0,10));
       var top=node('div','flex flex-col sm:flex-row sm:items-start justify-between gap-3');
       var info=node('div','min-w-0');
       var badges=node('div','flex flex-wrap items-center gap-2 mb-2');
@@ -867,10 +869,10 @@
       var professional=card.getAttribute('data-service-professional')||'';
       var start=toICSDate(date,'1000');
       var end=toICSDate(date,'1130');
-      events.push(['BEGIN:VEVENT','UID:'+code+'@vecired.local','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')+'Z','DTSTART;TZID=America/Santiago:'+start,'DTEND;TZID=America/Santiago:'+end,'SUMMARY:'+escapeICS(title),'DESCRIPTION:'+escapeICS('Código: '+code+'\\nProfesional: '+professional+'\\nExportado desde VeciRed. Importación de calendario de una sola vez.'),'END:VEVENT'].join('\\r\\n'));
+      events.push(['BEGIN:VEVENT','UID:'+code+'@vecired.local','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')+'Z','DTSTART;TZID=America/Santiago:'+start,'DTEND;TZID=America/Santiago:'+end,'SUMMARY:'+escapeICS(title),'DESCRIPTION:'+escapeICS('Código: '+code+'\nProfesional: '+professional+'\nExportado desde VeciRed. Importación de calendario de una sola vez.'),'END:VEVENT'].join('\r\n'));
     });
     if(!events.length){alert('No hay servicios agendados con fecha para exportar.');return;}
-    var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//VeciRed//Agenda de servicios//ES','CALSCALE:GREGORIAN','METHOD:PUBLISH'].concat(events).concat(['END:VCALENDAR']).join('\\r\\n');
+    var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//VeciRed//Agenda de servicios//ES','CALSCALE:GREGORIAN','METHOD:PUBLISH'].concat(events).concat(['END:VCALENDAR']).join('\r\n');
     var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
     var url=URL.createObjectURL(blob),a=document.createElement('a');
     a.href=url;a.download='VeciRed-Agenda.ics';document.body.appendChild(a);a.click();a.remove();
