@@ -415,3 +415,19 @@
   document.getElementById('cerrarGarantiaCruz').addEventListener('click', cerrarGarantia);
   modalGarantia.addEventListener('click', (e) => { if (e.target === modalGarantia) cerrarGarantia(); });
 })();</script>
+<script>
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var target=document.getElementById('btn-propuestas');
+  if(!target) return;
+  var next=new URLSearchParams();
+  ['latitud','longitud','radio','categoria','fecha','franja','presupuesto','tecnico'].forEach(function(key){
+    var value=params.get(key);
+    if(value!==null) next.set(key,value);
+  });
+  var destination='INT-18.html'+(next.toString()?'?'+next.toString():'');
+  target.setAttribute('href',destination);
+  target.setAttribute('data-go',destination);
+})();
+</script>
+
