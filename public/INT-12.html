@@ -828,18 +828,18 @@ main [data-vr-map="tecnicos"] {
 
     function numberFrom(text, regex) {
       var match = String(text || '').match(regex);
-      return match ? Number(match[1].replace(/\\./g, '').replace(',', '.')) : Number.POSITIVE_INFINITY;
+      return match ? Number(match[1].replace(/\./g, '').replace(',', '.')) : Number.POSITIVE_INFINITY;
     }
 
     function getValue(card, type) {
       var text = card.textContent || '';
-      if (type === 'distance') return numberFrom(text, /(\\d+(?:[.,]\\d+)?)\\s*km/i);
-      if (type === 'price') return numberFrom(text, /Desde\\s*\\$\\s*([\\d.]+)/i);
+      if (type === 'distance') return numberFrom(text, /(\d+(?:[.,]\d+)?)\s*km/i);
+      if (type === 'price') return numberFrom(text, /Desde\s*\$\s*([\d.]+)/i);
       var star = Array.from(card.querySelectorAll('.material-symbols-outlined')).find(function (el) {
         return el.textContent.trim().toLowerCase() === 'star';
       });
       var ratingText = star && star.parentElement ? star.parentElement.textContent : '';
-      return numberFrom(ratingText, /([0-5](?:[.,]\\d+)?)/);
+      return numberFrom(ratingText, /([0-5](?:[.,]\d+)?)/);
     }
 
     function sortCards() {
