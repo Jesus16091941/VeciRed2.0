@@ -191,6 +191,46 @@
 </label>
 </div>
 </div>
+<!-- Destino de la solicitud: profesional específico o difusión general -->
+<section id="vr-request-routing" class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
+  <div class="flex items-start gap-3 mb-4">
+    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0"><i class="fa-solid fa-bullseye text-lg"></i></div>
+    <div>
+      <h2 class="text-base font-bold text-slate-900">¿A quién quieres dirigir tu solicitud?</h2>
+      <p class="text-xs text-slate-500 mt-1">Puedes elegir un profesional o publicarla para que respondan profesionales de la categoría y zona seleccionadas.</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-300">
+      <input type="radio" name="vr-request-destination" value="specific" class="mt-1 accent-blue-700">
+      <span><strong class="block text-sm text-slate-800">Profesional específico</strong><span class="block text-xs text-slate-500 mt-1">La solicitud se dirige al profesional que elijas.</span></span>
+    </label>
+    <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 cursor-pointer hover:border-blue-300">
+      <input type="radio" name="vr-request-destination" value="general" class="mt-1 accent-blue-700">
+      <span><strong class="block text-sm text-slate-800">Solicitud general</strong><span class="block text-xs text-slate-500 mt-1">Pueden responder profesionales que coincidan con la categoría y el radio.</span></span>
+    </label>
+  </div>
+  <div id="vr-specific-professional-wrap" class="mt-4 hidden">
+    <label for="vr-specific-professional" class="block text-xs font-bold text-slate-700 mb-2">Selecciona al profesional</label>
+    <select id="vr-specific-professional" class="w-full rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+      <option value="">Selecciona un profesional</option>
+      <option value="seed-t-roberto">Roberto Díaz — Gasfitería</option>
+      <option value="seed-t-lucia">Lucía Muñoz — Electricidad</option>
+      <option value="seed-t-carlosv">Carlos Vargas — Cerrajería</option>
+      <option value="seed-t-carlost">Carlos Torres — Carpintería</option>
+      <option value="seed-t-andresp">Andrés Pizarro — Pintura y muros</option>
+      <option value="seed-t-juan">Juan Camilo Ramírez — Electricidad</option>
+      <option value="seed-t-luisa">Luisa María Mendoza — Gasfitería</option>
+      <option value="seed-t-valentina">Valentina Rivas — Climatización</option>
+      <option value="mateo-s">Mateo S. — Climatización y electrodomésticos</option>
+      <option value="seed-e-hernan">Hernán Soto — Albañilería</option>
+      <option value="seed-e-marta">Marta Leiva — Pintura y muros</option>
+      <option value="seed-e-jorge">Jorge Contreras — Gasfitería y hogar</option>
+    </select>
+    <p id="vr-specific-professional-note" class="text-xs text-slate-500 mt-2">Puedes cambiar de profesional antes de publicar. La descripción y el presupuesto se conservarán.</p>
+  </div>
+  <div id="vr-request-destination-status" class="mt-3 rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs text-slate-600" aria-live="polite"></div>
+</section>
 <!-- SECTION 1: Issue Description & Smart AI Categorization -->
 <section class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
 <div class="flex items-center justify-between mb-3">
@@ -671,6 +711,59 @@ document.addEventListener('DOMContentLoaded', function () {
   var main = document.querySelector('main');
   if (!main || !textarea) return;
 
+  var professionalDirectory = {
+    'seed-t-roberto': { slug:'roberto', name:'Roberto Díaz', short:'Roberto D.', category:'Gasfitería' },
+    'seed-t-lucia': { slug:'lucia', name:'Lucía Muñoz', short:'Lucía M.', category:'Electricidad' },
+    'seed-t-carlosv': { slug:'carlos', name:'Carlos Vargas', short:'Carlos V.', category:'Cerrajería' },
+    'seed-t-carlost': { slug:'carlost', name:'Carlos Torres', short:'Carlos T.', category:'Carpintería' },
+    'seed-t-andresp': { slug:'andresp', name:'Andrés Pizarro', short:'Andrés P.', category:'Pintura y muros' },
+    'seed-t-juan': { slug:'juan', name:'Juan Camilo Ramírez', short:'Juan C.', category:'Electricidad' },
+    'seed-t-luisa': { slug:'luisa', name:'Luisa María Mendoza', short:'Luisa M.', category:'Gasfitería' },
+    'seed-t-valentina': { slug:'valentina', name:'Valentina Rivas', short:'Valentina R.', category:'Climatización' },
+    'mateo-s': { slug:'mateo', name:'Mateo S.', short:'Mateo S.', category:'Climatización' },
+    'seed-e-hernan': { slug:'hernan', name:'Hernán Soto', short:'Hernán S.', category:'Albañilería' },
+    'seed-e-marta': { slug:'marta', name:'Marta Leiva', short:'Marta L.', category:'Pintura y muros' },
+    'seed-e-jorge': { slug:'jorge', name:'Jorge Contreras', short:'Jorge C.', category:'Gasfitería' }
+  };
+  var initialProfile = params.get('profile') || '';
+  var routeMode = params.get('destino') === 'general' ? 'general' : (initialProfile || params.get('tecnico') ? 'specific' : 'general');
+  var routeRadios = Array.from(document.querySelectorAll('input[name="vr-request-destination"]'));
+  var professionalSelect = document.getElementById('vr-specific-professional');
+  var professionalWrap = document.getElementById('vr-specific-professional-wrap');
+  var destinationStatus = document.getElementById('vr-request-destination-status');
+  function profileIdFromSlug(slug) {
+    var ids = Object.keys(professionalDirectory);
+    for (var i=0;i<ids.length;i++) if (professionalDirectory[ids[i]].slug === slug) return ids[i];
+    return '';
+  }
+  var selectedProfileId = initialProfile && professionalDirectory[initialProfile] ? initialProfile : profileIdFromSlug(technician);
+  if (!selectedProfileId && technician && professionalDirectory[technician]) selectedProfileId = technician;
+  function selectedProfessional() { return professionalDirectory[professionalSelect ? professionalSelect.value : ''] || null; }
+  function updateDestinationUI() {
+    var specific = routeMode === 'specific';
+    if (professionalWrap) professionalWrap.classList.toggle('hidden', !specific);
+    routeRadios.forEach(function (radio) { radio.checked = radio.value === routeMode; });
+    if (destinationStatus) {
+      var professional = selectedProfessional();
+      destinationStatus.textContent = specific
+        ? (professional ? 'Solicitud dirigida a ' + professional.name + '. Puedes cambiarlo antes de publicar.' : 'Selecciona el profesional que recibirá esta solicitud.')
+        : 'Solicitud general: se ofrecerá a profesionales compatibles con la categoría y el radio de búsqueda.';
+    }
+    updatePublishButton();
+  }
+  routeRadios.forEach(function (radio) { radio.addEventListener('change', function () { routeMode = radio.value; updateDestinationUI(); }); });
+  if (professionalSelect) professionalSelect.addEventListener('change', function () {
+    var professional = selectedProfessional();
+    if (professional) {
+      var previous = directRequests[technician];
+      technician = professional.slug;
+      if (directRequests[technician] && !textarea.dataset.userEdited) textarea.value = directRequests[technician].message;
+      if (!manualCategory) currentCategory = professional.category;
+      refreshCategory();
+      updateCounter();
+    }
+    updateDestinationUI();
+  });
   var directRequests = {
     roberto: {
       name: 'Roberto D.',
@@ -1082,15 +1175,16 @@ document.addEventListener('DOMContentLoaded', function () {
   function updatePublishButton() {
     if(!publishButton) return;
     var km=selectedRadius/1000;
-    var tech=directRequests[technician];
     var label=publishButton.querySelector('span');
-    var category=currentCategory||categoryFromDirectTechnician()||'servicio';
-    var matchingTech=tech && tech.category===category ? tech : null;
+    var professional=routeMode === 'specific' ? selectedProfessional() : null;
+    var matchingTech=professional ? (directRequests[professional.slug] || {name:professional.short,category:professional.category}) : null;
+    var category=professional ? professional.category : (currentCategory||'servicio');
     var action=urgencyToggle && !urgencyToggle.checked ? 'Publicar solicitud' : 'Publicar urgencia';
     var text=action+(matchingTech?' para '+matchingTech.name:'')+' · '+category+' ('+km+' km)';
     if(label) label.textContent=text;
     var query=new URLSearchParams();
-    if(matchingTech) query.set('tecnico',technician);
+    query.set('destino', routeMode);
+    if(professional) { query.set('tecnico',professional.slug); query.set('profile',professionalSelect.value); }
     query.set('categoria',category);
     query.set('radio',String(selectedRadius));
     if(gpsStatus && gpsStatus.dataset.lat && gpsStatus.dataset.lng){
