@@ -826,15 +826,17 @@ main [data-vr-map="tecnicos"] {
     var feed = header && header.nextElementSibling;
     if (!feed) return;
 
-    function numberFrom(text, regex) {
+    function numberFrom(text, regex, thousands) {
       var match = String(text || '').match(regex);
-      return match ? Number(match[1].replace(/\./g, '').replace(',', '.')) : Number.POSITIVE_INFINITY;
+      if (!match) return Number.POSITIVE_INFINITY;
+      var value = thousands ? match[1].replace(/\./g, '') : match[1].replace(',', '.');
+      return Number(value);
     }
 
     function getValue(card, type) {
       var text = card.textContent || '';
       if (type === 'distance') return numberFrom(text, /(\d+(?:[.,]\d+)?)\s*km/i);
-      if (type === 'price') return numberFrom(text, /Desde\s*\$\s*([\d.]+)/i);
+      if (type === 'price') return numberFrom(text, /Desde\s*\$\s*([\d.]+)/i, true);
       var star = Array.from(card.querySelectorAll('.material-symbols-outlined')).find(function (el) {
         return el.textContent.trim().toLowerCase() === 'star';
       });
