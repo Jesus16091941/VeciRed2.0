@@ -359,47 +359,23 @@ main [data-vr-map="tecnicos"] {
 </button>
 </div>
 <!-- INTERACTIVE TECHNICIAN MAP PINS -->
-<!-- Pin 1: Roberto D. (ACTIVE / SELECTED PIN with Expanded Popup Card) -->
-<div data-vr-pin="0.98,-52" class="absolute left-[37%] top-[40%] -translate-x-1/2 -translate-y-full z-30 flex flex-col items-center">
-<!-- Active Expanded Map Preview Card -->
-<div class="w-72 bg-surface-container-lowest p-3 rounded-xl shadow-xl ring-2 ring-primary mb-2 transition-transform hover:scale-[1.02]">
-<div class="flex items-start gap-2.5">
-<div class="relative flex-shrink-0">
-<img alt="Roberto D." class="w-12 h-12 rounded-xl object-cover ring-2 ring-secondary-container" src="https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"/>
-<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-secondary text-on-secondary flex items-center justify-center text-[10px]">
-<span class="material-symbols-outlined text-xs">verified</span>
-</span>
+<!-- Pin 1: Roberto D. (mismo estilo compacto que los demás) -->
+<div data-vr-pin="0.98,-52" class="absolute left-[37%] top-[40%] -translate-x-1/2 -translate-y-full z-20 group cursor-pointer">
+<div class="flex items-center gap-1.5 bg-surface-container-lowest px-2.5 py-1 rounded-full shadow-md group-hover:scale-105 group-hover:shadow-lg transition-all ring-1 ring-outline-variant">
+<img alt="Roberto D." class="w-6 h-6 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"/>
+<div class="flex flex-col leading-tight pr-1">
+<span class="font-label-sm text-label-sm text-primary font-bold">Roberto D. • 0.8 km</span>
+<span class="font-body-sm text-body-sm text-[10px] text-secondary font-semibold">🔧 Gasfitería &amp; Plomería • 4.9 ★</span>
 </div>
-<div class="flex-1 min-w-0">
-<div class="flex items-center justify-between">
-<h4 class="font-headline-sm text-headline-sm text-primary text-[15px] font-bold truncate">Roberto D.</h4>
-<span class="font-label-sm text-label-sm font-bold text-primary flex items-center gap-0.5">
-<span class="material-symbols-outlined text-xs text-amber-500 fill-current">star</span> 4.9
-                    </span>
-</div>
-<p class="font-label-sm text-label-sm text-secondary uppercase font-bold">Gasfitería &amp; Plomería</p>
-<p class="font-body-sm text-body-sm text-on-surface-variant text-[12px] flex items-center gap-1 mt-0.5">
-<span class="material-symbols-outlined text-xs text-secondary">schedule</span> ~12 min • 0.8 km
-                  </p>
-</div>
-</div>
-<div class="mt-2.5 pt-2 border-t border-surface-container flex items-center justify-between">
-<div>
+<div class="mt-1 flex flex-col items-stretch gap-2" data-vr-expanded-detail="true">
+<div class="min-w-0">
 <span class="font-label-sm text-label-sm text-on-surface-variant block text-[10px]">Tarifa sugerida:</span>
 <span class="font-headline-sm text-headline-sm text-[13px] text-primary font-bold">Desde $13.500 CLP</span>
 </div>
-<button class="px-3 py-1.5 bg-primary text-on-primary font-label-sm text-label-sm rounded-lg hover:bg-primary-container transition-colors font-semibold" data-go="INT-13.html">
-                  Ver Ficha
-                </button>
+<button class="px-3 py-1.5 bg-primary text-on-primary font-label-sm text-label-sm rounded-lg hover:bg-primary-container transition-colors font-semibold shrink-0" data-go="INT-13.html">Ver Ficha</button>
 </div>
 </div>
-<!-- Pin Pointer Anchor -->
-<div class="flex flex-col items-center">
-<div class="w-7 h-7 rounded-full bg-primary text-on-primary ring-4 ring-secondary-container flex items-center justify-center shadow-lg">
-<span class="material-symbols-outlined text-sm">plumbing</span>
-</div>
-<div class="w-2.5 h-2.5 -mt-1 rotate-45 bg-primary"></div>
-</div>
+<div class="w-2 h-2 mx-auto rotate-45 bg-surface-container-lowest -mt-1 shadow-sm"></div>
 </div>
 <!-- Pin 2: Juan C. (Electricista) -->
 <div data-vr-pin="1.24,23" class="absolute left-[58%] top-[31%] -translate-x-1/2 -translate-y-full z-20 group cursor-pointer">
