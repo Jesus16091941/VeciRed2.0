@@ -345,7 +345,14 @@
   if (rating) rating.textContent = pro.rating;
   if (photo) { photo.src = pro.image; photo.alt = pro.name + ' ' + pro.role; }
   if (amount) amount.textContent = formatCLP(pro.amount);
-  if (payment) payment.textContent = '$' + formatCLP(pro.amount) + ' CLP';
+  if (payment) payment.textContent = '
+</script>
+
+</body>
+</html>
+ + formatCLP(pro.amount) + ' CLP';
+  const chatLink = document.querySelector('a[data-path="chat-coordinacion"]');
+  if (chatLink) chatLink.href = 'INT-21.html?profesional=' + encodeURIComponent(key);
 })();
 </script>
 
