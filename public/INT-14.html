@@ -1175,6 +1175,43 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // Guarda la solicitud en la agenda local antes de pasar a la confirmación.
+  document.addEventListener('click', function(event) {
+    var clicked = event.target && event.target.closest ? event.target.closest('[data-go]') : null;
+    if (!clicked || !/INT-15\.html/.test(clicked.getAttribute('data-go') || '') || !/Publicar y Buscar Técnicos Cercanos|Publicar solicitud|Publicar urgencia/i.test(clicked.textContent)) return;
+    try {
+      var destination = new URL(clicked.getAttribute('data-go'), window.location.href);
+      var p = destination.searchParams;
+      var selected = routeMode === 'specific' ? selectedProfessional() : null;
+      var directoryId = selected && professionalSelect ? professionalSelect.value : '';
+      var record = {
+        id: 'VECI-' + Date.now().toString(36).toUpperCase(),
+        createdAt: new Date().toISOString(),
+        status: 'pendiente',
+        destino: selected ? 'specific' : 'general',
+        profileId: directoryId,
+        tecnico: selected ? selected.name : '',
+        categoria: p.get('categoria') || currentCategory || 'Servicio general',
+        descripcion: textarea ? textarea.value.trim() : '',
+        fecha: p.get('fecha') || selectedDate || 'hoy',
+        franja: p.get('franja') || selectedTime || '',
+        presupuesto: p.get('presupuesto') || selectedBudget || '',
+        radio: p.get('radio') || String(selectedRadius || 3000),
+        latitud: p.get('latitud') || '',
+        longitud: p.get('longitud') || '',
+        urgente: !!(urgencyToggle && urgencyToggle.checked)
+      };
+      if (!record.descripcion) record.descripcion = 'Solicitud de servicio sin descripción adicional.';
+      var key = 'vecired:agenda:requests:v1';
+      var all = JSON.parse(localStorage.getItem(key) || '[]');
+      if (!Array.isArray(all)) all = [];
+      all.unshift(record);
+      localStorage.setItem(key, JSON.stringify(all.slice(0, 100)));
+    } catch (saveError) {
+      console.warn('No se pudo guardar la solicitud en la agenda local.', saveError);
+    }
+  }, true);
+
   var publishButton = Array.from(document.querySelectorAll('[data-go="INT-15.html"]')).find(function(el){return /Publicar y Buscar Técnicos Cercanos/i.test(el.textContent);});
   function updatePublishButton() {
     if(!publishButton) return;
