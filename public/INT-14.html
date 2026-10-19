@@ -757,7 +757,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (professional) {
       var previous = directRequests[technician];
       technician = professional.slug;
-      if (directRequests[technician] && !textarea.dataset.userEdited) textarea.value = directRequests[technician].message;
+      if (!textarea.dataset.userEdited) {
+        if (directRequests[technician]) textarea.value = directRequests[technician].message;
+        else { textarea.value = ''; textarea.placeholder = 'Describe el trabajo que necesitas para ' + professional.short + '…'; }
+      }
       if (!manualCategory) currentCategory = professional.category;
       refreshCategory();
       updateCounter();
