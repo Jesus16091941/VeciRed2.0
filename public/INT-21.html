@@ -1035,5 +1035,147 @@
   if (escrow) escrow.textContent = amountText;
 })();
 </script>
+
+<script id="vr-precontract-chat-continuity">
+(() => {
+  const params = new URLSearchParams(window.location.search);
+  const rawKey = params.get('profesional') || 'juan';
+  const key = ['juan','roberto','luisa'].includes(rawKey) ? rawKey : 'juan';
+  const preview = params.get('modo') === 'previo';
+  const continuing = params.get('continuar') === '1';
+  const profiles = {
+    juan: { name: 'Juan Camilo R.', short: 'Juan C.', amount: 15000 },
+    roberto: { name: 'Roberto D.', short: 'Roberto D.', amount: 13500 },
+    luisa: { name: 'Luisa M.', short: 'Luisa M.', amount: 10500 }
+  };
+  const pro = profiles[key];
+  const storageKey = 'vecired:prochat:' + key;
+  const stream = document.getElementById('chat-stream');
+  const input = document.getElementById('message-input');
+  const sendButton = document.getElementById('send-button');
+  if (!stream || !input || !sendButton) return;
+
+  const money = n => '$' + new Intl.NumberFormat('es-CL').format(n) + ' CLP';
+  const readHistory = () => {
+    try {
+      const data = JSON.parse(sessionStorage.getItem(storageKey) || '[]');
+      return Array.isArray(data) ? data : [];
+    } catch (_) { return []; }
+  };
+  let history = readHistory();
+  const saveHistory = () => {
+    try { sessionStorage.setItem(storageKey, JSON.stringify(history)); } catch (_) {}
+  };
+  const timeNow = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  if (preview) {
+    const aside = document.querySelector('aside');
+    if (aside) aside.classList.add('hidden');
+    const chatPanel = stream.closest('main');
+    if (chatPanel) {
+      chatPanel.classList.remove('lg:col-span-7');
+      chatPanel.classList.add('lg:col-span-12', 'w-full');
+    }
+    const title = document.querySelector('.p-space-md.bg-surface-container-low.rounded-t-xl span.font-label-lg');
+    if (title) title.textContent = 'Chat seguro con ' + pro.name;
+    input.placeholder = 'Escribe tu consulta para ' + pro.short + '...';
+    const status = Array.from(document.querySelectorAll('body span')).find(el => /Aceptado & Confirmado/i.test(el.textContent));
+    if (status) status.textContent = 'Chat previo a la contratación';
+  }
+
+  function addOrderBanner() {
+    const banner = document.createElement('div');
+    banner.className = 'flex justify-center my-2';
+    const card = document.createElement('div');
+    card.className = 'max-w-md bg-surface-container-low px-space-md py-2 rounded-lg text-center font-body-sm text-body-sm text-on-surface-variant shadow-sm';
+    const heading = document.createElement('span');
+    heading.className = 'font-label-sm font-bold text-primary block mb-0.5';
+    heading.textContent = 'ORDEN #VECI-8492 INICIADA';
+    const body = document.createElement('span');
+    body.append('Se retuvieron ');
+    const amount = document.createElement('strong');
+    amount.id = 'vr-escrow-amount';
+    amount.className = 'text-primary';
+    amount.textContent = money(pro.amount);
+    body.append(amount, ' en la cuenta fiduciaria VeciPay. Solo se transferirán al profesional tras tu conformidad explícita.');
+    card.append(heading, body);
+    banner.append(card);
+    stream.append(banner);
+  }
+
+  function renderEntry(entry) {
+    const row = document.createElement('div');
+    row.className = entry.role === 'neighbor'
+      ? 'flex items-end gap-2 max-w-[85%] ml-auto justify-end'
+      : 'flex items-end gap-2 max-w-[85%]';
+    if (entry.role === 'neighbor') {
+      const wrap = document.createElement('div');
+      wrap.className = 'flex flex-col items-end gap-1';
+      const label = document.createElement('span');
+      label.className = 'font-label-sm text-label-sm text-on-surface-variant pr-1';
+      label.textContent = 'Tú • ' + (entry.time || '');
+      const bubble = document.createElement('div');
+      bubble.className = 'bg-primary text-on-primary rounded-2xl rounded-br-xs p-space-md shadow-sm font-body-md text-body-md whitespace-pre-wrap break-words';
+      bubble.textContent = entry.text;
+      wrap.append(label, bubble);
+      row.append(wrap);
+    } else {
+      const photo = document.createElement('img');
+      photo.className = 'w-8 h-8 rounded-full object-cover flex-shrink-0';
+      photo.src = document.getElementById('vr-chat-tech-photo-main')?.src || '';
+      photo.alt = pro.name;
+      const wrap = document.createElement('div');
+      wrap.className = 'flex flex-col gap-1';
+      const label = document.createElement('span');
+      label.className = 'font-label-sm text-label-sm text-on-surface-variant pl-1';
+      label.textContent = pro.name + ' • ' + (entry.time || '');
+      const bubble = document.createElement('div');
+      bubble.className = 'bg-surface-container-low text-on-surface rounded-2xl rounded-bl-xs p-space-md shadow-sm font-body-md text-body-md whitespace-pre-wrap break-words';
+      bubble.textContent = entry.text;
+      wrap.append(label, bubble);
+      row.append(photo, wrap);
+    }
+    stream.append(row);
+  }
+
+  function renderConversation(showOrder) {
+    stream.replaceChildren();
+    if (showOrder) addOrderBanner();
+    history.forEach(renderEntry);
+    stream.scrollTop = stream.scrollHeight;
+  }
+
+  if (preview || continuing || history.length) {
+    if (!history.length) {
+      history = [{
+        role: 'professional',
+        text: '¡Hola! Gracias por contactarme. Cuéntame qué necesitas revisar del servicio y con gusto lo conversamos antes de contratar.',
+        time: timeNow()
+      }];
+      saveHistory();
+    }
+    renderConversation(!preview);
+  }
+
+  window.appendUserMessage = function(message) {
+    const text = String(message || '').trim();
+    if (!text) return;
+    history.push({ role: 'neighbor', text, time: timeNow() });
+    saveHistory();
+    renderConversation(!preview);
+    input.value = '';
+    window.setTimeout(() => {
+      history.push({
+        role: 'professional',
+        text: '¡Gracias por tu mensaje! Revisemos los detalles para que tengas claro el servicio antes de continuar.',
+        time: timeNow()
+      });
+      saveHistory();
+      renderConversation(!preview);
+    }, 1200);
+  };
+})();
+</script>
+
 </body>
 </html>
