@@ -443,7 +443,7 @@ document.addEventListener('DOMContentLoaded', function () {
       try {
         localStorage.setItem('vecired:gps-address', label);
         sessionStorage.setItem('vecired:gps-address', label);
-        sessionStorage.setItem('vecired:location', JSON.stringify({lat:lat,lng:lon,label:label,place:'GPS de INT-20',fallback:false}));
+        sessionStorage.setItem('vecired:location', JSON.stringify({lat:lat,lng:lon,label:label,place:label,fallback:false}));
       } catch (_) {}
     } catch (_) {
       if (addressEl.textContent === 'Detectando dirección GPS...') {
