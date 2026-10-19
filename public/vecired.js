@@ -973,11 +973,12 @@
 
   function initMaps() {
     var hosts = document.querySelectorAll('[data-vr-map]');
+    // Los controles de GPS y el banner de ubicación deben funcionar incluso en pantallas sin mapa.
+    wireMapControls();
+    locate();
     if (!hosts.length) return;
     if (!window.L) { console.warn('[VeciRed] Leaflet no se cargó; los mapas no son interactivos.'); return; }
     hosts.forEach(initMap);
-    wireMapControls();
-    locate();
   }
 
   /* Chat de soporte: reemplaza los enlaces al Centro de Ayuda por una conversación con respuestas programadas */
