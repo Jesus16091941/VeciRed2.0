@@ -713,6 +713,7 @@
   var activeTab='upcoming';
   var activeView='list';
   var currentMonth=(monthInput && monthInput.value) ? monthInput.value : '2026-10';
+  var filterMonth=currentMonth;
   var cards=Array.prototype.slice.call(document.querySelectorAll('[data-vr-service-card]'));
   function monthLabel(value){
     var p=value.split('-');
@@ -721,15 +722,15 @@
   function parseDate(value){
     if(!value)return '';
     var s=String(value).trim();
-    var iso=s.match(/^(\\d{4})-(\\d{2})-(\\d{2})/);
+    var iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if(iso)return iso[1]+'-'+iso[2]+'-'+iso[3];
-    var d=s.match(/^(\\d{1,2})[\\s/-]+(ene(?:ro)?|feb(?:rero)?|mar(?:zo)?|abr(?:il)?|may(?:o)?|jun(?:io)?|jul(?:io)?|ago(?:sto)?|sep(?:tiembre)?|oct(?:ubre)?|nov(?:iembre)?|dic(?:iembre)?)[,\\s/-]+(\\d{4})/i);
+    var d=s.match(/^(\d{1,2})[\s/-]+(ene(?:ro)?|feb(?:rero)?|mar(?:zo)?|abr(?:il)?|may(?:o)?|jun(?:io)?|jul(?:io)?|ago(?:sto)?|sep(?:tiembre)?|oct(?:ubre)?|nov(?:iembre)?|dic(?:iembre)?)[,\s/-]+(\d{4})/i);
     if(d){
       var names=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
       var m=names.findIndex(function(n){return d[2].toLowerCase().indexOf(n)===0;})+1;
       return d[3]+'-'+String(m).padStart(2,'0')+'-'+String(Number(d[1])).padStart(2,'0');
     }
-    var en=s.match(/^(\\d{1,2})\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{4})/i);
+    var en=s.match(/^(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})/i);
     if(en){
       var enNames=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
       return en[3]+'-'+String(enNames.indexOf(en[2].toLowerCase())+1).padStart(2,'0')+'-'+String(Number(en[1])).padStart(2,'0');
@@ -743,7 +744,7 @@
     cards.forEach(function(card){
       var date=serviceDate(card);
       var kind=card.getAttribute('data-service-kind')||'history';
-      var monthOk=!currentMonth||date.slice(0,7)===currentMonth;
+      var monthOk=!filterMonth||date.slice(0,7)===filterMonth;
       var dayOk=!selectedDay||date===selectedDay;
       var tabOk=activeTab==='upcoming'?kind==='upcoming':kind==='history';
       var searchOk=!q||searchText(card).indexOf(q)!==-1;
@@ -760,7 +761,7 @@
       var pendingCards=pending.querySelectorAll('article');
       pendingCards.forEach(function(card){
         var d=card.getAttribute('data-service-date')||'';
-        var dateOk=(!currentMonth||!d||d.slice(0,7)===currentMonth)&&(!selectedDay||!d||d===selectedDay);
+        var dateOk=(!filterMonth||!d||d.slice(0,7)===filterMonth)&&(!selectedDay||!d||d===selectedDay);
         var textOk=!q||card.textContent.toLowerCase().indexOf(q)!==-1;
         card.hidden=!(dateOk&&textOk);
       });
@@ -808,10 +809,16 @@
       if(selectedDay===date)btn.classList.add('bg-primary-container','text-on-primary');
       btn.setAttribute('aria-pressed',selectedDay===date?'true':'false');
       btn.addEventListener('click',function(event){
-        selectedDay=event.currentTarget.getAttribute('data-calendar-date');
-        if(monthInput)monthInput.value=selectedDay.slice(0,7);
-        currentMonth=selectedDay.slice(0,7);
-        selectionLabel.textContent='Filtrando servicios del '+new Date(selectedDay+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})+'. Pulsa el día otra vez para quitar la selección.';
+        var clickedDate=event.currentTarget.getAttribute('data-calendar-date');
+        selectedDay=selectedDay===clickedDate?'':clickedDate;
+        currentMonth=clickedDate.slice(0,7);
+        filterMonth=selectedDay?selectedDay.slice(0,7):currentMonth;
+        if(monthInput)monthInput.value=filterMonth;
+        if(selectedDay){
+          selectionLabel.textContent='Filtrando servicios del '+new Date(selectedDay+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})+'. Pulsa el día otra vez para quitar la selección.';
+          var hasUpcoming=cards.some(function(card){return serviceDate(card)===selectedDay&&card.getAttribute('data-service-kind')==='upcoming';});
+          activeTab=hasUpcoming?'upcoming':'history';
+        }else selectionLabel.textContent='Día deseleccionado. Se mantiene el filtro mensual.';
         renderCalendar();applyFilters();
       });
       calendarDays.appendChild(btn);
@@ -820,18 +827,19 @@
   function changeMonth(delta){
     var p=currentMonth.split('-'), d=new Date(Number(p[0]),Number(p[1])-1+delta,1);
     currentMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    filterMonth=currentMonth;
     if(monthInput)monthInput.value=currentMonth;
     selectedDay='';
     selectionLabel.textContent='Selecciona un día para filtrar los servicios.';
     renderCalendar();applyFilters();
   }
   if(monthInput)monthInput.addEventListener('change',function(){
-    currentMonth=monthInput.value;selectedDay='';
+    currentMonth=monthInput.value||currentMonth;filterMonth=monthInput.value;selectedDay='';
     selectionLabel.textContent='Selecciona un día para filtrar los servicios.';
     renderCalendar();applyFilters();
   });
   if(clearDate)clearDate.addEventListener('click',function(){
-    currentMonth='';selectedDay='';
+    filterMonth='';selectedDay='';
     if(monthInput)monthInput.value='';
     selectionLabel.textContent='Filtro de fecha quitado. Se muestran todos los meses.';
     renderCalendar();applyFilters();
@@ -859,7 +867,7 @@
       var professional=card.getAttribute('data-service-professional')||'';
       var start=toICSDate(date,'1000');
       var end=toICSDate(date,'1130');
-      events.push(['BEGIN:VEVENT','UID:'+code+'@vecired.local','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\\.\\d{3}/,'')+'Z','DTSTART;TZID=America/Santiago:'+start,'DTEND;TZID=America/Santiago:'+end,'SUMMARY:'+escapeICS(title),'DESCRIPTION:'+escapeICS('Código: '+code+'\\nProfesional: '+professional+'\\nExportado desde VeciRed. Importación de calendario de una sola vez.'),'END:VEVENT'].join('\\r\\n'));
+      events.push(['BEGIN:VEVENT','UID:'+code+'@vecired.local','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'')+'Z','DTSTART;TZID=America/Santiago:'+start,'DTEND;TZID=America/Santiago:'+end,'SUMMARY:'+escapeICS(title),'DESCRIPTION:'+escapeICS('Código: '+code+'\\nProfesional: '+professional+'\\nExportado desde VeciRed. Importación de calendario de una sola vez.'),'END:VEVENT'].join('\\r\\n'));
     });
     if(!events.length){alert('No hay servicios agendados con fecha para exportar.');return;}
     var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//VeciRed//Agenda de servicios//ES','CALSCALE:GREGORIAN','METHOD:PUBLISH'].concat(events).concat(['END:VCALENDAR']).join('\\r\\n');
