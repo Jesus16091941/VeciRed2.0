@@ -281,16 +281,16 @@
 <!-- Sort Dropdown -->
 <div class="flex items-center gap-2 self-start md:self-auto">
 <label class="text-body-sm font-body-sm text-on-surface-variant whitespace-nowrap">Ordenar por:</label>
-<select class="bg-surface-container-low text-on-surface font-label-md text-body-sm rounded-lg px-space-sm py-2 focus:outline-none cursor-pointer">
-<option>Proximidad (más cercanos)</option>
-<option>Mejor Calificados</option>
-<option>Tarifa: Menor a Mayor</option>
-<option>Más contratos completados</option>
+<select id="vr-sort" aria-label="Ordenar profesionales" class="bg-surface-container-low text-on-surface font-label-md text-body-sm rounded-lg px-space-sm py-2 focus:outline-none cursor-pointer">
+<option value="distance">Proximidad (más cercanos)</option>
+<option value="rating">Mejor Calificados</option>
+<option value="price">Tarifa: Menor a Mayor</option>
+<option value="contracts">Más contratos completados</option>
 </select>
 </div>
 </div>
 <!-- Technician Cards Grid (3 Columns) -->
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-space-lg">
+<div id="vr-professional-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-space-lg">
 <!-- Card 1: Roberto D. (Plomero Master) -->
 <article data-cat="plomeria" data-rating="4.9" data-price="12000" data-distance="0.8" data-verified="true" data-emergency="false" data-free="true" class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
 <div>
@@ -656,6 +656,11 @@
   var paginationInfo = document.getElementById('vr-pagination-info');
   var paginationControls = document.getElementById('vr-pagination-controls');
   var cards = Array.prototype.slice.call(document.querySelectorAll('article[data-cat]'));
+  var grid = document.getElementById('vr-professional-grid');
+  var sortSelect = document.getElementById('vr-sort');
+  // Valores de demostración del prototipo para ordenar por contratos completados.
+  var demoContracts = [38, 52, 31, 27, 44, 19];
+  cards.forEach(function (card, index) { card.dataset.contracts = String(demoContracts[index] || 0); });
   var pageSize = 6;
   var currentPage = 1;
   var activeCategory = '';
@@ -718,6 +723,15 @@
 
   function render() {
     var term = (search.value || '').trim().toLocaleLowerCase('es-CL');
+    var sortMode = sortSelect ? sortSelect.value : 'distance';
+    cards.sort(function (a, b) {
+      if (sortMode === 'rating') return Number(b.dataset.rating || 0) - Number(a.dataset.rating || 0) || Number(a.dataset.distance || 999) - Number(b.dataset.distance || 999);
+      if (sortMode === 'price') return Number(a.dataset.price || 0) - Number(b.dataset.price || 0) || Number(a.dataset.distance || 999) - Number(b.dataset.distance || 999);
+      if (sortMode === 'contracts') return Number(b.dataset.contracts || 0) - Number(a.dataset.contracts || 0);
+      return Number(a.dataset.distance || 999) - Number(b.dataset.distance || 999);
+    });
+    // Reordenar también los elementos en el HTML, no solo la lista interna.
+    if (grid) cards.forEach(function (card) { grid.appendChild(card); });
     var filtered = cards.filter(function (card) {
       var categoryMatch = !activeCategory || card.getAttribute('data-cat') === activeCategory;
       var textMatch = !term || card.textContent.toLocaleLowerCase('es-CL').indexOf(term) !== -1;
@@ -808,6 +822,7 @@
     applyCategory('', false);
   });
   select.addEventListener('change', function () { applyCategory(select.value, true); });
+  if (sortSelect) sortSelect.addEventListener('change', function () { currentPage = 1; render(); });
   document.getElementById('vr-cat-clear').addEventListener('click', function () { applyCategory('', true); });
   search.addEventListener('input', function () { currentPage = 1; render(); });
 
