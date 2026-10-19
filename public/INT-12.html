@@ -719,3 +719,40 @@ main [data-vr-map="tecnicos"] {
   updateActiveLabel(buttons.find(button => button.getAttribute('aria-pressed') === 'true') || buttons[1]);
 })();
 </script>
+
+
+<script>
+  // INT-12 dropdown categorías: abre y cierra el menú al interactuar.
+  (function () {
+    var btnCategorias = document.getElementById('btnCategorias');
+    var dropdownCategorias = document.getElementById('dropdownCategorias');
+    if (!btnCategorias || !dropdownCategorias) return;
+
+    btnCategorias.setAttribute('aria-haspopup', 'true');
+    btnCategorias.setAttribute('aria-controls', 'dropdownCategorias');
+    btnCategorias.setAttribute('aria-expanded', 'false');
+
+    btnCategorias.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var abrir = dropdownCategorias.classList.contains('hidden');
+      dropdownCategorias.classList.toggle('hidden', !abrir);
+      btnCategorias.setAttribute('aria-expanded', String(abrir));
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!dropdownCategorias.contains(event.target) && !btnCategorias.contains(event.target)) {
+        dropdownCategorias.classList.add('hidden');
+        btnCategorias.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        dropdownCategorias.classList.add('hidden');
+        btnCategorias.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+</script>
+
