@@ -540,6 +540,7 @@
 
     function appendUserMessage(msg) {
       if (typeof window.appendUserMessage === 'function') { window.appendUserMessage(msg); return; }
+      if (typeof window.appendUserMessage === 'function') { window.appendUserMessage(msg); return; }
       if (!msg || msg.trim() === "") return;
 
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
