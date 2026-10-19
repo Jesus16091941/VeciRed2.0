@@ -539,6 +539,7 @@
     document.addEventListener('DOMContentLoaded', personalizeNeighborChat);
 
     function appendUserMessage(msg) {
+      if (typeof window.appendUserMessage === 'function') { window.appendUserMessage(msg); return; }
       if (!msg || msg.trim() === "") return;
 
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -1162,7 +1163,7 @@
     if (!history.length) {
       history = [{
         role: 'professional',
-        text: '¡Hola! Gracias por contactarme. Cuéntame qué necesitas revisar del servicio y con gusto lo conversamos antes de contratar.',
+        text: '¡Hola! Vi que estás revisando mi propuesta para la reparación de grifo de la solicitud #VECI-8492. ¿Qué detalle del trabajo, el precio o la coordinación te gustaría aclarar antes de decidir?',
         time: timeNow()
       }];
       saveHistory();
@@ -1257,8 +1258,7 @@
       return 'Entiendo lo que me comentas. Para darte una orientación más útil, ¿me puedes describir qué resultado esperas y qué está pasando ahora? Así podemos aclarar el alcance antes de avanzar.';
     }
     return 'Gracias por contarme. Para entender bien lo que necesitas, ¿qué es lo más importante que debería revisar del servicio? Con ese detalle podemos aclarar el alcance y evitar confusiones antes de avanzar.';
-  };
-  };
+  }
 })();
 </script>
 
