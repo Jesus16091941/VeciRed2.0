@@ -150,7 +150,27 @@ main [data-vr-map="tecnicos"] {
   </div>
   <div class="px-4 py-2 border-t border-outline-variant/30 bg-surface-container-low"><p class="text-[11px] text-on-surface-variant">Avisos de demostración del prototipo VeciRed.</p></div>
 </div>
-</div><div class="flex items-center gap-space-xs pl-space-xs"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"/><span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span></div></div></div></header><main class="w-full pt-20 bg-surface min-h-screen"><div class="flex flex-col w-full">
+</div><div id="headerAccount" class="relative flex items-center gap-space-md">
+  <div id="headerGuestLinks" class="hidden font-label-md text-label-md text-on-surface-variant"><a href="INT-02.html" class="hover:text-primary transition-colors">¿Ya tienes cuenta?</a> <a href="INT-04.html" class="font-semibold text-primary underline decoration-outline-variant hover:opacity-80">Iniciar Sesión</a></div>
+  <div id="headerUserMenu" data-vr-account-shared="true" class="hidden relative">
+    <button id="headerUserButton" type="button" aria-expanded="false" aria-controls="headerUserDropdown" class="flex items-center gap-2 rounded-full hover:bg-surface-container-low px-2 py-1.5 transition-colors">
+      <span id="headerUserName" class="font-label-md text-label-md text-primary font-semibold max-w-[150px] truncate"></span>
+      <span class="material-symbols-outlined text-primary text-[20px]">keyboard_arrow_down</span>
+      <span id="headerUserInitial" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-semibold text-sm">U</span>
+    </button>
+    <div id="headerUserDropdown" class="hidden absolute right-0 top-full mt-2 w-56 rounded-xl bg-surface-container-lowest border border-outline-variant/40 shadow-lg p-2 z-[60]">
+      <div class="px-3 py-2 border-b border-outline-variant/30">
+        <p class="text-xs text-on-surface-variant">Sesión iniciada como</p>
+        <p id="headerDropdownUserName" class="font-semibold text-primary text-sm truncate"></p>
+      </div>
+      <a id="headerAccountHomeLink" href="INT-10.html" class="block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Inicio del vecino</a>
+      <a id="headerPublishRequestLink" href="INT-14.html" class="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Publicar solicitud de servicio</a>
+      <a id="headerPublicProfileLink" href="INT-13.html" class="hidden block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Ver mi perfil público</a>
+      <button id="headerLogoutButton" type="button" class="w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-error hover:bg-error-container/40 transition-colors">Cerrar sesión</button>
+    </div>
+  </div>
+  <div id="headerGuestAvatar" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div>
+</div></div></div></header><main class="w-full pt-20 bg-surface min-h-screen"><div class="flex flex-col w-full">
 <!-- Top Hyperlocal Context & Filtering Bar -->
 <section class="w-full bg-surface-container-lowest/95 shadow-sm border-b border-outline-variant/30 px-space-lg py-2 sticky top-16 z-40">
 <div class="max-w-[1720px] mx-auto flex flex-col gap-2">
