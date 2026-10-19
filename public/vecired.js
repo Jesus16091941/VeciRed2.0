@@ -675,10 +675,11 @@
   }
 
   function updateLocationText(loc) {
+    var label = loc.fallback ? 'Santiago Centro (ubicación por defecto)' : (loc.street ? loc.street + ', ' : '') + (loc.place || loc.label);
     document.querySelectorAll('[data-vr-coords]').forEach(function (el) { el.textContent = formatCoords(loc); });
-    document.querySelectorAll('[data-vr-place]').forEach(function (el) {
-      el.textContent = loc.fallback ? 'Santiago Centro (ubicación por defecto)' : (loc.street ? loc.street + ', ' : '') + (loc.place || loc.label);
-    });
+    document.querySelectorAll('[data-vr-place]').forEach(function (el) { el.textContent = label; });
+    // Sincroniza la ubicación real/fallback en el banner superior de todas las pantallas.
+    document.querySelectorAll('#spanUbicacion, #spanUbicacionBanner').forEach(function (el) { el.textContent = label; });
   }
 
   /* Mapas */
