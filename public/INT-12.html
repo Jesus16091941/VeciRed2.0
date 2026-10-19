@@ -878,7 +878,7 @@ main [data-vr-map="tecnicos"] {
 (() => {
   // Guardar el profesional elegido antes de navegar a la confirmación del contrato.
   document.addEventListener('click', (event) => {
-    const button = event.target.closest('button[data-go="INT-20.html"]');
+    const button = event.target.closest('button[data-go="INT-20.html"], button[data-go="INT-14.html"]');
     if (!button) return;
     const card = button.closest('.bg-surface-container-lowest') || button.parentElement?.parentElement;
     if (!card) return;
