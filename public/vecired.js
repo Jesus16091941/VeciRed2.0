@@ -859,7 +859,17 @@
         if (action === 'locate') {
           toast('Buscando tu ubicación GPS…');
           locate({ force: true }).then(function (loc) {
+            // Refuerza la actualización visual del banner después de resolver el GPS.
+            updateLocationText(loc);
+            var bannerLocation = document.getElementById('spanUbicacion');
+            if (bannerLocation) {
+              bannerLocation.textContent = loc.fallback
+                ? 'Santiago Centro (ubicación por defecto)'
+                : (loc.street ? loc.street + ', ' : '') + (loc.place || loc.label || 'Ubicación GPS activa');
+            }
             toast(loc.fallback ? 'GPS no disponible: usamos Santiago Centro.' : 'Ubicación actualizada: ' + (loc.place || loc.label));
+          }).catch(function () {
+            toast('No pudimos actualizar la ubicación. Revisa el permiso de GPS del navegador.');
           });
         } else if (state && action === 'zoom-in') state.map.zoomIn();
         else if (state && action === 'zoom-out') state.map.zoomOut();
