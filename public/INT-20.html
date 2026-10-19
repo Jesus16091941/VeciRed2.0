@@ -335,26 +335,22 @@
 <script id="vr-selected-professional">
 (() => {
   const profiles = {"juan":{"name":"Juan C.","chatName":"Juan Camilo R.","role":"Maestro Gasfíter Certificado SENA","rating":"5.0","reviews":"64 reseñas","badge":"Sello Oro VeciRed","amount":15000,"image":"https://lh3.googleusercontent.com/aida/AEtjO1XUWgT-DqfbPGcSkTJTsTZKe6M6Y5a5R1stsiW9TA2-d-OR-kUtyTuKsI7sDo5mbGCM_rYNhMPststj_aN5vJr-8hRSAzrbk7Z4jT9LEEzRvSmHsmnrHbJ0K9ykFBm5RNqPbNduPvOApJoIbKQpYwbwom0Ti2pkp56isJ7hqBzLe8c6O0ysqr8YRiQM4cDDTqDwM6mEKJpf0_yPQZFvqzBGROSUSs7gV6Ukr6APvATfHHl2F07-1dE064A"},"roberto":{"name":"Roberto D.","chatName":"Roberto D.","role":"Fontanero Profesional (12+ años exp.)","rating":"4.8","reviews":"89 reseñas","badge":"Sello Vecino Verificado","amount":13500,"image":"https://lh3.googleusercontent.com/aida/AEtjO1WHVmi6HXJkdtAgwJUk1NIlhsIKDZ01TNOxgy9KY6aJIS1KIcJMbJPlC2ibkM9j8WRIgK2upT1gk8Wc7puiFRX5nHCNTsxARYoC1aqxVTr_g9teJIBM0YTzqdLfnv4L8nH64Og8gGZ2_ahfzPQuoewGFXDRtzO4R8k6KsGCGboxxAo4cW7Mt8JFkzWCJWvoAZrXjSO1Y2u4bLrU3gDkgborlA4CnDDvbVe_Ca__RLmHL-TRWzRWnIxQBLo"},"luisa":{"name":"Luisa M.","chatName":"Luisa M.","role":"Especialista en Reparaciones","rating":"4.6","reviews":"32 trabajos","badge":"Garantía directa 45 días","amount":10500,"image":"https://lh3.googleusercontent.com/aida/AEtjO1VM3m0LFMZF4f5oEGm-esaoDJyfnYOs8FHnpdBmytqNsBTsO_y5MorZLX5ATH0FmqmoW23rkSA_VAYQLUuquJpXKWjTL7Amt4wK4ycqGHegPJG-iWrgiCQHmMHSNZrrfIn2nUWOk88VaAL4AAhINmBkRLzn2HiYhV-M6iGjeoY0YHLWo2Gv0sqSd00uSwg5ltqlt8ff6V0YZKi7FggFxM5DC0ryinyiiEGcLWr9z-0X0uR2nFIldZUf8wk"}};
-  const key = new URLSearchParams(window.location.search).get('profesional') || 'roberto';
-  const pro = profiles[key] || profiles.roberto;
+  const rawKey = new URLSearchParams(window.location.search).get('profesional') || 'roberto';
+  const key = Object.prototype.hasOwnProperty.call(profiles, rawKey) ? rawKey : 'roberto';
+  const pro = profiles[key];
   const name = document.getElementById('vr-confirmed-tech-name');
   const role = document.getElementById('vr-confirmed-tech-role');
   const rating = document.getElementById('vr-confirmed-tech-rating');
   const photo = document.getElementById('vr-confirmed-tech-photo');
   const amount = document.getElementById('vr-confirmed-amount');
   const payment = document.getElementById('vr-payment-amount');
-  const formatCLP = value => String(Math.round(value)).replace(/\\B(?=(\\d{3})+(?!\\d))/g, '.');
+  const formatCLP = value => new Intl.NumberFormat('es-CL').format(Math.round(value));
   if (name) name.textContent = pro.name;
   if (role) role.textContent = pro.role;
   if (rating) rating.textContent = pro.rating;
   if (photo) { photo.src = pro.image; photo.alt = pro.name + ' ' + pro.role; }
   if (amount) amount.textContent = formatCLP(pro.amount);
-  if (payment) payment.textContent = '
-</script>
-
-</body>
-</html>
- + formatCLP(pro.amount) + ' CLP';
+  if (payment) payment.textContent = '$' + formatCLP(pro.amount) + ' CLP';
   const chatLink = document.querySelector('a[data-path="chat-coordinacion"]');
   if (chatLink) chatLink.href = 'INT-21.html?profesional=' + encodeURIComponent(key) + '&continuar=1';
 })();
