@@ -429,7 +429,7 @@
 <span class="material-symbols-outlined text-[18px]">check_circle</span>
 <span>Contratar a Juan</span>
 </button>
-<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button">
+<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button" data-go="INT-21.html?profesional=juan&modo=previo">
 <span class="material-symbols-outlined text-[18px] text-secondary">chat</span>
 <span>Chatear con Juan</span>
 </button>
@@ -440,7 +440,7 @@
 <span class="material-symbols-outlined text-[18px]">check_circle</span>
 <span>Contratar a Roberto</span>
 </button>
-<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button">
+<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button" data-go="INT-21.html?profesional=roberto&modo=previo">
 <span class="material-symbols-outlined text-[18px] text-secondary">chat</span>
 <span>Chatear con Roberto</span>
 </button>
@@ -451,7 +451,7 @@
 <span class="material-symbols-outlined text-[18px]">check_circle</span>
 <span>Contratar a Luisa</span>
 </button>
-<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button">
+<button class="w-full bg-surface hover:bg-surface-container text-primary font-label-md text-label-md py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5" type="button" data-go="INT-21.html?profesional=luisa&modo=previo">
 <span class="material-symbols-outlined text-[18px] text-secondary">chat</span>
 <span>Chatear con Luisa</span>
 </button>
@@ -512,16 +512,7 @@
 </div>
 </div>
 </section>
-<!-- Script for lightweight UI interactivity -->
-<script>
-    // En esta etapa, solo "Contratar a..." continúa a INT-20.
-    document.querySelectorAll('button:not([data-go])').forEach(btn => {
-      btn.addEventListener('click', function () {
-        const match = this.innerText.trim().match(/^Chatear con (.+)$/);
-        if (match) alert('Para continuar con ' + match[1] + ', presiona «Contratar a ' + match[1] + '».');
-      });
-    });
-  </script>
+<!-- Los chats previos a la contratación se abren en INT-21 con el profesional correspondiente. -->
 </div></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant/40 py-space-xl"><div class="max-w-container-max mx-auto px-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 VeciRed Marketplace. Conexión local confiable.</span></div><nav class="flex flex-wrap items-center justify-center gap-space-md" data-active-classes="text-on-surface font-semibold"><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="terminos-de-servicio" href="INT-00-teryser.html">Términos de Servicio</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="politica-de-privacidad" href="INT-00-poldepri.html">Política de Privacidad</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="proteccion-de-datos" href="INT-00-prodeda.html">Protección de Datos</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="centro-de-ayuda" href="INT-00-cendeayu.html">Centro de Ayuda</a></nav></div></footer>
 
 <!-- Banner compartido (replicado desde INT-01) -->
