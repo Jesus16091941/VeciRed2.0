@@ -899,7 +899,8 @@ document.addEventListener('DOMContentLoaded', function () {
   function refreshCategory() {
     updateCategoryIcon(category);
     var detected = detectCategory(textarea.value);
-    var category = manualCategory && currentCategory ? currentCategory : (detected || categoryFromDirectTechnician() || 'Gasfitería');
+    var selectedForRoute = routeMode === 'specific' ? selectedProfessional() : null;
+    var category = selectedForRoute ? selectedForRoute.category : (manualCategory && currentCategory ? currentCategory : (detected || categoryFromDirectTechnician() || 'Gasfitería'));
     currentCategory = category;
     if (categoryName) categoryName.textContent = category === 'Gasfitería' ? 'Gasfitería y detección de fugas' : category + ' · diagnóstico y reparación';
     if (confidence) {
@@ -1204,7 +1205,14 @@ document.addEventListener('DOMContentLoaded', function () {
   // Evita mostrar una confianza de IA inventada: la detección es local por palabras clave, no una IA conectada.
   var aiLabel = categoryBox ? categoryBox.querySelector('.text-xs.font-semibold') : null;
   if (aiLabel) aiLabel.innerHTML='<i class="fa-solid fa-microchip"></i> Detección automática por texto';
-  if (directRequests[technician]) textarea.value=directRequests[technician].message;
+  if (selectedProfileId && professionalSelect) professionalSelect.value = selectedProfileId;
+  if (routeMode === 'specific' && selectedProfileId && professionalDirectory[selectedProfileId]) {
+    technician = professionalDirectory[selectedProfileId].slug;
+    currentCategory = professionalDirectory[selectedProfileId].category;
+    if (directRequests[technician]) textarea.value = directRequests[technician].message;
+    else { textarea.value = ''; textarea.placeholder = 'Describe el trabajo que necesitas para ' + professionalDirectory[selectedProfileId].short + '…'; }
+  } else if (directRequests[technician]) textarea.value=directRequests[technician].message;
+  textarea.addEventListener('input', function(){ textarea.dataset.userEdited='true'; });
   updateCounter();
   refreshCategory();
   updatePublishButton();
