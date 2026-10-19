@@ -699,6 +699,65 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+<script id="vr-user-submitted-reviews">
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var profileId = params.get('profile') || 'seed-t-roberto';
+    var all = JSON.parse(localStorage.getItem('vecired:professional-reviews:v1') || '[]');
+    if (!Array.isArray(all)) all = [];
+    var reviews = all.filter(function (item) { return item && item.profileId === profileId; });
+    if (!reviews.length) return;
+    var heading = Array.from(document.querySelectorAll('h2')).find(function (el) { return el.textContent.indexOf('Opiniones de Vecinos Reales') !== -1; });
+    var section = heading && heading.closest('section');
+    var list = section && section.querySelector('.space-y-space-lg.mt-space-md');
+    if (!list) return;
+    function esc(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]);
+      });
+    }
+    function stars(value) {
+      var rounded = Math.round(Number(value) || 0);
+      return '<div class="flex text-amber-500" aria-label="' + esc(value) + ' de 5 estrellas">' +
+        [1,2,3,4,5].map(function (n) { return '<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: \'FILL\' ' + (n <= rounded ? '1' : '0') + ';">star</span>'; }).join('') +
+        '</div>';
+    }
+    reviews.slice().reverse().forEach(function (review) {
+      var initials = (review.professionalName || 'Vecino').split(/\s+/).filter(Boolean).slice(0,2).map(function (part) { return part.charAt(0); }).join('').toUpperCase();
+      var date = review.date ? new Date(review.date).toLocaleDateString('es-CL', {day:'numeric',month:'short',year:'numeric'}) : 'Reciente';
+      var tags = Array.isArray(review.tags) && review.tags.length
+        ? '<div class="flex flex-wrap gap-1 mt-space-sm">' + review.tags.map(function (tag) { return '<span class="bg-secondary-container/50 text-on-secondary-container px-2 py-1 rounded-full text-[11px] font-semibold">' + esc(tag) + '</span>'; }).join('') + '</div>' : '';
+      var photos = Array.isArray(review.photos) && review.photos.length
+        ? '<div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-space-sm">' + review.photos.map(function (src) { return '<img class="w-full h-28 object-cover rounded-lg border border-outline-variant/30" alt="Foto adjunta a la evaluación" src="' + esc(src) + '">'; }).join('') + '</div>' : '';
+      var details = review.ratings ? '<p class="text-[11px] text-on-surface-variant mt-1">Puntualidad: ' + esc(review.ratings.punctuality) + '/5 · Calidad: ' + esc(review.ratings.quality) + '/5 · Trato vecinal: ' + esc(review.ratings.courtesy) + '/5</p>' : '';
+      var comment = review.comment ? '<p class="text-body-md text-on-surface mt-space-sm">“' + esc(review.comment) + '”</p>' : '<p class="text-body-sm text-on-surface-variant mt-space-sm">El vecino compartió su puntuación y los aspectos destacados del servicio.</p>';
+      var article = document.createElement('article');
+      article.className = 'p-space-md rounded-lg bg-secondary-container/20 border border-secondary/30';
+      article.innerHTML = '<div class="flex items-start justify-between gap-3"><div class="flex items-center gap-space-sm"><div class="w-10 h-10 rounded-full bg-secondary/10 text-secondary font-bold flex items-center justify-center font-label-md">' + esc(initials) + '</div><div><h4 class="font-label-md text-label-md font-bold text-primary">Vecino/a de VeciRed</h4><span class="font-body-sm text-body-sm text-on-surface-variant">Evaluación verificada · #' + esc(review.request || 'VECI') + '</span></div></div><div class="flex flex-col items-end">' + stars(review.overall) + '<span class="text-label-sm text-outline text-[11px] mt-0.5">' + esc(date) + '</span></div></div>' + details + comment + tags + photos + '<div class="mt-space-sm text-[11px] font-semibold text-secondary">Evaluación publicada desde VeciRed</div>';
+      list.insertBefore(article, list.firstChild);
+    });
+    var baseRatingLabel = document.querySelector('aside .text-headline-lg');
+    var baseCountLabel = Array.from(document.querySelectorAll('aside span')).find(function (el) { return /reseñas locales/.test(el.textContent); });
+    var baseRating = parseFloat(baseRatingLabel ? baseRatingLabel.textContent : '0') || 0;
+    var baseCount = parseInt(baseCountLabel ? baseCountLabel.textContent : '0', 10) || 0;
+    var totalScore = reviews.reduce(function (sum, item) { return sum + (Number(item.overall) || 0); }, 0);
+    if (baseRatingLabel) baseRatingLabel.textContent = ((baseRating * baseCount + totalScore) / (baseCount + reviews.length)).toFixed(1);
+    if (baseCountLabel) baseCountLabel.textContent = (baseCount + reviews.length) + ' reseñas locales';
+    var allFilter = section.querySelector('button');
+    if (allFilter) allFilter.textContent = 'Todas (' + (baseCount + reviews.length) + ')';
+    if (params.get('review') === 'sent') {
+      var notice = document.createElement('div');
+      notice.className = 'mb-space-md p-space-md rounded-lg bg-secondary-container/40 text-on-secondary-container font-label-md';
+      notice.textContent = '¡Gracias! Tu evaluación ya aparece en este perfil.';
+      list.parentElement.insertBefore(notice, list);
+    }
+  } catch (error) {
+    console.warn('No se pudieron mostrar las evaluaciones guardadas en este navegador.', error);
+  }
+});
+</script>
+
 <!-- Banner compartido (replicado desde INT-01) -->
 <style id="vecired-banner-style">
   .modal-overlay { display: none; position: fixed; inset: 0; background-color: rgba(11, 28, 48, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 16px; }
