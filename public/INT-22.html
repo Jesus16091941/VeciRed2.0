@@ -60,7 +60,7 @@
         </p>
 </div>
 <div class="flex items-center flex-wrap gap-space-sm">
-<button class="inline-flex items-center gap-space-xs px-space-md h-12 rounded-lg bg-surface-container-lowest text-primary font-label-lg text-label-lg hover:bg-surface-container-low transition-all shadow-[0_1px_3px_0_rgba(15,41,66,0.06)] active:scale-[0.99]" type="button" data-toast="Agenda sincronizada con tu calendario.">
+<button id="vr-sync-calendar" class="inline-flex items-center gap-space-xs px-space-md h-12 rounded-lg bg-surface-container-lowest text-primary font-label-lg text-label-lg hover:bg-surface-container-low transition-all shadow-[0_1px_3px_0_rgba(15,41,66,0.06)] active:scale-[0.99]" type="button" title="Descargar citas para importarlas a Google Calendar u otra agenda.">
 <span class="material-symbols-outlined text-secondary text-[20px]">sync</span>
 <span>Sincronizar Calendar</span>
 </button>
@@ -89,26 +89,24 @@
 <div class="flex flex-wrap items-center gap-space-sm px-space-xs">
 <!-- View Toggle -->
 <div class="flex items-center bg-surface-container-low p-1 rounded-lg">
-<button class="flex items-center gap-1 px-3 py-1.5 rounded-md bg-surface-container-lowest text-primary font-label-md text-label-md shadow-sm" type="button">
-<span class="material-symbols-outlined text-[16px]">view_timeline</span>
-<span>Lista</span>
+<button id="vr-view-list" class="flex items-center gap-1 px-3 py-1.5 rounded-md bg-surface-container-lowest text-primary font-label-md text-label-md shadow-sm" type="button" aria-pressed="true">
+<span class="material-symbols-outlined text-[16px]">view_timeline</span><span>Lista</span>
 </button>
-<button class="flex items-center gap-1 px-3 py-1.5 rounded-md text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" type="button">
-<span class="material-symbols-outlined text-[16px]">calendar_month</span>
-<span>Mensual</span>
+<button id="vr-view-month" class="flex items-center gap-1 px-3 py-1.5 rounded-md text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors" type="button" aria-pressed="false">
+<span class="material-symbols-outlined text-[16px]">calendar_month</span><span>Mensual</span>
 </button>
 </div>
 <!-- Quick Search -->
 <div class="relative min-w-[240px]">
 <span class="material-symbols-outlined text-outline absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">search</span>
-<input class="w-full pl-9 pr-3 py-2 text-body-sm font-body-sm rounded-lg bg-surface-container-low text-on-surface placeholder-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container/20 transition-all" placeholder="Buscar por técnico o código..." type="text"/>
+<input id="vr-service-search" class="w-full pl-9 pr-3 py-2 text-body-sm font-body-sm rounded-lg bg-surface-container-low text-on-surface placeholder-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container/20 transition-all" placeholder="Buscar por técnico o código..." type="search" aria-label="Buscar servicios por técnico, trabajo o código"/>
 </div>
 <!-- Month Filter Selector -->
-<div class="flex items-center gap-1 bg-surface-container-low px-3 py-2 rounded-lg text-primary font-label-md text-label-md">
-<span class="material-symbols-outlined text-[18px]">tune</span>
-<span>Octubre 2026</span>
-<span class="material-symbols-outlined text-[16px]">expand_more</span>
-</div>
+<label class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg text-primary font-label-md text-label-md" for="vr-date-filter">
+<span class="material-symbols-outlined text-[18px]">tune</span><span>Filtrar fecha</span>
+<input id="vr-date-filter" type="month" value="2026-10" class="min-w-0 bg-transparent text-sm font-semibold focus:outline-none" aria-label="Filtrar servicios por mes"/>
+<button id="vr-clear-date-filter" type="button" class="text-xs underline" title="Quitar filtro de fecha">Limpiar</button>
+</label>
 </div>
 </div>
 <!-- Main Grid: 2 Columns (68% / 32%) -->
@@ -146,7 +144,7 @@
           </span>
 </div>
 <!-- Card 1: UPCOMING / SCHEDULED SERVICE -->
-<article class="bg-surface-container-lowest rounded-xl p-space-xl shadow-[0_1px_3px_0_rgba(15,41,66,0.06),0_10px_20px_-5px_rgba(15,41,66,0.03)] relative overflow-hidden transition-all hover:shadow-[0_10px_25px_-5px_rgba(15,41,66,0.08)]">
+<article data-vr-service-card data-service-date="2026-10-15" data-service-kind="upcoming" data-service-code="VECI-8492" data-service-professional="Roberto D." data-service-title="Reparación de Grifo y Fuga Menor" class="bg-surface-container-lowest rounded-xl p-space-xl shadow-[0_1px_3px_0_rgba(15,41,66,0.06),0_10px_20px_-5px_rgba(15,41,66,0.03)] relative overflow-hidden transition-all hover:shadow-[0_10px_25px_-5px_rgba(15,41,66,0.08)]">
 <!-- Left Visual Accent Strip -->
 <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary-container"></div>
 <!-- Card Header & Metadata -->
@@ -264,7 +262,7 @@
 <span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">3 completados en 2026</span>
 </div>
 <!-- Card 2: COMPLETED SERVICE WITH GUARANTEE ACTIVE -->
-<article class="bg-surface-container-lowest rounded-xl p-space-xl shadow-[0_1px_3px_0_rgba(15,41,66,0.04)] transition-all hover:shadow-[0_8px_16px_-4px_rgba(15,41,66,0.06)]">
+<article data-vr-service-card data-service-date="2026-10-02" data-service-kind="history" data-service-code="VECI-8120" data-service-professional="Juan C." data-service-title="Revisión Eléctrica y Cambio de Breakers" class="bg-surface-container-lowest rounded-xl p-space-xl shadow-[0_1px_3px_0_rgba(15,41,66,0.04)] transition-all hover:shadow-[0_8px_16px_-4px_rgba(15,41,66,0.06)]">
 <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-space-md pb-space-md">
 <div>
 <div class="flex items-center gap-space-xs flex-wrap mb-1">
@@ -336,7 +334,7 @@
 </div>
 </article>
 <!-- Card 3: PREVIOUS HISTORICAL SERVICE -->
-<article class="bg-surface-container-lowest rounded-xl p-space-lg shadow-[0_1px_3px_0_rgba(15,41,66,0.03)] opacity-95 transition-all hover:opacity-100">
+<article data-vr-service-card data-service-date="2026-08-18" data-service-kind="history" data-service-code="VECI-7714" data-service-professional="Roberto D." data-service-title="Mantenimiento Preventivo de Calefón a Gas" class="bg-surface-container-lowest rounded-xl p-space-lg shadow-[0_1px_3px_0_rgba(15,41,66,0.03)] opacity-95 transition-all hover:opacity-100">
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
 <div>
 <div class="flex items-center gap-space-xs mb-1">
@@ -367,14 +365,14 @@
 <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-[0_1px_3px_0_rgba(15,41,66,0.05)]">
 <div class="flex items-center justify-between mb-space-md">
 <div>
-<span class="font-headline-sm text-headline-sm text-primary font-bold">Octubre 2026</span>
+<span id="vr-calendar-month-title" class="font-headline-sm text-headline-sm text-primary font-bold">Octubre 2026</span>
 <span class="block font-body-sm text-[12px] text-on-surface-variant">Visitas agendadas en tu domicilio</span>
 </div>
 <div class="flex items-center gap-1">
-<button aria-label="Mes anterior" class="w-8 h-8 rounded-lg bg-surface-container-low text-primary flex items-center justify-center hover:bg-surface-container-high transition-colors" type="button">
+<button id="vr-calendar-prev" aria-label="Mes anterior" class="w-8 h-8 rounded-lg bg-surface-container-low text-primary flex items-center justify-center hover:bg-surface-container-high transition-colors" type="button">
 <span class="material-symbols-outlined text-[18px]">chevron_left</span>
 </button>
-<button aria-label="Mes siguiente" class="w-8 h-8 rounded-lg bg-surface-container-low text-primary flex items-center justify-center hover:bg-surface-container-high transition-colors" type="button">
+<button id="vr-calendar-next" aria-label="Mes siguiente" class="w-8 h-8 rounded-lg bg-surface-container-low text-primary flex items-center justify-center hover:bg-surface-container-high transition-colors" type="button">
 <span class="material-symbols-outlined text-[18px]">chevron_right</span>
 </button>
 </div>
@@ -390,54 +388,9 @@
 <div>Do</div>
 </div>
 <!-- Calendar Grid Numerical Cells -->
-<div class="grid grid-cols-7 gap-1 text-center font-body-sm text-body-sm">
-<!-- Muted previous month days -->
-<div class="py-1.5 text-outline-variant font-body-sm">28</div>
-<div class="py-1.5 text-outline-variant font-body-sm">29</div>
-<div class="py-1.5 text-outline-variant font-body-sm">30</div>
-<!-- Oct 1 -->
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">1</div>
-<!-- Oct 2 (Past completed job) -->
-<div class="py-1.5 text-primary font-semibold bg-secondary-container/40 rounded-lg cursor-pointer relative group" title="Servicio eléctrico finalizado">
-              2
-              <span class="w-1 h-1 bg-secondary rounded-full absolute bottom-1 left-1/2 -translate-x-1/2"></span>
-</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">3</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">4</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">5</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">6</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">7</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">8</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">9</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">10</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">11</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">12</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">13</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">14</div>
-<!-- Oct 15 (ACTIVE SCHEDULED DAY) -->
-<div class="py-1.5 bg-primary-container text-on-primary font-bold rounded-lg cursor-pointer shadow-sm relative" title="Visita: Roberto D. (Gasfitería)">
-              15
-              <span class="w-1.5 h-1.5 bg-secondary-container rounded-full absolute bottom-0.5 left-1/2 -translate-x-1/2"></span>
-</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">16</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">17</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">18</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">19</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">20</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">21</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">22</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">23</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">24</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">25</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">26</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">27</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">28</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">29</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">30</div>
-<div class="py-1.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">31</div>
-<div class="py-1.5 text-outline-variant font-body-sm">1</div>
-</div>
+<div id="vr-calendar-days" class="grid grid-cols-7 gap-1 text-center font-body-sm text-body-sm" role="group" aria-label="Días del mes"></div>
 <!-- Calendar Legend -->
+<div id="vr-calendar-selection" class="mt-3 text-xs text-on-surface-variant" aria-live="polite">Selecciona un día para filtrar los servicios.</div>
 <div class="mt-space-md pt-space-sm flex items-center justify-between text-body-sm text-[12px] bg-surface-container-low p-2 rounded-lg">
 <div class="flex items-center gap-1.5">
 <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
@@ -736,5 +689,188 @@
     if(!button)return;
     event.preventDefault();event.stopPropagation();downloadReceipt(button);
   },true);
+})();
+</script>
+
+<script id="vr-agenda-interactions">
+(function(){
+  var monthInput=document.getElementById('vr-date-filter');
+  var clearDate=document.getElementById('vr-clear-date-filter');
+  var searchInput=document.getElementById('vr-service-search');
+  var calendarTitle=document.getElementById('vr-calendar-month-title');
+  var calendarDays=document.getElementById('vr-calendar-days');
+  var prevButton=document.getElementById('vr-calendar-prev');
+  var nextButton=document.getElementById('vr-calendar-next');
+  var selectionLabel=document.getElementById('vr-calendar-selection');
+  var syncButton=document.getElementById('vr-sync-calendar');
+  var upcomingTab=document.getElementById('tab-upcoming');
+  var historyTab=document.getElementById('tab-history');
+  var listView=document.getElementById('vr-view-list');
+  var monthView=document.getElementById('vr-view-month');
+  var mainSection=document.querySelector('main section.lg\\:col-span-8');
+  var calendarCard=calendarTitle ? calendarTitle.closest('.bg-surface-container-lowest.rounded-xl') : null;
+  var selectedDay='';
+  var activeTab='upcoming';
+  var activeView='list';
+  var currentMonth=(monthInput && monthInput.value) ? monthInput.value : '2026-10';
+  var cards=Array.prototype.slice.call(document.querySelectorAll('[data-vr-service-card]'));
+  function monthLabel(value){
+    var p=value.split('-');
+    return new Date(Number(p[0]),Number(p[1])-1,1).toLocaleDateString('es-CL',{month:'long',year:'numeric'});
+  }
+  function parseDate(value){
+    if(!value)return '';
+    var s=String(value).trim();
+    var iso=s.match(/^(\\d{4})-(\\d{2})-(\\d{2})/);
+    if(iso)return iso[1]+'-'+iso[2]+'-'+iso[3];
+    var d=s.match(/^(\\d{1,2})[\\s/-]+(ene(?:ro)?|feb(?:rero)?|mar(?:zo)?|abr(?:il)?|may(?:o)?|jun(?:io)?|jul(?:io)?|ago(?:sto)?|sep(?:tiembre)?|oct(?:ubre)?|nov(?:iembre)?|dic(?:iembre)?)[,\\s/-]+(\\d{4})/i);
+    if(d){
+      var names=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      var m=names.findIndex(function(n){return d[2].toLowerCase().indexOf(n)===0;})+1;
+      return d[3]+'-'+String(m).padStart(2,'0')+'-'+String(Number(d[1])).padStart(2,'0');
+    }
+    var en=s.match(/^(\\d{1,2})\\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{4})/i);
+    if(en){
+      var enNames=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+      return en[3]+'-'+String(enNames.indexOf(en[2].toLowerCase())+1).padStart(2,'0')+'-'+String(Number(en[1])).padStart(2,'0');
+    }
+    return '';
+  }
+  function serviceDate(card){return card.getAttribute('data-service-date')||'';}
+  function searchText(card){return ((card.getAttribute('data-service-code')||'')+' '+(card.getAttribute('data-service-professional')||'')+' '+(card.getAttribute('data-service-title')||'')+' '+card.textContent).toLowerCase();}
+  function applyFilters(){
+    var q=(searchInput && searchInput.value||'').trim().toLowerCase();
+    cards.forEach(function(card){
+      var date=serviceDate(card);
+      var kind=card.getAttribute('data-service-kind')||'history';
+      var monthOk=!currentMonth||date.slice(0,7)===currentMonth;
+      var dayOk=!selectedDay||date===selectedDay;
+      var tabOk=activeTab==='upcoming'?kind==='upcoming':kind==='history';
+      var searchOk=!q||searchText(card).indexOf(q)!==-1;
+      card.hidden=!(monthOk&&dayOk&&tabOk&&searchOk);
+    });
+    var headings=document.querySelectorAll('main section.lg\\:col-span-8 > div, main section.lg\\:col-span-8 > h2, main section.lg\\:col-span-8 > p');
+    headings.forEach(function(el){
+      if(el.id==='vr-pending-requests')return;
+      if(el.textContent.indexOf('Servicios Recientes y Finalizados')!==-1) el.hidden=activeTab!=='history'||(!!selectedDay&&selectedDay.slice(0,7)!==currentMonth);
+      if(el.textContent.indexOf('Agenda domiciliaria confirmada y asignada')!==-1) el.hidden=activeTab!=='upcoming';
+    });
+    var pending=document.getElementById('vr-pending-requests');
+    if(pending){
+      var pendingCards=pending.querySelectorAll('article');
+      pendingCards.forEach(function(card){
+        var d=card.getAttribute('data-service-date')||'';
+        var dateOk=(!currentMonth||!d||d.slice(0,7)===currentMonth)&&(!selectedDay||!d||d===selectedDay);
+        var textOk=!q||card.textContent.toLowerCase().indexOf(q)!==-1;
+        card.hidden=!(dateOk&&textOk);
+      });
+    }
+    if(upcomingTab)upcomingTab.setAttribute('aria-pressed',activeTab==='upcoming'?'true':'false');
+    if(historyTab)historyTab.setAttribute('aria-pressed',activeTab==='history'?'true':'false');
+    if(listView)listView.setAttribute('aria-pressed',activeView==='list'?'true':'false');
+    if(monthView)monthView.setAttribute('aria-pressed',activeView==='month'?'true':'false');
+    if(calendarCard)calendarCard.classList.toggle('ring-2',activeView==='month');
+  }
+  function renderCalendar(){
+    if(!calendarDays||!currentMonth)return;
+    var p=currentMonth.split('-'), year=Number(p[0]), month=Number(p[1])-1;
+    calendarTitle.textContent=monthLabel(currentMonth);
+    calendarDays.textContent='';
+    var firstDay=new Date(year,month,1);
+    var offset=(firstDay.getDay()+6)%7;
+    var days=new Date(year,month+1,0).getDate();
+    var serviceDates={};
+    cards.forEach(function(card){
+      var d=serviceDate(card);
+      if(d)serviceDates[d]=(serviceDates[d]||[]).concat(card.getAttribute('data-service-title')||card.getAttribute('data-service-code')||'Servicio');
+    });
+    var requestKey='vecired:agenda:requests:v1';
+    try{
+      var requests=JSON.parse(localStorage.getItem(requestKey)||'[]');
+      if(Array.isArray(requests))requests.forEach(function(item){
+        var d=parseDate(item.fecha||item.date||'');
+        if(d)serviceDates[d]=(serviceDates[d]||[]).concat(item.tecnico||item.categoria||'Solicitud pendiente');
+      });
+    }catch(e){}
+    for(var i=0;i<offset;i++){
+      var blank=document.createElement('div');blank.className='py-1.5 text-outline-variant';blank.setAttribute('aria-hidden','true');calendarDays.appendChild(blank);
+    }
+    for(var day=1;day<=days;day++){
+      var date=year+'-'+String(month+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+      var btn=document.createElement('button');
+      btn.type='button';btn.textContent=String(day);btn.setAttribute('data-calendar-date',date);
+      btn.className='relative py-1.5 rounded-lg transition-colors hover:bg-surface-container-low focus:outline-none focus:ring-2 focus:ring-primary';
+      if(serviceDates[date]){
+        btn.classList.add('font-bold','text-primary');
+        var dot=document.createElement('span');dot.className='w-1.5 h-1.5 bg-secondary rounded-full absolute bottom-0.5 left-1/2 -translate-x-1/2';dot.setAttribute('aria-hidden','true');btn.appendChild(dot);
+        btn.title=serviceDates[date].join(', ');
+      }else btn.classList.add('text-on-surface-variant');
+      if(selectedDay===date)btn.classList.add('bg-primary-container','text-on-primary');
+      btn.setAttribute('aria-pressed',selectedDay===date?'true':'false');
+      btn.addEventListener('click',function(event){
+        selectedDay=event.currentTarget.getAttribute('data-calendar-date');
+        if(monthInput)monthInput.value=selectedDay.slice(0,7);
+        currentMonth=selectedDay.slice(0,7);
+        selectionLabel.textContent='Filtrando servicios del '+new Date(selectedDay+'T12:00:00').toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})+'. Pulsa el día otra vez para quitar la selección.';
+        renderCalendar();applyFilters();
+      });
+      calendarDays.appendChild(btn);
+    }
+  }
+  function changeMonth(delta){
+    var p=currentMonth.split('-'), d=new Date(Number(p[0]),Number(p[1])-1+delta,1);
+    currentMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    if(monthInput)monthInput.value=currentMonth;
+    selectedDay='';
+    selectionLabel.textContent='Selecciona un día para filtrar los servicios.';
+    renderCalendar();applyFilters();
+  }
+  if(monthInput)monthInput.addEventListener('change',function(){
+    currentMonth=monthInput.value;selectedDay='';
+    selectionLabel.textContent='Selecciona un día para filtrar los servicios.';
+    renderCalendar();applyFilters();
+  });
+  if(clearDate)clearDate.addEventListener('click',function(){
+    currentMonth='';selectedDay='';
+    if(monthInput)monthInput.value='';
+    selectionLabel.textContent='Filtro de fecha quitado. Se muestran todos los meses.';
+    renderCalendar();applyFilters();
+  });
+  if(searchInput)searchInput.addEventListener('input',applyFilters);
+  if(prevButton)prevButton.addEventListener('click',function(){changeMonth(-1);});
+  if(nextButton)nextButton.addEventListener('click',function(){changeMonth(1);});
+  if(upcomingTab)upcomingTab.addEventListener('click',function(){activeTab='upcoming';applyFilters();});
+  if(historyTab)historyTab.addEventListener('click',function(){activeTab='history';applyFilters();});
+  if(listView)listView.addEventListener('click',function(){activeView='list';applyFilters();});
+  if(monthView)monthView.addEventListener('click',function(){activeView='month';if(calendarCard)calendarCard.scrollIntoView({behavior:'smooth',block:'nearest'});applyFilters();});
+  function toICSDate(date,time){
+    var d=(date||'').replace(/-/g,'');
+    var t=(time||'1000').replace(':','');
+    return d+'T'+t+'00';
+  }
+  function escapeICS(value){return String(value||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');}
+  function downloadCalendar(){
+    var events=[];
+    cards.forEach(function(card){
+      if(card.getAttribute('data-service-kind')!=='upcoming')return;
+      var date=serviceDate(card);if(!date)return;
+      var title=card.getAttribute('data-service-title')||'Servicio VeciRed';
+      var code=card.getAttribute('data-service-code')||'';
+      var professional=card.getAttribute('data-service-professional')||'';
+      var start=toICSDate(date,'1000');
+      var end=toICSDate(date,'1130');
+      events.push(['BEGIN:VEVENT','UID:'+code+'@vecired.local','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').replace(/\\.\\d{3}/,'')+'Z','DTSTART;TZID=America/Santiago:'+start,'DTEND;TZID=America/Santiago:'+end,'SUMMARY:'+escapeICS(title),'DESCRIPTION:'+escapeICS('Código: '+code+'\\nProfesional: '+professional+'\\nExportado desde VeciRed. Importación de calendario de una sola vez.'),'END:VEVENT'].join('\\r\\n'));
+    });
+    if(!events.length){alert('No hay servicios agendados con fecha para exportar.');return;}
+    var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//VeciRed//Agenda de servicios//ES','CALSCALE:GREGORIAN','METHOD:PUBLISH'].concat(events).concat(['END:VCALENDAR']).join('\\r\\n');
+    var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+    var url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='VeciRed-Agenda.ics';document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    alert('Se descargó VeciRed-Agenda.ics. Impórtalo en Google Calendar desde Configuración > Importar y exportar. Esto exporta las citas actuales; no activa sincronización automática de doble vía.');
+  }
+  if(syncButton)syncButton.addEventListener('click',downloadCalendar);
+  window.addEventListener('storage',function(event){if(event.key==='vecired:agenda:requests:v1')renderCalendar();});
+  renderCalendar();applyFilters();
 })();
 </script>
