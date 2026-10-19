@@ -783,7 +783,7 @@
     currentPage = 1;
     render();
     if (applyButton) {
-      var span = applyButton.querySelector('span.bg-surface-container-lowest\\/20');
+      var span = applyButton.querySelector('span:last-child');
       if (span) span.textContent = count ? count.textContent.split(' ')[0] : '';
     }
   }
@@ -794,6 +794,7 @@
   applyButton.addEventListener('click', applySidebarFilters);
   clearButton.addEventListener('click', function () {
     distance.value = '3.5';
+    search.value = '';
     verified.checked = false;
     document.querySelector('input[name="rating-filter"][value="0"]').checked = true;
     document.querySelector('input[name="price-filter"][value="todos"]').checked = true;
