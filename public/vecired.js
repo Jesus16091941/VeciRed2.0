@@ -159,79 +159,248 @@
       store.set('user', updated);
       return updated;
     },
+
     registerFromForm: function (form) {
       var field = function (name) {
         var el = form.elements.namedItem(name);
         return el && typeof el.value === 'string' ? el.value.trim() : '';
       };
+
       var email = field('correo').toLowerCase();
       var password = (form.elements.namedItem('password') || {}).value || '';
       var perfil = form.getAttribute('data-vr-perfil') || 'vecino';
       var isPro = perfil !== 'vecino';
       var verificacion = isPro ? collectVerification(form) : null;
+
       if (users.list().some(function (u) { return u.correo === email; })) {
         toast('Ya existe una cuenta registrada con ' + email + '.');
         var emailInput = form.elements.namedItem('correo');
         if (emailInput) emailInput.focus();
         return Promise.resolve(null);
       }
-      if (verificacion && verificacion.rut && users.list().some(function (u) { return u.verificacion && u.verificacion.rut === verificacion.rut; })) {
+
+      if (verificacion && verificacion.rut && users.list().some(function (u) {
+        return u.verificacion && u.verificacion.rut === verificacion.rut;
+      })) {
         toast('Ya existe un especialista registrado con el RUT ' + verificacion.rut + '.');
         var rutInput = form.elements.namedItem('rut');
         if (rutInput) rutInput.focus();
         return Promise.resolve(null);
       }
-      var salt = randomHex(16);
-      return hashPassword(password, salt).then(function (hash) {
-        var user = {
-          id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'u-' + Date.now(),
+
+      var telefono = '+56 ' + field('telefono').replace(/\s+/g, ' ');
+
+      // REGISTRO DE VECINOS: utiliza FastAPI y MariaDB.
+      if (!isPro) {
+        return fetch('http://127.0.0.1:8000/registro/vecino', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            nombre: field('nombre'),
+            correo: email,
+            telefono: telefono,
+            password: password,
+            direccion: field('direccion'),
+            barrio: field('barrio'),
+            depto: field('depto') || null
+          })
+        })
+          .then(function (response) {
+            return response.json().then(function (data) {
+              if (!response.ok) {
+                toast(data.detail || 'No se pudo completar el registro.');
+                return null;
+              }
+
+              var publicUser = {
+                id: String(data.id_usuario),
+                nombre: data.nombre || field('nombre'),
+                correo: email,
+                telefono: telefono,
+                direccion: field('direccion'),
+                barrio: field('barrio'),
+                depto: field('depto'),
+                rol: 'client',
+                perfil: 'vecino',
+                verificacion: null,
+                proveedor: form.getAttribute('data-vr-provider') || 'correo',
+                creadoEn: new Date().toISOString(),
+                estado: 'pendiente'
+              };
+
+              store.set('user', publicUser);
+              return publicUser;
+            });
+          })
+          .catch(function (error) {
+            console.error('Error al registrar vecino:', error);
+            toast('No se pudo conectar con el servidor. Comprueba que FastAPI esté funcionando.');
+            return null;
+          });
+      }
+
+      // REGISTRO DE PROFESIONALES: utiliza FastAPI y MariaDB.
+      return fetch('http://127.0.0.1:8000/registro/profesional', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
           nombre: field('nombre'),
           correo: email,
-          telefono: '+56 ' + field('telefono').replace(/\s+/g, ' '),
+          telefono: telefono,
+          password: password,
           direccion: field('direccion'),
           barrio: field('barrio'),
-          depto: field('depto'),
-          rol: isPro ? 'tech' : 'client',
-          perfil: perfil,
-          verificacion: verificacion,
-          proveedor: form.getAttribute('data-vr-provider') || 'correo',
-          salt: salt,
-          passwordHash: hash,
-          creadoEn: new Date().toISOString()
-        };
-        var list = users.list();
-        list.push(user);
-        try {
-          users.save(list);
-        } catch (e) {
-          toast('No se pudo guardar el registro en este navegador.');
+          depto: field('depto') || null,
+
+          tipo_profesional: perfil,
+          especialidad: field('especialidad'),
+          rut: field('rut'),
+
+          tipo_comprobante: field('tipo_comprobante') || null,
+          institucion: field('institucion') || null,
+          registro_publico: field('registro_publico') || null,
+
+          anos_experiencia: field('anios_experiencia') || null,
+
+          ref1_nombre: field('ref1_nombre') || null,
+          ref1_contacto: field('ref1_contacto') || null,
+          ref1_trabajo: field('ref1_trabajo') || null,
+          ref2_nombre: field('ref2_nombre') || null,
+          ref2_contacto: field('ref2_contacto') || null,
+          ref2_trabajo: field('ref2_trabajo') || null,
+          portafolio: field('portafolio') || null
+        })
+      })
+
+        .then(function (response) {
+          return response.json().then(function (data) {
+            if (!response.ok) {
+              toast(data.detail || 'No se pudo completar el registro.');
+              return null;
+            }
+
+            // Preparar los archivos del formulario
+            var archivos = new FormData();
+            var comprobante = form.elements.namedItem('comprobante');
+            var fotos = form.elements.namedItem('fotos_trabajos');
+
+            if (comprobante && comprobante.files.length > 0) {
+              archivos.append('comprobante', comprobante.files[0]);
+            }
+
+            if (fotos && fotos.files.length > 0) {
+              Array.from(fotos.files).forEach(function (foto) {
+                archivos.append('fotos_trabajos', foto);
+              });
+            }
+
+            // Enviar archivos solamente si hay alguno seleccionado
+            var envioArchivos = archivos.has('comprobante') ||
+              archivos.has('fotos_trabajos')
+              ? fetch('http://127.0.0.1:8000/profesionales/' +
+                data.id_usuario + '/archivos', {
+                method: 'POST',
+                body: archivos
+              }).then(function (respuestaArchivos) {
+                return respuestaArchivos.json().then(function (resultado) {
+                  if (!respuestaArchivos.ok) {
+                    throw new Error(
+                      resultado.detail || 'No se pudieron guardar los archivos.'
+                    );
+                  }
+                  return resultado;
+                });
+              })
+              : Promise.resolve();
+
+            return envioArchivos.then(function () {
+              var publicUser = {
+                id: String(data.id_usuario),
+                nombre: data.nombre || field('nombre'),
+                correo: email,
+                telefono: telefono,
+                direccion: field('direccion'),
+                barrio: field('barrio'),
+                depto: field('depto'),
+                rol: 'tech',
+                perfil: perfil,
+                verificacion: verificacion,
+                proveedor: form.getAttribute('data-vr-provider') || 'correo',
+                creadoEn: new Date().toISOString(),
+                estado: 'pendiente'
+              };
+
+              store.set('user', publicUser);
+              return publicUser;
+            });
+          });
+        })
+
+        .catch(function (error) {
+          console.error('Error al registrar profesional:', error);
+          toast('No se pudo conectar con el servidor. Comprueba que FastAPI esté funcionando.');
           return null;
-        }
-        var publicUser = Object.assign({}, user);
-        delete publicUser.salt;
-        delete publicUser.passwordHash;
-        store.set('user', publicUser);
-        return publicUser;
-      });
+        });
+
     },
     authenticate: function (identifier, password) {
       var id = String(identifier || '').trim().toLowerCase();
       var digits = id.replace(/\D/g, '');
+
       return seedReady.then(function () {
         var user = users.list().find(function (u) {
           if (u.correo === id) return true;
           var phone = String(u.telefono || '').replace(/\D/g, '');
           return digits.length >= 8 && phone.slice(-digits.length) === digits;
         });
-        if (!user) return null;
-        return hashPassword(password, user.salt).then(function (hash) {
-          if (!hash || hash !== user.passwordHash) return null;
-          if (user.suspendido) return { suspendido: true, motivo: user.motivoSuspension || '' };
-          var publicUser = Object.assign({}, user);
-          delete publicUser.salt;
-          delete publicUser.passwordHash;
+
+        // Primero conserva el inicio de sesión local (demos y administrador).
+        if (user) {
+          return hashPassword(password, user.salt).then(function (hash) {
+            if (!hash || hash !== user.passwordHash) return null;
+            if (user.suspendido) {
+              return { suspendido: true, motivo: user.motivoSuspension || '' };
+            }
+
+            var publicUser = Object.assign({}, user);
+            delete publicUser.salt;
+            delete publicUser.passwordHash;
+
+            store.set('user', publicUser);
+            store.set('role', user.rol === 'tech' ? 'tech' : user.rol === 'admin' ? 'admin' : 'client');
+            return publicUser;
+          });
+        }
+
+        // Si no existe localmente, consulta la base de datos mediante FastAPI.
+        return fetch('http://127.0.0.1:8000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            identificador: identifier,
+            password: password
+          })
+        }).then(function (response) {
+          if (response.status === 401) return null;
+          if (!response.ok) throw new Error('Error al iniciar sesión');
+
+          return response.json();
+        }).then(function (data) {
+          if (!data) return null;
+
+          if (data.suspendido) return data;
+
+          var publicUser = Object.assign({}, data, {
+            proveedor: 'correo'
+          });
+
           store.set('user', publicUser);
-          store.set('role', user.rol === 'tech' ? 'tech' : user.rol === 'admin' ? 'admin' : 'client');
+          store.set('role', publicUser.rol);
+
           return publicUser;
         });
       });
@@ -797,12 +966,12 @@
     var draggable = interactive && host.hasAttribute('data-vr-draggable');
     var dot = draggable
       ? L.marker([0, 0], {
-          icon: L.divIcon({ className: 'vr-divicon', iconSize: [0, 0], html: '<div class="vr-pin vr-pin--bottom"><div class="vr-home-pin"><span class="vr-home-pin__label">' + (host.getAttribute('data-vr-draggable') || 'Tu hogar') + '</span><span class="material-symbols-outlined" aria-hidden="true">home_pin</span></div></div>' }),
-          draggable: true,
-          autoPan: true,
-          title: 'Arrastra el pin para ajustar tu ubicación',
-          zIndexOffset: 1000
-        }).addTo(map)
+        icon: L.divIcon({ className: 'vr-divicon', iconSize: [0, 0], html: '<div class="vr-pin vr-pin--bottom"><div class="vr-home-pin"><span class="vr-home-pin__label">' + (host.getAttribute('data-vr-draggable') || 'Tu hogar') + '</span><span class="material-symbols-outlined" aria-hidden="true">home_pin</span></div></div>' }),
+        draggable: true,
+        autoPan: true,
+        title: 'Arrastra el pin para ajustar tu ubicación',
+        zIndexOffset: 1000
+      }).addTo(map)
       : L.circleMarker([0, 0], { radius: 7, color: '#ffffff', weight: 3, fillColor: '#001428', fillOpacity: 1, interactive: false }).addTo(map);
     if (draggable) L.control.zoom({ position: 'topright' }).addTo(map);
     var expandedUserMarker = null;
@@ -957,7 +1126,7 @@
       if (share) {
         event.preventDefault();
         var url = 'https://www.google.com/maps?q=' + currentLocation.lat + ',' + currentLocation.lng;
-        if (navigator.share) navigator.share({ title: 'Mi servicio VeciRed', text: 'Sigue la llegada de mi técnico VeciRed', url: url }).catch(function () {});
+        if (navigator.share) navigator.share({ title: 'Mi servicio VeciRed', text: 'Sigue la llegada de mi técnico VeciRed', url: url }).catch(function () { });
         else if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { toast('Enlace de la ruta copiado al portapapeles.'); });
       }
     });
@@ -1271,17 +1440,17 @@
       host.setAttribute('aria-labelledby', 'vr-chat-title');
       host.innerHTML =
         '<header class="vr-chat__header">' +
-          '<span class="vr-chat__avatar vr-chat__avatar--lg" aria-hidden="true">' + AGENT.inicial + '<i class="vr-chat__online"></i></span>' +
-          '<div class="vr-chat__who"><h2 id="vr-chat-title">' + AGENT.nombre + ' · ' + AGENT.cargo + '</h2><span class="vr-chat__status">En línea</span></div>' +
-          '<button type="button" class="vr-chat__icon-btn" data-chat-restart aria-label="Reiniciar conversación" title="Nueva conversación"><span class="material-symbols-outlined" aria-hidden="true">refresh</span></button>' +
-          '<button type="button" class="vr-chat__icon-btn" data-chat-close aria-label="Cerrar chat de soporte"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>' +
+        '<span class="vr-chat__avatar vr-chat__avatar--lg" aria-hidden="true">' + AGENT.inicial + '<i class="vr-chat__online"></i></span>' +
+        '<div class="vr-chat__who"><h2 id="vr-chat-title">' + AGENT.nombre + ' · ' + AGENT.cargo + '</h2><span class="vr-chat__status">En línea</span></div>' +
+        '<button type="button" class="vr-chat__icon-btn" data-chat-restart aria-label="Reiniciar conversación" title="Nueva conversación"><span class="material-symbols-outlined" aria-hidden="true">refresh</span></button>' +
+        '<button type="button" class="vr-chat__icon-btn" data-chat-close aria-label="Cerrar chat de soporte"><span class="material-symbols-outlined" aria-hidden="true">close</span></button>' +
         '</header>' +
         '<div class="vr-chat__log" role="log" aria-live="polite" aria-label="Conversación con soporte"><p class="vr-chat__day">Hoy · Respondemos en minutos</p></div>' +
         '<div class="vr-chat__chips" hidden></div>' +
         '<form class="vr-chat__form" autocomplete="off">' +
-          '<label class="sr-only" for="vr-chat-input">Escribe tu mensaje</label>' +
-          '<input id="vr-chat-input" class="vr-chat__input" type="text" placeholder="Escribe tu mensaje…" maxlength="400"/>' +
-          '<button type="submit" class="vr-chat__send" aria-label="Enviar mensaje" disabled><span class="material-symbols-outlined" aria-hidden="true">send</span></button>' +
+        '<label class="sr-only" for="vr-chat-input">Escribe tu mensaje</label>' +
+        '<input id="vr-chat-input" class="vr-chat__input" type="text" placeholder="Escribe tu mensaje…" maxlength="400"/>' +
+        '<button type="submit" class="vr-chat__send" aria-label="Enviar mensaje" disabled><span class="material-symbols-outlined" aria-hidden="true">send</span></button>' +
         '</form>';
       document.body.appendChild(host);
 
@@ -1440,16 +1609,16 @@
         userMenu.setAttribute('data-vr-account-shared', 'true');
         userMenu.innerHTML =
           '<button id="headerUserButton" type="button" aria-expanded="false" aria-controls="headerUserDropdown" class="flex items-center gap-2 rounded-full hover:bg-surface-container-low px-2 py-1.5 transition-colors">' +
-            '<span id="headerUserName" class="font-label-md text-label-md text-primary font-semibold max-w-[150px] truncate"></span>' +
-            '<span class="material-symbols-outlined text-primary text-[20px]">keyboard_arrow_down</span>' +
-            '<span id="headerUserInitial" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-semibold text-sm">U</span>' +
+          '<span id="headerUserName" class="font-label-md text-label-md text-primary font-semibold max-w-[150px] truncate"></span>' +
+          '<span class="material-symbols-outlined text-primary text-[20px]">keyboard_arrow_down</span>' +
+          '<span id="headerUserInitial" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-semibold text-sm">U</span>' +
           '</button>' +
           '<div id="headerUserDropdown" class="hidden absolute right-0 top-full mt-2 w-56 rounded-xl bg-surface-container-lowest border border-outline-variant/40 shadow-lg p-2 z-[60]">' +
-            '<div class="px-3 py-2 border-b border-outline-variant/30"><p class="text-xs text-on-surface-variant">Sesión iniciada como</p><p id="headerDropdownUserName" class="font-semibold text-primary text-sm truncate"></p></div>' +
-            '<a id="headerAccountHomeLink" href="INT-10.html" class="block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Inicio del vecino</a>' +
-            '<a id="headerPublishRequestLink" href="INT-14.html" class="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Publicar solicitud de servicio</a>' +
-            '<a id="headerPublicProfileLink" href="INT-13.html" class="hidden block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Ver mi perfil público</a>' +
-            '<button id="headerLogoutButton" type="button" class="w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-error hover:bg-error-container/40 transition-colors">Cerrar sesión</button>' +
+          '<div class="px-3 py-2 border-b border-outline-variant/30"><p class="text-xs text-on-surface-variant">Sesión iniciada como</p><p id="headerDropdownUserName" class="font-semibold text-primary text-sm truncate"></p></div>' +
+          '<a id="headerAccountHomeLink" href="INT-10.html" class="block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Inicio del vecino</a>' +
+          '<a id="headerPublishRequestLink" href="INT-14.html" class="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Publicar solicitud de servicio</a>' +
+          '<a id="headerPublicProfileLink" href="INT-13.html" class="hidden block w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-on-surface hover:bg-surface-container transition-colors">Ver mi perfil público</a>' +
+          '<button id="headerLogoutButton" type="button" class="w-full text-left px-3 py-2.5 mt-1 rounded-lg text-sm text-error hover:bg-error-container/40 transition-colors">Cerrar sesión</button>' +
           '</div>';
 
         linksWrap.replaceWith(guestLinks, userMenu);
@@ -1580,7 +1749,7 @@
       var currentUser = users.current();
       var lastSync = null;
       try { lastSync = JSON.parse(localStorage.getItem('vecired:session-sync')); } catch (e) { /* sincronización no disponible */ }
-      if (currentUser || (lastSync && lastSync.action === 'login' && lastSync.user)) {
+      if (currentUser) {
         alert('Ya tienes una sesión iniciada en VeciRed. Para evitar iniciar otra sesión o registrar una cuenta mientras estás conectado, volverás a la página principal. Si necesitas cambiar de cuenta, cierra primero la sesión actual desde el menú de tu perfil.');
         location.replace('INT-01.html');
         return;

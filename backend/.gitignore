@@ -1,0 +1,9 @@
+# Configuración privada
+.env
+backend/.env
+
+# Archivos temporales de Python
+__pycache__/
+*.py[cod]
+.venv/
+uploads/
