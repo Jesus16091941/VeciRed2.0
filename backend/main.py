@@ -1,4 +1,5 @@
 import hashlib
+import os
 import secrets
 import uuid
 
@@ -22,9 +23,18 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 
+# Orígenes permitidos, separados por comas. Configurable con CORS_ORIGINS.
+CORS_ORIGINS = [
+    origen.strip()
+    for origen in os.getenv(
+        "CORS_ORIGINS", "https://veci-red2-0.vercel.app"
+    ).split(",")
+    if origen.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
