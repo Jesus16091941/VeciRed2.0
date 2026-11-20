@@ -762,11 +762,21 @@
     return null;
   }
 
-  function fieldKey(el, position) {
+  function baseFieldKey(el, position) {
     var shared = sharedKey(el);
     if (shared) return shared;
     if (el.type === 'radio') return 'field:' + PAGE + ':radio:' + (el.name || position);
     return 'field:' + PAGE + ':' + (el.id || el.name || (el.tagName.toLowerCase() + '-' + position));
+  }
+
+  /* Dentro de [data-vr-store-scope="user"] los valores se guardan por cuenta para no mezclarlos entre sesiones. */
+  function fieldKey(el, position) {
+    var key = baseFieldKey(el, position);
+    if (el.closest('[data-vr-store-scope="user"]')) {
+      var u = users.current();
+      key += ':u:' + (u && u.id != null ? u.id : 'anon');
+    }
+    return key;
   }
 
   function persistFields() {
@@ -1710,6 +1720,11 @@
       location.replace('INT-01.html');
       return;
     }
+    // Las páginas con datos por cuenta se recargan para no mostrar valores de la sesión anterior.
+    if (document.querySelector('[data-vr-store-scope="user"]')) {
+      location.reload();
+      return;
+    }
     renderAccountBanners();
     wireBrandLogo();
     bindCurrentUser();
@@ -1718,7 +1733,37 @@
   /* Rellena los elementos [data-vr-user="campo"] con los datos de la cuenta en sesión. */
   function bindCurrentUser() {
     var u = users.current();
-    if (!u) return;
+    var valores = u ? sessionValues(u) : {};
+    var esTech = !!(u && u.rol === 'tech');
+    document.querySelectorAll('[data-vr-user]').forEach(function (el) {
+      // [data-vr-session="tech"]: sin sesión profesional válida se vacían los datos en lugar de mostrar los del HTML.
+      var requiereTech = !!el.closest('[data-vr-session="tech"]');
+      if (!requiereTech && !u) return;
+      var valor = (!requiereTech || esTech) ? (valores[el.getAttribute('data-vr-user')] || '') : '';
+      if (!requiereTech && !valor) return;
+      if (el.tagName === 'SELECT') { selectSessionOption(el, valor); return; }
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') { el.value = valor; return; }
+      var texto = valor
+        ? (el.getAttribute('data-vr-user-prefix') || '') + valor
+        : (el.getAttribute('data-vr-user-fallback') || '');
+      var attr = el.getAttribute('data-vr-user-attr');
+      if (attr) el.setAttribute(attr, texto);
+      else el.textContent = texto;
+    });
+  }
+
+  function selectSessionOption(select, valor) {
+    if (!valor) { select.value = ''; return; }
+    var target = valor.trim().toLowerCase();
+    var match = Array.prototype.find.call(select.options, function (o) {
+      var texto = String(o.value || o.text).trim().toLowerCase();
+      return texto === target || (texto.indexOf(target) === 0 && /[\s,\/&]/.test(texto.charAt(target.length)));
+    });
+    if (!match) { match = new Option(valor, valor); select.add(match); }
+    select.value = match.value;
+  }
+
+  function sessionValues(u) {
     var seed = SEED_USERS.find(function (s) { return s.id === u.id; }) || {};
     var genero = u.genero || seed.genero;
     var partes = String(u.nombre || '').trim().split(/\s+/).filter(Boolean);
@@ -1727,7 +1772,7 @@
     var tipo = u.perfil === 'vecino'
       ? (genero === 'f' ? 'Vecina Residente' : genero === 'm' ? 'Vecino Residente' : 'Vecino/a Residente')
       : (u.tipoCuenta || TIPO_CUENTA[u.perfil] || '');
-    var valores = {
+    return {
       nombre: u.nombre || '',
       nombrePila: pila,
       nombreCorto: pila + (apellido ? ' ' + apellido.charAt(0) + '.' : ''),
@@ -1735,12 +1780,10 @@
       tipo: tipo,
       direccion: u.direccion || '',
       barrio: u.barrio || '',
-      direccionCompleta: [u.direccion, u.barrio].filter(Boolean).join(', ')
+      direccionCompleta: [u.direccion, u.barrio].filter(Boolean).join(', '),
+      especialidad: (u.verificacion && u.verificacion.especialidad) || (u.oficios && u.oficios[0]) || '',
+      aliasPublico: u.aliasPublico || ''
     };
-    document.querySelectorAll('[data-vr-user]').forEach(function (el) {
-      var valor = valores[el.getAttribute('data-vr-user')];
-      if (valor) el.textContent = valor;
-    });
   }
 
   function boot() {
