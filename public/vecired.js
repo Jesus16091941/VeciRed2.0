@@ -192,7 +192,8 @@
 
       // REGISTRO DE VECINOS: utiliza FastAPI y MariaDB.
       if (!isPro) {
-        return fetch('http://127.0.0.1:8000/registro/vecino', {
+        return fetch('https://vecired20-production.up.railway.app', {
+          
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -242,7 +243,7 @@
       }
 
       // REGISTRO DE PROFESIONALES: utiliza FastAPI y MariaDB.
-      return fetch('http://127.0.0.1:8000/registro/profesional', {
+      return fetch('https://vecired20-production.up.railway.app', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -301,7 +302,7 @@
             // Enviar archivos solamente si hay alguno seleccionado
             var envioArchivos = archivos.has('comprobante') ||
               archivos.has('fotos_trabajos')
-              ? fetch('http://127.0.0.1:8000/profesionales/' +
+              ? fetch('https://vecired20-production.up.railway.app/profesionales/' +
                 data.id_usuario + '/archivos', {
                 method: 'POST',
                 body: archivos
@@ -377,7 +378,7 @@
         }
 
         // Si no existe localmente, consulta la base de datos mediante FastAPI.
-        return fetch('http://127.0.0.1:8000/login', {
+        return fetch('https://vecired20-production.up.railway.app/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
