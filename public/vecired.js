@@ -192,7 +192,7 @@
 
       // REGISTRO DE VECINOS: utiliza FastAPI y MariaDB.
       if (!isPro) {
-        return fetch('https://vecired20-production.up.railway.app', {
+        return fetch('https://vecired20-production.up.railway.app/registro/vecino', {
           
           method: 'POST',
           headers: {
@@ -243,7 +243,7 @@
       }
 
       // REGISTRO DE PROFESIONALES: utiliza FastAPI y MariaDB.
-      return fetch('https://vecired20-production.up.railway.app', {
+      return fetch('https://vecired20-production.up.railway.app/registro/profesional', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
