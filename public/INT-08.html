@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="vecired.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
 <script src="vecired.js" defer></script>
+<script src="int-08.js" defer></script>
 </head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-outline-variant/40 shadow-[0_1px_8px_rgba(15,41,66,0.04)]"><div class="h-16 max-w-container-max mx-auto px-space-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[32px]" aria-hidden="true">hub</span><span class="font-headline-sm text-headline-sm text-primary tracking-tight">VeciRed</span></div><div class="hidden lg:flex items-center gap-space-2xs bg-surface-container-low border border-outline-variant/60 rounded-full px-space-sm py-1"><span class="material-symbols-outlined text-secondary text-[16px]">location_on</span><span class="font-label-sm text-label-sm text-secondary uppercase">Tu Barrio:</span><span id="spanUbicacion" class="font-label-sm text-label-sm text-on-surface font-semibold">Santiago Centro / Barrio Lastarria</span></div></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="text-primary font-bold border-b-2 border-primary">
   <a id="btnComoFunciona" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 cursor-pointer" data-path="como-funciona" href="INT-01.html">Cómo funciona</a>
 
@@ -46,9 +47,9 @@
 <span class="text-on-surface font-semibold">Editar Perfil</span>
 </nav>
 <!-- Auto-Save Timestamp -->
-<div class="flex items-center gap-space-2xs text-secondary font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1 rounded-full shadow-sm">
-<span class="material-symbols-outlined text-[15px] font-bold">cloud_done</span>
-<span>Cambios guardados automáticamente hace 1 min</span>
+<div class="flex items-center gap-space-2xs text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1 rounded-full shadow-sm" role="status" aria-live="polite">
+<span id="estado-sincronizacion-icono" class="material-symbols-outlined text-[15px] font-bold" aria-hidden="true">cloud_sync</span>
+<span id="estado-sincronizacion">Cargando perfil…</span>
 </div>
 </div>
 </div>
@@ -60,9 +61,9 @@
 <h1 class="font-headline-xl text-headline-xl text-primary font-bold tracking-tight">
             Editar Perfil Profesional<span data-vr-user="nombreCorto" data-vr-user-prefix=": "></span>
           </h1>
-<div class="inline-flex items-center gap-1.5 bg-secondary-container/30 text-on-secondary-container px-space-sm py-1 rounded-full">
-<span class="material-symbols-outlined text-[16px] text-secondary" style="font-variation-settings: 'FILL' 1;">verified</span>
-<span class="font-label-sm text-label-sm uppercase tracking-wider font-bold">Sello Vecino Verificado Activo</span>
+<div id="sello-verificado" hidden class="inline-flex items-center gap-1.5 bg-secondary-container/30 text-on-secondary-container px-space-sm py-1 rounded-full">
+<span class="material-symbols-outlined text-[16px] text-secondary" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">verified</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider font-bold">Perfil verificado</span>
 </div>
 </div>
 <p class="font-body-md text-body-md text-on-surface-variant">
@@ -71,12 +72,12 @@
 </div>
 <!-- Quick Action Controls -->
 <div class="flex items-center gap-space-sm self-start md:self-center">
-<button class="inline-flex items-center gap-space-xs bg-surface-container-lowest text-on-surface hover:bg-surface-container-low px-space-md py-2.5 rounded-lg shadow-sm transition-all active:scale-[0.98]" type="button" data-go="INT-13.html">
-<span class="material-symbols-outlined text-[18px] text-on-surface-variant">visibility</span>
+<button class="inline-flex items-center gap-space-xs bg-surface-container-lowest text-on-surface hover:bg-surface-container-low px-space-md py-2.5 rounded-lg shadow-sm transition-all active:scale-[0.98]" type="button" data-int08-accion="vista-previa" aria-haspopup="dialog">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant" aria-hidden="true">visibility</span>
 <span class="font-label-md text-label-md">Vista Previa Perfil Público</span>
 </button>
-<button class="inline-flex items-center gap-space-xs bg-primary text-on-primary hover:bg-primary-container px-space-lg py-2.5 rounded-lg shadow-md transition-all active:scale-[0.98]" type="button" data-toast="Cambios guardados.">
-<span class="material-symbols-outlined text-[18px]">save</span>
+<button class="inline-flex items-center gap-space-xs bg-primary text-on-primary hover:bg-primary-container px-space-lg py-2.5 rounded-lg shadow-md transition-all active:scale-[0.98]" type="button" data-int08-accion="guardar">
+<span class="material-symbols-outlined text-[18px]" aria-hidden="true">save</span>
 <span class="font-label-md text-label-md">Guardar Cambios</span>
 </button>
 </div>
@@ -84,6 +85,11 @@
 </header>
 <!-- Main Content Layout (Desktop Split Architecture) -->
 <div class="max-w-container-max mx-auto w-full px-space-lg py-space-xl">
+<div id="aviso-cuenta" hidden class="mb-space-lg flex items-start gap-space-sm bg-surface-container-low text-on-surface rounded-xl p-space-md shadow-sm" role="status">
+<span class="material-symbols-outlined text-secondary text-[22px]" aria-hidden="true">info</span>
+<p class="font-body-sm text-body-sm" data-aviso-texto></p>
+</div>
+<div id="errores-formulario" hidden class="mb-space-lg flex flex-col gap-space-2xs bg-error-container text-on-error-container rounded-xl p-space-md shadow-sm" role="alert" tabindex="-1"></div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
 <!-- LEFT COLUMN: Professional Details & Core Form -->
 <section class="lg:col-span-7 flex flex-col gap-space-xl">
@@ -92,27 +98,28 @@
 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-space-lg">
 <!-- Avatar Frame with Status Indicator -->
 <div class="relative shrink-0">
-<img alt="Retrato profesional" data-vr-user="nombre" data-vr-user-attr="alt" data-vr-user-prefix="Retrato profesional de " data-vr-user-fallback="Retrato profesional" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbzWYRLoe31eJM1I0AChpqHlUGc1u08EpE-WST1lu-toYvtehK3VwW0fPtXc75DDPx_ON32_ebW33cvvIniF4jWFN5mwIFdeX5d8Ru8CY9xsehEtZirg_WRhUwmgdEdMjSCVivpQ3p6XSUX6FUOyjZQqNGq3AvnodboTHBfzN2oQv3iZCcWYx3TybZe1OurhFOWepWmtRzty8sR0qnk6v8qWXJhG19qySWT6j71odb65qG3BgKRR8K"/>
-<div class="absolute bottom-1 right-1 bg-secondary text-on-secondary rounded-full p-1 shadow-md flex items-center justify-center">
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+<img alt="Retrato profesional" data-vr-user="nombre" data-vr-user-attr="alt" data-vr-user-prefix="Retrato profesional de " data-vr-user-fallback="Retrato profesional" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-sm bg-surface-container" src="placeholder-user.jpg"/>
+<div id="sello-avatar" hidden class="absolute bottom-1 right-1 bg-secondary text-on-secondary rounded-full p-1 shadow-md flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">verified</span>
+<span class="sr-only">Perfil verificado</span>
 </div>
 </div>
 <!-- Avatar Action Controls -->
 <div class="flex flex-col gap-space-xs flex-1">
 <div class="flex items-center gap-space-sm">
-<button class="bg-surface-container text-on-surface hover:bg-surface-container-high px-space-md py-2 rounded-lg font-label-md text-label-md transition-colors shadow-sm" type="button">
+<button class="bg-surface-container text-on-surface px-space-md py-2 rounded-lg font-label-md text-label-md transition-colors shadow-sm opacity-60 cursor-not-allowed" type="button" disabled aria-describedby="foto-pendiente">
                   Cambiar Foto
                 </button>
-<button class="text-error hover:text-on-error-container font-label-md text-label-md px-space-xs py-2 transition-colors" type="button">
+<button class="text-error font-label-md text-label-md px-space-xs py-2 transition-colors opacity-60 cursor-not-allowed" type="button" disabled aria-describedby="foto-pendiente">
                   Eliminar
                 </button>
 </div>
 <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-                Foto nítida de frente con buena iluminación. Un rostro visible aumenta las contrataciones en tu cuadrante en un <strong class="text-on-surface font-semibold">40%</strong>.
+                Usa una foto nítida de frente y con buena iluminación para que tus vecinos te reconozcan.
               </p>
-<div class="flex items-center gap-space-2xs text-secondary font-label-sm text-label-sm">
-<span class="material-symbols-outlined text-[14px]">shield_person</span>
-<span>Rostro cotejado mediante Reconocimiento Biométrico VeciRed</span>
+<div class="flex items-center gap-space-2xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]" aria-hidden="true">schedule</span>
+<span id="foto-pendiente">Gestión de foto de perfil: pendiente de configuración</span>
 </div>
 </div>
 </div>
@@ -128,22 +135,22 @@
 <!-- Official Registered Name (Verified Lock) -->
 <div class="flex flex-col gap-space-2xs">
 <div class="flex items-center justify-between">
-<label class="font-label-md text-label-md text-on-surface-variant font-medium">Nombre Legal Cotejado</label>
-<span class="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm">
-<span class="material-symbols-outlined text-[14px]">lock</span>
-                Cotejado con documento de identidad
+<label class="font-label-md text-label-md text-on-surface-variant font-medium" for="nombre-legal">Nombre Legal</label>
+<span class="inline-flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]" aria-hidden="true">lock</span>
+                Solo lectura
               </span>
 </div>
 <div class="relative flex items-center">
-<input class="w-full h-12 px-space-md bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md cursor-not-allowed opacity-90 shadow-inner" disabled="" type="text" value="" aria-label="Nombre Legal Cotejado" data-vr-user="nombre" data-vr-nostore=""/>
-<span class="material-symbols-outlined absolute right-space-md text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<input id="nombre-legal" class="w-full h-12 px-space-md bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md cursor-not-allowed opacity-90 shadow-inner" readonly aria-readonly="true" type="text" value="" data-vr-nostore=""/>
+<span class="material-symbols-outlined absolute right-space-md text-outline text-[20px]" aria-hidden="true">lock</span>
 </div>
 <span class="font-body-sm text-body-sm text-on-surface-variant">Para modificar tu nombre legal debes solicitar una re-validación de cédula con soporte.</span>
 </div>
 <!-- Public Commercial Alias -->
 <div class="flex flex-col gap-space-2xs">
 <label class="font-label-md text-label-md text-on-surface font-semibold" for="alias-input">Nombre Comercial o Alias de Perfil</label>
-<input class="w-full h-12 px-space-md bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container transition-all" id="alias-input" type="text" value="" data-vr-user="aliasPublico"/>
+<input class="w-full h-12 px-space-md bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container transition-all" id="alias-input" type="text" value="" maxlength="100" autocomplete="off" data-vr-nostore=""/>
 <span class="font-body-sm text-body-sm text-on-surface-variant">Este es el encabezado que verán tus vecinos cuando busquen servicios de urgencia o agenda.</span>
 </div>
 <!-- Main Specialty Dropdown -->
@@ -151,9 +158,9 @@
 <label class="font-label-md text-label-md text-on-surface font-semibold" for="specialty-select">Rubro y Especialidad Primaria</label>
 <div class="relative">
 <div class="absolute left-space-md top-1/2 -translate-y-1/2 text-primary flex items-center">
-<span class="material-symbols-outlined text-[20px]">plumbing</span>
+<span class="material-symbols-outlined text-[20px]" aria-hidden="true">handyman</span>
 </div>
-<select class="w-full h-12 pl-11 pr-space-lg bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary-container transition-all cursor-pointer" id="specialty-select" data-vr-user="especialidad" data-vr-nostore="">
+<select class="w-full h-12 pl-11 pr-space-lg bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary-container transition-all cursor-pointer" id="specialty-select" data-vr-nostore="">
 <option value="">Selecciona tu especialidad</option>
 <option>Gasfitería / Plomería y Redes Sanitarias</option>
 <option>Electricidad Domiciliaria &amp; Certificaciones SEC</option>
@@ -176,30 +183,25 @@
 <div class="flex flex-col gap-space-2xs">
 <div class="flex items-center justify-between">
 <label class="font-label-md text-label-md text-on-surface font-semibold" for="bio-input">Descripción Profesional para Vecinos</label>
-<span class="font-label-sm text-label-sm text-on-surface-variant tabular-nums" id="char-counter">263 / 600 caracteres</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant tabular-nums" id="char-counter" aria-live="polite">0 / 600 caracteres</span>
 </div>
-<textarea class="w-full p-space-md bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container leading-relaxed resize-none transition-all" id="bio-input" rows="4">Maestro gasfíter con más de 12 años resolviendo averías de agua, gas y sanitarias en el barrio. Puntualidad, herramientas certificadas y garantía de 30 días en mano de obra. Atención rápida en cuadrante cercano.</textarea>
+<textarea class="w-full p-space-md bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container leading-relaxed resize-none transition-all" id="bio-input" rows="4" maxlength="600" aria-describedby="char-counter" data-vr-nostore=""></textarea>
 <p class="font-body-sm text-body-sm text-on-surface-variant">Destaca tu cercanía, garantías explícitas y años de experiencia en la comuna.</p>
 </div>
 <!-- Official Certification Inputs -->
 <div class="flex flex-col gap-space-2xs">
 <div class="flex items-center justify-between">
-<label class="font-label-md text-label-md text-on-surface font-semibold">Certificación Técnica Registrada</label>
-<div class="flex items-center gap-1 text-secondary font-label-sm text-label-sm bg-secondary-container/20 px-2 py-0.5 rounded">
-<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">verified</span>
-<span>Certificado Validado</span>
+<h3 class="font-label-md text-label-md text-on-surface font-semibold" id="titulo-certificaciones">Certificaciones Técnicas Registradas</h3>
 </div>
-</div>
-<div class="relative flex items-center">
-<span class="material-symbols-outlined absolute left-space-md text-secondary text-[20px]">workspace_premium</span>
-<input class="w-full h-12 pl-11 pr-10 bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container" type="text" value="SEC Instalador Gasfiter Clase 3 (Reg. #88492-CL)"/>
-<span class="material-symbols-outlined absolute right-space-md text-secondary text-[18px]">verified</span>
-</div>
+<ul id="lista-certificaciones" class="flex flex-col gap-space-xs" aria-labelledby="titulo-certificaciones">
+<li class="font-body-sm text-body-sm text-on-surface-variant p-space-sm bg-surface-container-low rounded-lg">Cargando certificaciones…</li>
+</ul>
+<span class="font-body-sm text-body-sm text-on-surface-variant">El estado de cada certificación lo asigna el equipo de verificación de VeciRed.</span>
 </div>
 <!-- Diagnostic Fee Range -->
 <div class="flex flex-col gap-space-2xs pt-space-xs">
 <div class="flex items-center gap-space-xs">
-<label class="font-label-md text-label-md text-on-surface font-semibold">Tarifa Visita Diagnóstica en Cuadrante</label>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Tarifas de Atención</span>
 <div class="group relative flex items-center cursor-help">
 <span class="material-symbols-outlined text-[16px] text-outline">help</span>
 <div class="hidden group-hover:flex absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-2 bg-primary text-on-primary rounded text-body-sm shadow-xl z-20">
@@ -209,21 +211,21 @@
 </div>
 <div class="grid grid-cols-2 gap-space-md">
 <div class="flex flex-col gap-1">
-<span class="font-label-sm text-label-sm text-on-surface-variant">Mínimo sugerido</span>
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="tarifa-visita">Tarifa de visita (CLP)</label>
 <div class="relative flex items-center">
-<span class="absolute left-space-sm text-on-surface-variant font-semibold">$</span>
-<input class="w-full h-11 pl-7 pr-space-sm bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container" type="text" value="10.500 CLP"/>
+<span class="absolute left-space-sm text-on-surface-variant font-semibold" aria-hidden="true">$</span>
+<input id="tarifa-visita" class="w-full h-11 pl-7 pr-space-sm bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container" type="text" inputmode="numeric" autocomplete="off" value="" data-vr-nostore=""/>
 </div>
 </div>
 <div class="flex flex-col gap-1">
-<span class="font-label-sm text-label-sm text-on-surface-variant">Máximo sugerido</span>
+<label class="font-label-sm text-label-sm text-on-surface-variant" for="tarifa-urgencia">Tarifa de urgencia (CLP)</label>
 <div class="relative flex items-center">
-<span class="absolute left-space-sm text-on-surface-variant font-semibold">$</span>
-<input class="w-full h-11 pl-7 pr-space-sm bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container" type="text" value="13.500 CLP"/>
+<span class="absolute left-space-sm text-on-surface-variant font-semibold" aria-hidden="true">$</span>
+<input id="tarifa-urgencia" class="w-full h-11 pl-7 pr-space-sm bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container" type="text" inputmode="numeric" autocomplete="off" value="" data-vr-nostore=""/>
 </div>
 </div>
 </div>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Monto sugerido deducible del trabajo final si el cliente acepta la cotización.</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Monto único en pesos chilenos, sin decimales. La tarifa de visita es deducible del trabajo final si el cliente acepta la cotización.</span>
 </div>
 </div>
 <!-- 4. Specialties & Service Tags Card -->
@@ -240,37 +242,15 @@
 <span class="material-symbols-outlined text-outline">label</span>
 </div>
 <!-- Tag Cloud Chips -->
-<div class="flex flex-wrap gap-space-xs" id="tags-container">
-<span class="inline-flex items-center gap-space-xs bg-surface-container text-on-surface px-space-sm py-1.5 rounded-full font-label-md text-label-md transition-colors hover:bg-surface-container-high">
-<span>Reparación de llaves y monomandos</span>
-<button class="text-outline hover:text-error flex items-center" type="button"><span class="material-symbols-outlined text-[15px]">close</span></button>
-</span>
-<span class="inline-flex items-center gap-space-xs bg-surface-container text-on-surface px-space-sm py-1.5 rounded-full font-label-md text-label-md transition-colors hover:bg-surface-container-high">
-<span>Instalación de artefactos sanitarios</span>
-<button class="text-outline hover:text-error flex items-center" type="button"><span class="material-symbols-outlined text-[15px]">close</span></button>
-</span>
-<span class="inline-flex items-center gap-space-xs bg-surface-container text-on-surface px-space-sm py-1.5 rounded-full font-label-md text-label-md transition-colors hover:bg-surface-container-high">
-<span>Detección y reparación de fugas</span>
-<button class="text-outline hover:text-error flex items-center" type="button"><span class="material-symbols-outlined text-[15px]">close</span></button>
-</span>
-<span class="inline-flex items-center gap-space-xs bg-surface-container text-on-surface px-space-sm py-1.5 rounded-full font-label-md text-label-md transition-colors hover:bg-surface-container-high">
-<span>Destape de alcantarillado y sifones</span>
-<button class="text-outline hover:text-error flex items-center" type="button"><span class="material-symbols-outlined text-[15px]">close</span></button>
-</span>
-<span class="inline-flex items-center gap-space-xs bg-surface-container text-on-surface px-space-sm py-1.5 rounded-full font-label-md text-label-md transition-colors hover:bg-surface-container-high">
-<span>Calefones y Termos a Gas</span>
-<button class="text-outline hover:text-error flex items-center" type="button"><span class="material-symbols-outlined text-[15px]">close</span></button>
-</span>
-<span class="inline-flex items-center gap-space-xs bg-surface-container text-on-surface px-space-sm py-1.5 rounded-full font-label-md text-label-md transition-colors hover:bg-surface-container-high">
-<span>Redes de Cobre y Termofusión</span>
-<button class="text-outline hover:text-error flex items-center" type="button"><span class="material-symbols-outlined text-[15px]">close</span></button>
-</span>
+<div class="flex flex-wrap gap-space-xs" id="tags-container" aria-live="polite">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Aún no has agregado especialidades.</span>
 </div>
 <!-- Add Tag Input -->
 <div class="flex items-center gap-space-sm pt-space-xs">
-<input class="flex-1 h-11 px-space-md bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Escribe otra especialidad (ej. Instalación de tinas de hidromasaje)..." type="text"/>
-<button class="h-11 px-space-md bg-surface-container-high text-primary hover:bg-surface-variant font-label-md text-label-md rounded-lg flex items-center gap-1 shadow-sm transition-colors" type="button">
-<span class="material-symbols-outlined text-[18px]">add</span>
+<label for="tag-input" class="sr-only">Nueva especialidad</label>
+<input id="tag-input" class="flex-1 h-11 px-space-md bg-surface-container-lowest text-primary rounded-lg font-body-md text-body-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Escribe una especialidad (máx. 40 caracteres)..." type="text" maxlength="40" autocomplete="off" data-vr-nostore=""/>
+<button id="tag-agregar" class="h-11 px-space-md bg-surface-container-high text-primary hover:bg-surface-variant font-label-md text-label-md rounded-lg flex items-center gap-1 shadow-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]" aria-hidden="true">add</span>
               Agregar
             </button>
 </div>
@@ -289,39 +269,40 @@
 </div>
 </div>
 <div class="flex flex-col gap-space-md">
-<!-- Toggle 1: ON -->
+<p id="origen-preferencias" hidden class="font-body-sm text-body-sm text-on-surface-variant">Se muestran los valores por defecto. Tus preferencias guardadas se cargarán cuando el servidor publique la ruta del perfil.</p>
+<!-- Toggle 1 -->
 <div class="flex items-start justify-between gap-space-md p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
 <div class="flex flex-col">
-<span class="font-label-lg text-label-lg text-on-surface font-semibold">Mostrar teléfono directo a clientes con solicitud aceptada</span>
+<span id="pref-whatsapp-titulo" class="font-label-lg text-label-lg text-on-surface font-semibold">Mostrar teléfono directo a clientes con solicitud aceptada</span>
 <span class="font-body-sm text-body-sm text-on-surface-variant">Permite que el cliente vea tu canal directo de WhatsApp tras formalizar y aceptar la propuesta en la app.</span>
 </div>
 <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
-<input checked="" class="sr-only peer" type="checkbox"/>
+<input id="pref-whatsapp" class="sr-only peer" type="checkbox" role="switch" aria-labelledby="pref-whatsapp-titulo" data-vr-nostore=""/>
 <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
 </label>
 </div>
-<!-- Toggle 2: OFF -->
+<!-- Toggle 2 -->
 <div class="flex items-start justify-between gap-space-md p-space-sm rounded-lg hover:bg-surface-container-low transition-colors">
 <div class="flex flex-col">
-<span class="font-label-lg text-label-lg text-on-surface font-semibold">Mostrar correo electrónico en perfil público</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Mantiene tu dirección de correo electrónico oculta a visitantes generales para evitar spam y scraping masivo.</span>
+<span id="pref-correo-titulo" class="font-label-lg text-label-lg text-on-surface font-semibold">Mostrar correo electrónico en perfil público</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Desactivado, tu dirección de correo electrónico queda oculta a visitantes generales para evitar spam y scraping masivo.</span>
 </div>
 <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
-<input class="sr-only peer" type="checkbox"/>
+<input id="pref-correo" class="sr-only peer" type="checkbox" role="switch" aria-labelledby="pref-correo-titulo" data-vr-nostore=""/>
 <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
 </label>
 </div>
-<!-- Toggle 3: ON (Emergency 24/7) -->
+<!-- Toggle 3 (Emergency 24/7) -->
 <div class="flex items-start justify-between gap-space-md p-space-sm rounded-lg bg-surface-container-low/60">
 <div class="flex flex-col">
 <div class="flex items-center gap-space-xs">
-<span class="font-label-lg text-label-lg text-primary font-bold">Permitir llamadas de urgencia 24/7 (Modo Urgencias Activo)</span>
+<span id="pref-urgencias-titulo" class="font-label-lg text-label-lg text-primary font-bold">Recibir notificaciones de urgencia 24/7</span>
 <span class="bg-error/15 text-error font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase font-bold">Prioritario</span>
 </div>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Recibe alertas sonoras push para emergencias de roturas de cañería o fugas de gas a menos de 3 km a cualquier hora.</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Recibe alertas de emergencias como roturas de cañería o fugas de gas dentro de tu radio de cobertura, a cualquier hora.</span>
 </div>
 <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
-<input checked="" class="sr-only peer" type="checkbox"/>
+<input id="pref-urgencias" class="sr-only peer" type="checkbox" role="switch" aria-labelledby="pref-urgencias-titulo" data-vr-nostore=""/>
 <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
 </label>
 </div>
@@ -339,45 +320,43 @@
                 Zona de Cobertura Barrial
               </h2>
 </div>
-<span class="font-label-sm text-label-sm bg-secondary-container/30 text-on-secondary-container px-2 py-0.5 rounded font-bold">GPS Activo</span>
 </div>
-<!-- Base Location Selector -->
+<!-- Base Location -->
 <div class="flex flex-col gap-space-2xs">
-<label class="font-label-sm text-label-sm text-on-surface-variant font-semibold uppercase tracking-wider">Centro de Operaciones / Taller</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-semibold uppercase tracking-wider">Centro de Operaciones / Barrio</span>
 <div class="flex items-center gap-space-xs p-space-sm bg-surface-container-low rounded-lg text-primary font-body-sm text-body-sm font-medium">
-<span class="material-symbols-outlined text-secondary text-[18px]">location_on</span>
-<span class="truncate">Estación Central, Santiago (Sector Las Rejas / Alameda)</span>
-<button class="ml-auto text-secondary hover:underline font-label-sm text-label-sm" type="button">Modificar</button>
+<span class="material-symbols-outlined text-secondary text-[18px]" aria-hidden="true">location_on</span>
+<span id="centro-operaciones" class="truncate">No especificada</span>
 </div>
 </div>
 <!-- Radius Selector Tabs -->
 <div class="flex flex-col gap-space-2xs">
-<label class="font-label-sm text-label-sm text-on-surface-variant font-semibold">Radio Máximo de Cobertura</label>
-<div class="grid grid-cols-4 gap-space-xs bg-surface-container p-1 rounded-lg">
-<button class="py-1.5 text-center font-label-md text-label-md rounded-md text-on-surface hover:bg-surface-container-highest transition-colors" type="button">3 km</button>
-<button class="py-1.5 text-center font-label-md text-label-md rounded-md bg-primary text-on-primary font-bold shadow-sm" type="button">5 km (Activo)</button>
-<button class="py-1.5 text-center font-label-md text-label-md rounded-md text-on-surface hover:bg-surface-container-highest transition-colors" type="button">8 km</button>
-<button class="py-1.5 text-center font-label-md text-label-md rounded-md text-on-surface hover:bg-surface-container-highest transition-colors" type="button">10 km</button>
+<span id="titulo-radio" class="font-label-sm text-label-sm text-on-surface-variant font-semibold">Radio Máximo de Cobertura</span>
+<div id="selector-radio" class="grid grid-cols-4 gap-space-xs bg-surface-container p-1 rounded-lg" role="radiogroup" aria-labelledby="titulo-radio">
+<button class="py-1.5 text-center font-label-md text-label-md rounded-md text-on-surface hover:bg-surface-container-highest transition-colors" type="button" role="radio" aria-checked="false" data-radio-km="3">3 km</button>
+<button class="py-1.5 text-center font-label-md text-label-md rounded-md text-on-surface hover:bg-surface-container-highest transition-colors" type="button" role="radio" aria-checked="false" data-radio-km="5">5 km</button>
+<button class="py-1.5 text-center font-label-md text-label-md rounded-md text-on-surface hover:bg-surface-container-highest transition-colors" type="button" role="radio" aria-checked="false" data-radio-km="8">8 km</button>
+<button class="py-1.5 text-center font-label-md text-label-md rounded-md text-on-surface hover:bg-surface-container-highest transition-colors" type="button" role="radio" aria-checked="false" data-radio-km="10">10 km</button>
 </div>
 </div>
 <!-- High-End Dark Navy Radar Visualizer Display -->
-<div class="relative w-full aspect-square max-h-72 bg-primary-container rounded-xl overflow-hidden shadow-inner flex items-center justify-center p-space-md select-none">
+<div class="relative w-full aspect-square max-h-72 bg-primary-container rounded-xl overflow-hidden shadow-inner flex items-center justify-center p-space-md select-none" aria-hidden="true">
 <!-- Concentric Grid Circles -->
 <div class="absolute w-[88%] h-[88%] rounded-full border border-surface-container/15 flex items-center justify-center pointer-events-none">
-<span class="absolute -top-3 font-label-sm text-[10px] text-surface-container/50">5 km (Límite Máx.)</span>
+<span id="radar-label-exterior" class="absolute -top-3 font-label-sm text-[10px] text-surface-container/50">Radio no especificado</span>
 </div>
 <div class="absolute w-[58%] h-[58%] rounded-full border border-surface-container/20 flex items-center justify-center pointer-events-none">
-<span class="absolute -top-3 font-label-sm text-[10px] text-surface-container/50">3 km</span>
+<span id="radar-label-medio" class="absolute -top-3 font-label-sm text-[10px] text-surface-container/50"></span>
 </div>
 <div class="absolute w-[28%] h-[28%] rounded-full border border-secondary/40 flex items-center justify-center pointer-events-none">
-<span class="absolute -top-3 font-label-sm text-[10px] text-secondary">1 km</span>
+<span id="radar-label-interior" class="absolute -top-3 font-label-sm text-[10px] text-secondary"></span>
 </div>
 <!-- Coordinate Crosshairs -->
 <div class="absolute inset-x-0 h-px bg-surface-container/10"></div>
 <div class="absolute inset-y-0 w-px bg-surface-container/10"></div>
 <!-- Radar Sweep Simulation Effect -->
 <div class="absolute inset-0 bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(0,106,97,0.35)_360deg)] rounded-full animate-spin [animation-duration:8s]"></div>
-<!-- Center Base Marker (Roberto's Workshop) -->
+<!-- Center Base Marker -->
 <div class="relative z-10 flex flex-col items-center">
 <div class="w-4 h-4 rounded-full bg-secondary ring-4 ring-secondary/30 flex items-center justify-center animate-pulse">
 <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
@@ -386,42 +365,21 @@
                 Tu Taller / Base
               </div>
 </div>
-<!-- Neighborhood Points within Radar Area -->
-<!-- Estación Central -->
-<div class="absolute top-[28%] left-[28%] z-10 flex items-center gap-1 group">
-<div class="w-2 h-2 rounded-full bg-secondary-container"></div>
-<span class="font-label-sm text-[10px] text-surface-container-low font-medium">Estación Central</span>
-</div>
-<!-- Santiago Centro -->
-<div class="absolute top-[32%] right-[22%] z-10 flex items-center gap-1">
-<div class="w-2 h-2 rounded-full bg-surface-container-high"></div>
-<span class="font-label-sm text-[10px] text-surface-container-low font-medium">Santiago Centro</span>
-</div>
-<!-- Lo Valledor -->
-<div class="absolute bottom-[24%] left-[34%] z-10 flex items-center gap-1">
-<div class="w-2 h-2 rounded-full bg-surface-container-high"></div>
-<span class="font-label-sm text-[10px] text-surface-container-low font-medium">Lo Valledor</span>
-</div>
-<!-- Maipú Norte -->
-<div class="absolute bottom-[36%] right-[18%] z-10 flex items-center gap-1">
-<div class="w-2 h-2 rounded-full bg-secondary-container"></div>
-<span class="font-label-sm text-[10px] text-surface-container-low font-medium">Maipú Norte</span>
-</div>
-<!-- Dynamic Estimated Time Pill Overlay -->
+<!-- Estimated Time Pill Overlay -->
 <div class="absolute bottom-space-sm left-space-sm z-20 bg-surface/90 backdrop-blur-md px-space-sm py-1 rounded-full shadow-md flex items-center gap-1.5">
-<span class="material-symbols-outlined text-secondary text-[16px]">schedule</span>
-<span class="font-label-sm text-label-sm text-primary font-bold">15 - 20 min llegada promedio</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">schedule</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-bold">Tiempo de llegada: sin datos todavía</span>
 </div>
 </div>
-<!-- Real-Time Reach Projection Stats -->
+<!-- Reach Projection Stats -->
 <div class="grid grid-cols-2 gap-space-sm pt-space-2xs">
 <div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col">
-<span class="font-headline-sm text-headline-sm text-primary font-bold">~42.000</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant leading-snug">Viviendas y locales en tu perímetro de 5 km</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">Sin datos disponibles todavía</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-snug">Viviendas y locales en <span id="alcance-radio">tu radio (no especificado)</span></span>
 </div>
 <div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col">
-<span class="font-headline-sm text-headline-sm text-secondary font-bold">15 - 22</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant leading-snug">trabajos/sem demanda estimada de plomería</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">Sin datos disponibles todavía</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-snug">Demanda estimada de trabajos por semana</span>
 </div>
 </div>
 </div>
@@ -440,58 +398,57 @@
 <span class="material-symbols-outlined text-[24px]">military_tech</span>
 </div>
 <div class="flex flex-col">
-<span class="font-label-lg text-label-lg font-bold text-white tracking-wide">Membresía VeciPro Gold Activa</span>
-<span class="font-body-sm text-body-sm text-primary-fixed-dim">0% Comisión Barrial en servicios directos</span>
+<span class="font-label-lg text-label-lg font-bold text-white tracking-wide">Membresía VeciPro</span>
+<span class="font-body-sm text-body-sm text-primary-fixed-dim">Pendiente de configuración</span>
 </div>
 </div>
-<span class="font-label-sm text-label-sm bg-secondary-container/20 text-secondary-container px-2 py-1 rounded font-bold">Al día</span>
 </div>
 <!-- Trust & Background Checklist -->
 <div class="flex flex-col gap-space-xs pt-space-2xs">
 <div class="flex items-center justify-between p-space-xs rounded-lg hover:bg-surface-container-low transition-colors">
 <div class="flex items-center gap-space-xs">
-<span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-<span class="font-body-sm text-body-sm text-on-surface font-medium">Verificación de Identidad y Cédula</span>
+<span class="material-symbols-outlined text-outline text-[20px]" aria-hidden="true">badge</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Estado de verificación del perfil</span>
 </div>
-<span class="font-label-sm text-label-sm text-secondary bg-secondary-container/20 px-2 py-0.5 rounded font-bold">Aprobado</span>
+<span id="estado-verificacion-identidad" class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded font-bold">Pendiente de configuración</span>
 </div>
 <div class="flex items-center justify-between p-space-xs rounded-lg hover:bg-surface-container-low transition-colors">
 <div class="flex items-center gap-space-xs">
-<span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="material-symbols-outlined text-outline text-[20px]" aria-hidden="true">gavel</span>
 <span class="font-body-sm text-body-sm text-on-surface font-medium">Antecedentes Penales y Judiciales</span>
 </div>
-<span class="font-label-sm text-label-sm text-secondary bg-secondary-container/20 px-2 py-0.5 rounded font-bold">Sin anotaciones</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded font-bold">Sin datos todavía</span>
 </div>
 <div class="flex items-center justify-between p-space-xs rounded-lg hover:bg-surface-container-low transition-colors">
 <div class="flex items-center gap-space-xs">
-<span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="material-symbols-outlined text-outline text-[20px]" aria-hidden="true">insights</span>
 <span class="font-body-sm text-body-sm text-on-surface font-medium">Tasa de Cumplimiento Barrial</span>
 </div>
-<span class="font-label-sm text-label-sm text-primary font-bold bg-surface-container px-2 py-0.5 rounded">99.2% (Excelente)</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded font-bold">Sin datos todavía</span>
 </div>
 <div class="flex items-center justify-between p-space-xs rounded-lg hover:bg-surface-container-low transition-colors">
 <div class="flex items-center gap-space-xs">
-<span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-<span class="font-body-sm text-body-sm text-on-surface font-medium">Póliza de Daños VeciProtege ($3.000.000 CLP)</span>
+<span class="material-symbols-outlined text-outline text-[20px]" aria-hidden="true">shield</span>
+<span class="font-body-sm text-body-sm text-on-surface font-medium">Póliza de Daños VeciProtege</span>
 </div>
-<span class="font-label-sm text-label-sm text-secondary bg-secondary-container/20 px-2 py-0.5 rounded font-bold">Activa</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded font-bold">Pendiente de configuración</span>
 </div>
 </div>
 <!-- Official Document Link -->
 <div class="pt-space-xs">
 <a class="inline-flex items-center gap-1.5 font-label-md text-label-md text-secondary hover:text-on-secondary-container font-semibold transition-colors" href="INT-00-teryser.html">
-<span>Ver documento de póliza y certificaciones oficiales</span>
-<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+<span>Ver términos del servicio</span>
+<span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
 </a>
 </div>
 </div>
 <!-- Hyperlocal Community Recommendation Snippet -->
 <div class="bg-surface-container-low rounded-xl p-space-md shadow-sm flex items-start gap-space-sm">
-<span class="material-symbols-outlined text-secondary text-[24px]">recommend</span>
+<span class="material-symbols-outlined text-secondary text-[24px]" aria-hidden="true">recommend</span>
 <div class="flex flex-col">
-<span class="font-label-md text-label-md text-primary font-bold">Recomendado por 68 vecinos verificados</span>
+<span class="font-label-md text-label-md text-primary font-bold">Recomendaciones de vecinos: sin datos disponibles todavía</span>
 <p class="font-body-sm text-body-sm text-on-surface-variant">
-              Mantener tus etiquetas al día permite que la Junta de Vecinos de Las Rejas te priorice en llamados comunales.
+              Mantener tus especialidades al día ayuda a que los vecinos te encuentren en las búsquedas.
             </p>
 </div>
 </div>
@@ -503,43 +460,38 @@
 <div class="max-w-container-max mx-auto flex flex-col sm:flex-row items-center justify-between gap-space-sm">
 <!-- Status Meta Sync Text -->
 <div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
-<span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
-<span>Última sincronización con la red vecinal: <strong>Hoy 11:42 AM</strong></span>
+<span class="w-2 h-2 rounded-full bg-outline" aria-hidden="true"></span>
+<span>Última sincronización con el servidor: <strong id="ultima-sincronizacion">Sin sincronizar</strong></span>
 </div>
 <!-- Action Group -->
 <div class="flex items-center gap-space-sm w-full sm:w-auto justify-end">
-<button class="px-space-md py-2.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-colors" type="button" data-go="INT-07.html">
+<button class="px-space-md py-2.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container transition-colors" type="button" data-int08-accion="descartar">
           Descartar cambios
         </button>
-<button class="inline-flex items-center gap-1.5 bg-surface-container-low text-on-surface hover:bg-surface-container px-space-md py-2.5 rounded-lg font-label-md text-label-md transition-colors shadow-sm" type="button" data-go="INT-13.html">
-<span class="material-symbols-outlined text-[18px]">visibility</span>
+<button class="inline-flex items-center gap-1.5 bg-surface-container-low text-on-surface hover:bg-surface-container px-space-md py-2.5 rounded-lg font-label-md text-label-md transition-colors shadow-sm" type="button" data-int08-accion="vista-previa" aria-haspopup="dialog">
+<span class="material-symbols-outlined text-[18px]" aria-hidden="true">visibility</span>
 <span>Vista Previa</span>
 </button>
-<button class="inline-flex items-center gap-1.5 bg-primary text-on-primary hover:bg-primary-container px-space-lg py-2.5 rounded-lg font-label-md text-label-md font-semibold transition-all shadow-md active:scale-[0.98]" type="button" data-toast="Cambios guardados.">
-<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<button class="inline-flex items-center gap-1.5 bg-primary text-on-primary hover:bg-primary-container px-space-lg py-2.5 rounded-lg font-label-md text-label-md font-semibold transition-all shadow-md active:scale-[0.98]" type="button" data-int08-accion="guardar">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;" aria-hidden="true">check_circle</span>
 <span>Guardar Cambios</span>
 </button>
 </div>
 </div>
 </div>
 </div>
-<script>
-  // Dynamic Character Counter for Professional Bio
-  const bioInput = document.getElementById('bio-input');
-  const charCounter = document.getElementById('char-counter');
-  if (bioInput && charCounter) {
-    bioInput.addEventListener('input', () => {
-      const len = bioInput.value.length;
-      charCounter.textContent = `${len} / 600 caracteres`;
-      if (len > 550) {
-        charCounter.classList.add('text-error');
-        charCounter.classList.remove('text-on-surface-variant');
-      } else {
-        charCounter.classList.remove('text-error');
-        charCounter.classList.add('text-on-surface-variant');
-      }
-    });
-  }
+<!-- Vista previa del perfil público (datos actuales del formulario) -->
+<div id="modalVistaPrevia" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="vista-previa-titulo">
+  <div class="modal-card flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <h3 id="vista-previa-titulo" class="font-headline-lg text-primary">Vista previa del perfil público</h3>
+      <button type="button" class="text-on-surface-variant hover:text-primary text-xl font-bold" data-vista-cerrar aria-label="Cerrar vista previa">&times;</button>
+    </div>
+    <p data-vista-aviso hidden class="font-body-sm text-body-sm text-on-surface-variant bg-surface-container-low rounded-lg p-3">Incluye cambios que todavía no se han guardado.</p>
+    <dl class="flex flex-col gap-3" data-vista-contenido></dl>
+    <button type="button" class="mt-2 bg-primary text-on-primary font-label-md py-2.5 px-4 rounded-lg hover:opacity-90 transition-opacity" data-vista-cerrar>Cerrar</button>
+  </div>
+</div>
 </div></main><footer class="w-full bg-surface-container-lowest border-t border-outline-variant/40 py-space-xl"><div class="max-w-container-max mx-auto px-space-lg flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-body-sm text-body-sm text-on-surface-variant">© 2026 VeciRed Marketplace. Conexión local confiable.</span></div><nav class="flex flex-wrap items-center justify-center gap-space-md" data-active-classes="text-on-surface font-semibold"><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="terminos-de-servicio" href="INT-00-teryser.html">Términos de Servicio</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="politica-de-privacidad" href="INT-00-poldepri.html">Política de Privacidad</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="proteccion-de-datos" href="INT-00-prodeda.html">Protección de Datos</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="centro-de-ayuda" href="INT-00-cendeayu.html">Centro de Ayuda</a></nav></div></footer>
 
 <!-- Banner compartido (replicado desde INT-01) -->
