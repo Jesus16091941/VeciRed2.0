@@ -3,7 +3,7 @@
  * Carga y edición del perfil del profesional autenticado contra FastAPI (Railway).
  * Depende de window.VeciRed (vecired.js), que debe cargarse antes que este archivo.
  *
- * Contrato esperado del backend (AÚN NO IMPLEMENTADO en backend/main.py):
+ * Contrato del backend (backend/main.py):
  *   GET  /profesionales/me/perfil   -> perfil del usuario dueño del token
  *   PUT  /profesionales/me/perfil   -> guarda los campos editables y devuelve el perfil actualizado
  *   Ambas rutas reciben "Authorization: Bearer <token>" y nunca un id de usuario en la URL.
@@ -78,7 +78,7 @@
     return 'local';
   }
 
-  // El token lo emitirá FastAPI al iniciar sesión; se espera en sessionStorage bajo "vecired:token".
+  // FastAPI emite el token en POST /login; vecired.js lo guarda solo en sessionStorage ("vecired:token").
   function tokenSesion() {
     var t = VR.store.get('token');
     return typeof t === 'string' && t.length > 0 ? t : null;
@@ -546,8 +546,8 @@
       return;
     }
     if (!tokenSesion()) {
-      VR.toast('No se guardó: el servidor todavía no emite tokens de sesión.');
-      mostrarEstado('No guardado: falta el token de sesión de FastAPI', 'error');
+      VR.toast('No se guardó: vuelve a iniciar sesión para continuar.');
+      mostrarEstado('No guardado: tu sesión necesita renovarse', 'error');
       return;
     }
 
@@ -582,7 +582,7 @@
   function mensajeError(err, accion) {
     var verbo = accion === 'guardar' ? 'guardar' : 'cargar';
     switch (err && err.tipo) {
-      case 'sin-token': return 'No se pudo ' + verbo + ': falta el token de sesión de FastAPI.';
+      case 'sin-token': return 'No se pudo ' + verbo + ': vuelve a iniciar sesión.';
       case 'no-autorizado': return 'Tu sesión no es válida o expiró. Vuelve a iniciar sesión.';
       case 'sin-endpoint': return 'No se pudo ' + verbo + ': la ruta del perfil aún no existe en el backend.';
       case 'red': return 'No se pudo conectar con el servidor de VeciRed.';
@@ -664,8 +664,8 @@
     var base = perfilDesdeSesion(u);
     if (!tokenSesion()) {
       inicializarConPerfil(base, false);
-      mostrarAviso('Se muestran los datos básicos de tu inicio de sesión. Para cargar y guardar el perfil completo, el backend debe emitir un token de sesión y publicar la ruta del perfil.');
-      mostrarEstado('Datos de la sesión: perfil completo pendiente del servidor', 'neutral');
+      mostrarAviso('Tu sesión se inició antes de esta actualización o en otra pestaña. Cierra sesión y vuelve a ingresar para cargar y guardar tu perfil completo.');
+      mostrarEstado('Vuelve a iniciar sesión para cargar tu perfil', 'neutral');
       return;
     }
 

@@ -58,6 +58,26 @@
     }
   };
 
+  var API_BASE = 'https://vecired20-production.up.railway.app';
+
+  function clearSessionToken() {
+    try { sessionStorage.removeItem('vecired:token'); } catch (e) { /* sin almacenamiento */ }
+  }
+
+  // Revoca el token en Railway (keepalive sobrevive a la navegación) y lo borra de esta pestaña.
+  function revokeSessionToken() {
+    var token = store.get('token');
+    clearSessionToken();
+    if (typeof token !== 'string' || !token) return;
+    try {
+      fetch(API_BASE + '/logout', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        keepalive: true
+      }).catch(function () { /* el token expira solo a los 7 días */ });
+    } catch (e) { /* fetch no disponible */ }
+  }
+
   function homeFor(page) {
     if (TECH_PAGES.indexOf(page) !== -1) return 'INT-07.html';
     if (CLIENT_PAGES.indexOf(page) !== -1) return 'INT-10.html';
@@ -142,6 +162,7 @@
     },
     current: function () { return store.get('user'); },
     logout: function () {
+      revokeSessionToken();
       try { sessionStorage.removeItem('vecired:user'); sessionStorage.removeItem('vecired:role'); } catch (e) { /* sin almacenamiento */ }
       try { localStorage.setItem('vecired:session-sync', JSON.stringify({ action: 'logout', timestamp: Date.now() })); } catch (e) { /* sincronización entre pestañas no disponible */ }
     },
@@ -371,6 +392,7 @@
             delete publicUser.salt;
             delete publicUser.passwordHash;
 
+            clearSessionToken();
             store.set('user', publicUser);
             store.set('role', user.rol === 'tech' ? 'tech' : user.rol === 'admin' ? 'admin' : 'client');
             return publicUser;
@@ -398,9 +420,13 @@
           var publicUser = Object.assign({}, data, {
             proveedor: 'correo'
           });
+          // El token solo vive en sessionStorage de esta pestaña; nunca se copia a localStorage.
+          delete publicUser.token;
 
           store.set('user', publicUser);
           store.set('role', publicUser.rol);
+          if (typeof data.token === 'string' && data.token) store.set('token', data.token);
+          else clearSessionToken();
 
           return publicUser;
         });
@@ -1707,10 +1733,13 @@
     var sync;
     try { sync = JSON.parse(event.newValue); } catch (e) { return; }
     try {
+      // El token de esta pestaña pertenece a la sesión anterior: se descarta en ambos casos.
       if (sync.action === 'logout') {
+        sessionStorage.removeItem('vecired:token');
         sessionStorage.removeItem('vecired:user');
         sessionStorage.removeItem('vecired:role');
       } else if (sync.action === 'login' && sync.user) {
+        sessionStorage.removeItem('vecired:token');
         sessionStorage.setItem('vecired:user', JSON.stringify(sync.user));
         sessionStorage.setItem('vecired:role', JSON.stringify(sync.role || 'client'));
       }
