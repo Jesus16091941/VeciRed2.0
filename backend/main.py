@@ -1,12 +1,13 @@
 import hashlib
 import os
 import secrets
+import unicodedata
 import uuid
 
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Header, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
@@ -100,15 +101,29 @@ MAX_ETIQUETAS = 15
 
 
 class PrivacidadPerfil(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     mostrar_whatsapp: bool = False
     ocultar_correo: bool = True
 
 
 class NotificacionesPerfil(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     alertas_urgencia: bool = False
 
 
+def clave_etiqueta(etiqueta: str) -> str:
+    # La columna usa utf8mb4_uca1400_ai_ci: ignora mayúsculas y tildes.
+    descompuesta = unicodedata.normalize("NFKD", etiqueta)
+    sin_tildes = "".join(c for c in descompuesta if not unicodedata.combining(c))
+    return sin_tildes.casefold()
+
+
 class ActualizarPerfilProfesional(BaseModel):
+    # Rechaza campos protegidos (nombre legal, RUT, estado de verificación, etc.).
+    model_config = ConfigDict(extra="forbid")
+
     nombre_publico: str = Field(min_length=1, max_length=100)
     # La especialidad verificada no se edita desde INT-08; se acepta y se ignora.
     especialidad: str | None = Field(default=None, max_length=100)
@@ -151,7 +166,7 @@ class ActualizarPerfilProfesional(BaseModel):
                 continue
             if len(etiqueta) > 40:
                 raise ValueError("Cada especialidad puede tener hasta 40 caracteres")
-            clave = etiqueta.casefold()
+            clave = clave_etiqueta(etiqueta)
             if clave in vistas:
                 continue
             vistas.add(clave)

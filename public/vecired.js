@@ -1733,13 +1733,13 @@
     var sync;
     try { sync = JSON.parse(event.newValue); } catch (e) { return; }
     try {
-      // El token de esta pestaña pertenece a la sesión anterior: se descarta en ambos casos.
+      // El token de esta pestaña pertenece a la sesión anterior: se revoca en Railway en ambos casos.
       if (sync.action === 'logout') {
-        sessionStorage.removeItem('vecired:token');
+        revokeSessionToken();
         sessionStorage.removeItem('vecired:user');
         sessionStorage.removeItem('vecired:role');
       } else if (sync.action === 'login' && sync.user) {
-        sessionStorage.removeItem('vecired:token');
+        revokeSessionToken();
         sessionStorage.setItem('vecired:user', JSON.stringify(sync.user));
         sessionStorage.setItem('vecired:role', JSON.stringify(sync.role || 'client'));
       }
