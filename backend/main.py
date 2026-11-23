@@ -1,5 +1,6 @@
 import hashlib
 import os
+import re
 import secrets
 import unicodedata
 import uuid
@@ -7,6 +8,7 @@ import uuid
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Header, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
@@ -1004,47 +1006,128 @@ def nombre_corto_publico(nombre: str | None) -> str:
     return f"{partes[0]} {partes[1][0].upper()}."
 
 
+RUTA_FOTO_PERFIL = re.compile(r"^uploads/profesionales/([0-9a-f]{32}\.(?:jpg|jpeg|png))$")
+FIRMAS_IMAGEN = {
+    ".png": (b"\x89PNG\r\n\x1a\n",),
+    ".jpg": (b"\xff\xd8\xff",),
+    ".jpeg": (b"\xff\xd8\xff",),
+}
+TIPOS_IMAGEN = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}
+
+
+def foto_perfil_segura(conexion, id_perfil: int) -> Path | None:
+    # Solo se sirve el archivo si la ruta registrada tiene el formato que genera
+    # el backend, queda dentro de UPLOAD_DIR y su contenido es realmente PNG/JPEG.
+    ruta = conexion.execute(
+        text("""
+            SELECT ruta_archivo
+            FROM archivos_profesional
+            WHERE id_perfil_profesional = :id_perfil
+                AND tipo_archivo = 'foto_perfil'
+            ORDER BY id_archivo_profesional DESC
+            LIMIT 1
+        """),
+        {"id_perfil": id_perfil}
+    ).scalar()
+
+    coincidencia = RUTA_FOTO_PERFIL.match(ruta or "")
+    if not coincidencia:
+        return None
+
+    base = UPLOAD_DIR.resolve()
+    archivo = (base / coincidencia.group(1)).resolve()
+    if archivo.parent != base or not archivo.is_file():
+        return None
+    if archivo.stat().st_size > MAX_FILE_SIZE:
+        return None
+
+    with open(archivo, "rb") as origen:
+        cabecera = origen.read(8)
+    if not cabecera.startswith(FIRMAS_IMAGEN[archivo.suffix]):
+        return None
+
+    return archivo
+
+
+def perfil_publico_base(conexion, id_usuario: int):
+    return conexion.execute(
+        text("""
+            SELECT
+                pp.id_perfil_profesional,
+                u.nombre,
+                u.correo,
+                COALESCE(pr.ocultar_correo, 1) AS ocultar_correo,
+                pp.nombre_publico,
+                pp.especialidad,
+                pp.descripcion,
+                pp.anos_experiencia,
+                pp.tarifa_visita,
+                pp.tarifa_urgencia,
+                pp.radio_cobertura_km,
+                pp.estado_verificacion,
+                d.barrio
+            FROM perfiles_profesional pp
+            JOIN usuarios u ON u.id_usuario = pp.id_usuario
+            LEFT JOIN privacidad_profesional pr
+                ON pr.id_perfil_profesional = pp.id_perfil_profesional
+            LEFT JOIN direcciones d
+                ON d.id_usuario = u.id_usuario
+                AND d.es_principal = 1
+            WHERE pp.id_usuario = :id_usuario
+                AND u.rol = 'profesional'
+                AND u.estado <> 'bloqueado'
+            ORDER BY pp.id_perfil_profesional
+            LIMIT 1
+        """),
+        {"id_usuario": id_usuario}
+    ).mappings().first()
+
+
+@app.get("/profesionales/{id_usuario}/foto")
+def obtener_foto_publica(id_usuario: int):
+    if id_usuario <= 0:
+        raise HTTPException(status_code=404, detail="Foto no disponible")
+
+    try:
+        with engine.connect() as conexion:
+            perfil = perfil_publico_base(conexion, id_usuario)
+            archivo = foto_perfil_segura(conexion, perfil["id_perfil_profesional"]) if perfil else None
+    except Exception as error:
+        print(f"ERROR AL LEER FOTO PÚBLICA: {error}")
+        raise HTTPException(status_code=404, detail="Foto no disponible") from error
+
+    if not archivo:
+        raise HTTPException(status_code=404, detail="Foto no disponible")
+
+    return FileResponse(
+        archivo,
+        media_type=TIPOS_IMAGEN[archivo.suffix],
+        headers={
+            "Cache-Control": "public, max-age=300",
+            "Content-Disposition": "inline",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )
+
+
 @app.get("/profesionales/{id_usuario}/perfil-publico")
 def obtener_perfil_publico(id_usuario: int):
-    # Solo datos de vitrina: nunca RUT, correo, teléfono, dirección,
-    # nombre legal completo, números de registro ni archivos.
+    # Solo datos de vitrina: nunca RUT, teléfono, dirección, nombre legal completo,
+    # números de registro ni rutas de archivos. El correo solo se entrega cuando el
+    # profesional desactivó ocultar_correo en INT-08. mostrar_whatsapp no aplica aquí:
+    # es solo para clientes con una solicitud aceptada.
     if id_usuario <= 0:
         raise HTTPException(status_code=404, detail="Perfil no disponible")
 
     try:
         with engine.connect() as conexion:
-            perfil = conexion.execute(
-                text("""
-                    SELECT
-                        pp.id_perfil_profesional,
-                        u.nombre,
-                        pp.nombre_publico,
-                        pp.especialidad,
-                        pp.descripcion,
-                        pp.anos_experiencia,
-                        pp.tarifa_visita,
-                        pp.tarifa_urgencia,
-                        pp.radio_cobertura_km,
-                        pp.estado_verificacion,
-                        d.barrio
-                    FROM perfiles_profesional pp
-                    JOIN usuarios u ON u.id_usuario = pp.id_usuario
-                    LEFT JOIN direcciones d
-                        ON d.id_usuario = u.id_usuario
-                        AND d.es_principal = 1
-                    WHERE pp.id_usuario = :id_usuario
-                        AND u.rol = 'profesional'
-                        AND u.estado <> 'bloqueado'
-                    ORDER BY pp.id_perfil_profesional
-                    LIMIT 1
-                """),
-                {"id_usuario": id_usuario}
-            ).mappings().first()
+            perfil = perfil_publico_base(conexion, id_usuario)
 
             if not perfil:
                 raise HTTPException(status_code=404, detail="Perfil no disponible")
 
             id_perfil = perfil["id_perfil_profesional"]
+            foto = foto_perfil_segura(conexion, id_perfil)
 
             etiquetas = conexion.execute(
                 text("""
@@ -1105,6 +1188,8 @@ def obtener_perfil_publico(id_usuario: int):
             {"nombre": c["nombre"], "institucion": c["institucion"] or ""}
             for c in certificaciones
         ],
+        "foto_url": f"/profesionales/{id_usuario}/foto?v={foto.stem[:12]}" if foto else None,
+        "correo": (perfil["correo"] or None) if not perfil["ocultar_correo"] else None,
     }
 
 

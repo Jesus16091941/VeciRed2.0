@@ -101,16 +101,29 @@
     if (leftAside) {
       var img = $('img', leftAside);
       if (img) {
-        img.src = avatarSvg(name);
-        img.alt = name ? 'Iniciales de ' + name + '; aún no hay foto de perfil' : 'Foto de perfil no disponible';
         var wrap = img.parentElement;
         var status = $('.absolute.-bottom-2', wrap);
         if (status) status.remove();
-        if (!$('[data-vr-photo-hint]', wrap.parentElement)) {
-          var photoHint = hint(HINTS.foto);
-          photoHint.setAttribute('data-vr-photo-hint', '');
-          photoHint.classList.add('justify-center', 'text-center', 'mb-space-sm');
-          wrap.insertAdjacentElement('afterend', photoHint);
+        var showInitials = function () {
+          img.onerror = null;
+          img.src = avatarSvg(name);
+          img.alt = name ? 'Iniciales de ' + name + '; aún no hay foto de perfil' : 'Foto de perfil no disponible';
+          if (!$('[data-vr-photo-hint]', wrap.parentElement)) {
+            var photoHint = hint(HINTS.foto);
+            photoHint.setAttribute('data-vr-photo-hint', '');
+            photoHint.classList.add('justify-center', 'text-center', 'mb-space-sm');
+            wrap.insertAdjacentElement('afterend', photoHint);
+          }
+        };
+        var photoPath = typeof d.foto_url === 'string' && /^\/profesionales\/\d+\/foto(\?v=[0-9a-f]+)?$/.test(d.foto_url) ? d.foto_url : '';
+        if (photoPath) {
+          var existingHint = $('[data-vr-photo-hint]', wrap.parentElement);
+          if (existingHint) existingHint.remove();
+          img.onerror = showInitials;
+          img.alt = 'Foto de perfil de ' + (name || 'el profesional');
+          img.src = API_BASE + photoPath;
+        } else {
+          showInitials();
         }
       }
 
@@ -341,6 +354,21 @@
         quote.setAttribute('data-go', 'INT-14.html?profile=' + encodeURIComponent(profileId) + '&destino=specific');
         quote.setAttribute('data-profile-id', profileId);
         quote.setAttribute('aria-label', 'Solicitar presupuesto' + (name ? ' dirigido a ' + name : ''));
+      }
+
+      var oldEmail = $('[data-vr-contact-email]', rightAside);
+      if (oldEmail) oldEmail.remove();
+      var email = typeof d.correo === 'string' ? d.correo.trim() : '';
+      if (quote && /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(email)) {
+        var emailRow = el('p', 'mt-space-sm flex items-center justify-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant');
+        emailRow.setAttribute('data-vr-contact-email', '');
+        emailRow.appendChild(el('span', 'material-symbols-outlined text-[16px] text-secondary', 'mail'));
+        emailRow.firstChild.setAttribute('aria-hidden', 'true');
+        var mail = el('a', 'text-primary font-semibold underline underline-offset-2 break-all', email);
+        mail.href = 'mailto:' + encodeURIComponent(email).replace(/%40/g, '@');
+        mail.setAttribute('aria-label', 'Enviar correo a ' + (name || 'el profesional'));
+        emailRow.appendChild(mail);
+        quote.insertAdjacentElement('afterend', emailRow);
       }
     }
 
