@@ -1015,21 +1015,12 @@ FIRMAS_IMAGEN = {
 TIPOS_IMAGEN = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}
 
 
-def foto_perfil_segura(conexion, id_perfil: int) -> Path | None:
+MAX_FOTOS_TRABAJO_PUBLICAS = 12
+
+
+def imagen_segura(ruta: str | None) -> Path | None:
     # Solo se sirve el archivo si la ruta registrada tiene el formato que genera
     # el backend, queda dentro de UPLOAD_DIR y su contenido es realmente PNG/JPEG.
-    ruta = conexion.execute(
-        text("""
-            SELECT ruta_archivo
-            FROM archivos_profesional
-            WHERE id_perfil_profesional = :id_perfil
-                AND tipo_archivo = 'foto_perfil'
-            ORDER BY id_archivo_profesional DESC
-            LIMIT 1
-        """),
-        {"id_perfil": id_perfil}
-    ).scalar()
-
     coincidencia = RUTA_FOTO_PERFIL.match(ruta or "")
     if not coincidencia:
         return None
@@ -1047,6 +1038,56 @@ def foto_perfil_segura(conexion, id_perfil: int) -> Path | None:
         return None
 
     return archivo
+
+
+def foto_perfil_segura(conexion, id_perfil: int) -> Path | None:
+    ruta = conexion.execute(
+        text("""
+            SELECT ruta_archivo
+            FROM archivos_profesional
+            WHERE id_perfil_profesional = :id_perfil
+                AND tipo_archivo = 'foto_perfil'
+            ORDER BY id_archivo_profesional DESC
+            LIMIT 1
+        """),
+        {"id_perfil": id_perfil}
+    ).scalar()
+
+    return imagen_segura(ruta)
+
+
+def fotos_trabajo_seguras(conexion, id_perfil: int, id_archivo: int | None = None) -> list[tuple[int, Path]]:
+    filas = conexion.execute(
+        text("""
+            SELECT id_archivo_profesional, ruta_archivo
+            FROM archivos_profesional
+            WHERE id_perfil_profesional = :id_perfil
+                AND tipo_archivo = 'fotografia_trabajo'
+                AND (:id_archivo IS NULL OR id_archivo_profesional = :id_archivo)
+            ORDER BY id_archivo_profesional DESC
+            LIMIT :limite
+        """),
+        {"id_perfil": id_perfil, "id_archivo": id_archivo, "limite": MAX_FOTOS_TRABAJO_PUBLICAS}
+    ).mappings().all()
+
+    fotos = []
+    for fila in filas:
+        archivo = imagen_segura(fila["ruta_archivo"])
+        if archivo:
+            fotos.append((fila["id_archivo_profesional"], archivo))
+    return fotos
+
+
+def respuesta_imagen(archivo: Path) -> FileResponse:
+    return FileResponse(
+        archivo,
+        media_type=TIPOS_IMAGEN[archivo.suffix],
+        headers={
+            "Cache-Control": "public, max-age=300",
+            "Content-Disposition": "inline",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )
 
 
 def perfil_publico_base(conexion, id_usuario: int):
@@ -1099,15 +1140,26 @@ def obtener_foto_publica(id_usuario: int):
     if not archivo:
         raise HTTPException(status_code=404, detail="Foto no disponible")
 
-    return FileResponse(
-        archivo,
-        media_type=TIPOS_IMAGEN[archivo.suffix],
-        headers={
-            "Cache-Control": "public, max-age=300",
-            "Content-Disposition": "inline",
-            "X-Content-Type-Options": "nosniff",
-        },
-    )
+    return respuesta_imagen(archivo)
+
+
+@app.get("/profesionales/{id_usuario}/trabajos/{id_archivo}")
+def obtener_foto_trabajo_publica(id_usuario: int, id_archivo: int):
+    if id_usuario <= 0 or id_archivo <= 0:
+        raise HTTPException(status_code=404, detail="Foto no disponible")
+
+    try:
+        with engine.connect() as conexion:
+            perfil = perfil_publico_base(conexion, id_usuario)
+            fotos = fotos_trabajo_seguras(conexion, perfil["id_perfil_profesional"], id_archivo) if perfil else []
+    except Exception as error:
+        print(f"ERROR AL LEER FOTO DE TRABAJO: {error}")
+        raise HTTPException(status_code=404, detail="Foto no disponible") from error
+
+    if not fotos:
+        raise HTTPException(status_code=404, detail="Foto no disponible")
+
+    return respuesta_imagen(fotos[0][1])
 
 
 @app.get("/profesionales/{id_usuario}/perfil-publico")
@@ -1128,6 +1180,7 @@ def obtener_perfil_publico(id_usuario: int):
 
             id_perfil = perfil["id_perfil_profesional"]
             foto = foto_perfil_segura(conexion, id_perfil)
+            fotos_trabajo = fotos_trabajo_seguras(conexion, id_perfil)
 
             etiquetas = conexion.execute(
                 text("""
@@ -1189,6 +1242,10 @@ def obtener_perfil_publico(id_usuario: int):
             for c in certificaciones
         ],
         "foto_url": f"/profesionales/{id_usuario}/foto?v={foto.stem[:12]}" if foto else None,
+        "trabajos": [
+            {"url": f"/profesionales/{id_usuario}/trabajos/{id_archivo}"}
+            for id_archivo, _ in fotos_trabajo
+        ],
         "correo": (perfil["correo"] or None) if not perfil["ocultar_correo"] else None,
     }
 

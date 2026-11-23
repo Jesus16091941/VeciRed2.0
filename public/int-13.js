@@ -169,14 +169,14 @@
 
       var rating = $all('.text-headline-lg', leftAside).find(function (n) { return n.tagName !== 'H1'; });
       if (rating) {
-        rating.textContent = '—';
+        rating.textContent = '0';
         var starRow = rating.parentElement && $('.text-amber-500', rating.parentElement);
         if (starRow) $all('.material-symbols-outlined', starRow).forEach(function (s) {
           s.style.fontVariationSettings = "'FILL' 0";
         });
       }
       var reviewCount = byText('span', /reseñas locales/, leftAside);
-      if (reviewCount) reviewCount.textContent = '0 reseñas locales';
+      if (reviewCount) reviewCount.textContent = 'Aún no tiene calificaciones · 0 reseñas locales';
       var satisfaction = byText('span', /Satisfacción|Sin evaluaciones/, leftAside);
       if (satisfaction) satisfaction.textContent = 'Sin evaluaciones';
 
@@ -265,22 +265,51 @@
     var gallery = sectionByHeading('Galería de Trabajos');
     if (gallery) {
       var gGrid = $('.grid', gallery);
-      if (gGrid) setContent(gGrid, hint(HINTS.galeria));
       var gCount = $('.flex.items-center.justify-between > span', gallery);
-      if (gCount) gCount.textContent = '';
+      var works = (Array.isArray(d.trabajos) ? d.trabajos : []).filter(function (w) {
+        return w && typeof w.url === 'string' && /^\/profesionales\/\d+\/trabajos\/\d+$/.test(w.url);
+      });
+      var updateCount = function (n) { if (gCount) gCount.textContent = n ? n + (n === 1 ? ' fotografía' : ' fotografías') : ''; };
+      if (gGrid) {
+        gGrid.textContent = '';
+        if (works.length) {
+          works.forEach(function (w, i) {
+            var item = el('article', 'rounded-lg overflow-hidden border border-outline-variant/30 bg-surface flex flex-col');
+            item.setAttribute('data-vr-work', '');
+            var frame = el('div', 'relative h-40 overflow-hidden bg-surface-container');
+            var photo = el('img', 'w-full h-full object-cover');
+            photo.loading = 'lazy';
+            photo.alt = 'Fotografía ' + (i + 1) + ' de un trabajo realizado por ' + (name || 'el profesional');
+            photo.onerror = function () {
+              item.remove();
+              var left = $all('[data-vr-work]', gGrid).length;
+              updateCount(left);
+              if (!left) setContent(gGrid, hint(HINTS.galeria));
+            };
+            photo.src = API_BASE + w.url;
+            frame.appendChild(photo);
+            frame.appendChild(el('span', 'absolute top-2 left-2 bg-primary/80 text-white font-label-sm text-[10px] px-2 py-0.5 rounded', 'Trabajo realizado'));
+            item.appendChild(frame);
+            gGrid.appendChild(item);
+          });
+        } else {
+          gGrid.appendChild(hint(HINTS.galeria));
+        }
+      }
+      updateCount(works.length);
     }
 
     var reviews = sectionByHeading('Opiniones de Vecinos');
     if (reviews) {
       var list = $('.space-y-space-lg.mt-space-md', reviews);
+      // MariaDB aún no tiene reseñas: se quitan las de ejemplo y las guardadas solo en este navegador.
       if (list) {
-        $all(':scope > article:not([data-vr-user-review])', list).forEach(function (a) {
-          if (!a.classList.contains('bg-secondary-container/20')) a.remove();
-        });
-        if (!$('article', list) && !$('[data-vr-hint]', list)) list.appendChild(hint(HINTS.resenas));
+        setContent(list, hint(HINTS.resenas));
+        var sentNotice = list.previousElementSibling;
+        if (sentNotice && /Tu evaluación ya aparece/.test(sentNotice.textContent)) sentNotice.remove();
       }
       var allTab = $('button', reviews);
-      if (allTab && /\(\d+\)/.test(allTab.textContent) && !$('article', reviews)) allTab.textContent = 'Todas (0)';
+      if (allTab && /\(\d+\)/.test(allTab.textContent)) allTab.textContent = 'Todas (0)';
       var more = byText('button', /opiniones restantes/, reviews);
       if (more && more.parentElement) more.parentElement.remove();
     }
@@ -391,6 +420,18 @@
       notice.remove();
     }
   }
+
+  var current = { data: null, error: null };
+  var paint = render;
+  render = function (p, error) {
+    current = { data: p, error: error };
+    paint(p, error);
+  };
+  // El script en línea de reseñas locales de INT-13 corre en DOMContentLoaded;
+  // se vuelve a pintar después para que nunca queden datos que no vienen de MariaDB.
+  document.addEventListener('DOMContentLoaded', function () {
+    paint(current.data, current.error);
+  });
 
   var grid = $('main .grid.lg\\:grid-cols-12');
   render(null);
