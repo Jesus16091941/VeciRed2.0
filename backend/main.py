@@ -988,6 +988,126 @@ def obtener_mi_perfil(authorization: str | None = Header(default=None)):
         ) from error
 
 
+# ------------------------------------------
+# INT-13: perfil público de un profesional
+# ------------------------------------------
+
+ESTADOS_VERIFICADOS = {"verificado", "validado", "aprobado"}
+
+
+def nombre_corto_publico(nombre: str | None) -> str:
+    partes = (nombre or "").split()
+    if not partes:
+        return ""
+    if len(partes) == 1:
+        return partes[0]
+    return f"{partes[0]} {partes[1][0].upper()}."
+
+
+@app.get("/profesionales/{id_usuario}/perfil-publico")
+def obtener_perfil_publico(id_usuario: int):
+    # Solo datos de vitrina: nunca RUT, correo, teléfono, dirección,
+    # nombre legal completo, números de registro ni archivos.
+    if id_usuario <= 0:
+        raise HTTPException(status_code=404, detail="Perfil no disponible")
+
+    try:
+        with engine.connect() as conexion:
+            perfil = conexion.execute(
+                text("""
+                    SELECT
+                        pp.id_perfil_profesional,
+                        u.nombre,
+                        pp.nombre_publico,
+                        pp.especialidad,
+                        pp.descripcion,
+                        pp.anos_experiencia,
+                        pp.tarifa_visita,
+                        pp.tarifa_urgencia,
+                        pp.radio_cobertura_km,
+                        pp.estado_verificacion,
+                        d.barrio
+                    FROM perfiles_profesional pp
+                    JOIN usuarios u ON u.id_usuario = pp.id_usuario
+                    LEFT JOIN direcciones d
+                        ON d.id_usuario = u.id_usuario
+                        AND d.es_principal = 1
+                    WHERE pp.id_usuario = :id_usuario
+                        AND u.rol = 'profesional'
+                        AND u.estado <> 'bloqueado'
+                    ORDER BY pp.id_perfil_profesional
+                    LIMIT 1
+                """),
+                {"id_usuario": id_usuario}
+            ).mappings().first()
+
+            if not perfil:
+                raise HTTPException(status_code=404, detail="Perfil no disponible")
+
+            id_perfil = perfil["id_perfil_profesional"]
+
+            etiquetas = conexion.execute(
+                text("""
+                    SELECT etiqueta
+                    FROM etiquetas_profesional
+                    WHERE id_perfil_profesional = :id_perfil
+                    ORDER BY orden, id_etiqueta
+                """),
+                {"id_perfil": id_perfil}
+            ).scalars().all()
+
+            comunas = conexion.execute(
+                text("""
+                    SELECT comuna
+                    FROM comunas_cobertura_profesional
+                    WHERE id_perfil_profesional = :id_perfil
+                    ORDER BY comuna
+                """),
+                {"id_perfil": id_perfil}
+            ).scalars().all()
+
+            certificaciones = conexion.execute(
+                text("""
+                    SELECT nombre, institucion
+                    FROM certificaciones_profesional
+                    WHERE id_perfil_profesional = :id_perfil
+                        AND estado = 'validado'
+                    ORDER BY fecha_registro DESC, id_certificacion DESC
+                """),
+                {"id_perfil": id_perfil}
+            ).mappings().all()
+
+    except HTTPException:
+        raise
+
+    except Exception as error:
+        print(f"ERROR AL LEER PERFIL PÚBLICO: {error}")
+        raise HTTPException(
+            status_code=500,
+            detail="No se pudo cargar el perfil"
+        ) from error
+
+    return {
+        "id": id_usuario,
+        "nombre_corto": nombre_corto_publico(perfil["nombre"]),
+        "nombre_publico": perfil["nombre_publico"] or "",
+        "especialidad": perfil["especialidad"] or "",
+        "descripcion": perfil["descripcion"] or "",
+        "anos_experiencia": perfil["anos_experiencia"],
+        "tarifa_visita": perfil["tarifa_visita"],
+        "tarifa_urgencia": perfil["tarifa_urgencia"],
+        "radio_cobertura_km": perfil["radio_cobertura_km"],
+        "barrio": perfil["barrio"] or "",
+        "verificado": (perfil["estado_verificacion"] or "").lower() in ESTADOS_VERIFICADOS,
+        "etiquetas": list(etiquetas),
+        "comunas": list(comunas),
+        "certificaciones": [
+            {"nombre": c["nombre"], "institucion": c["institucion"] or ""}
+            for c in certificaciones
+        ],
+    }
+
+
 @app.put("/profesionales/me/perfil")
 def actualizar_mi_perfil(
     datos: ActualizarPerfilProfesional,

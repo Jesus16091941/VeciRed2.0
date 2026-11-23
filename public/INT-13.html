@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="vecired.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
 <script src="vecired.js" defer></script>
+<script src="int-13.js" defer></script>
 </head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest border-b border-outline-variant/40 shadow-[0_1px_8px_rgba(15,41,66,0.04)]"><div class="h-16 max-w-container-max mx-auto px-space-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-secondary text-[32px]" aria-hidden="true">hub</span><span class="font-headline-sm text-headline-sm text-primary tracking-tight">VeciRed</span></div><div class="hidden lg:flex items-center gap-space-2xs bg-surface-container-low border border-outline-variant/60 rounded-full px-space-sm py-1"><span class="material-symbols-outlined text-secondary text-[16px]">location_on</span><span class="font-label-sm text-label-sm text-secondary uppercase">Tu Barrio:</span><span id="spanUbicacion" class="font-label-sm text-label-sm text-on-surface font-semibold">Santiago Centro / Barrio Lastarria</span></div></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="text-primary font-bold border-b-2 border-primary">
   <a id="btnComoFunciona" class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 cursor-pointer" data-path="como-funciona" href="INT-01.html">Cómo funciona</a>
 
@@ -519,6 +520,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   var params = new URLSearchParams(window.location.search);
   var requested = params.get('profile') || '';
+  // Los perfiles reales (id numérico de MariaDB) los pinta int-13.js.
+  if (/^\d+$/.test(requested)) return;
   var user = window.VeciRed && window.VeciRed.users ? window.VeciRed.users.current() : null;
   var profile = profiles[requested];
   if (!profile && user && user.rol === 'tech') {
